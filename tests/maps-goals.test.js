@@ -8,23 +8,24 @@ import { tryCollectGem } from '../js/game/gems/collect.js';
 import { spawnGemPickup } from '../js/game/gems/pickups.js';
 
 test('computeMapGoalProgress tracks collected diamonds', () => {
-  const world = new World(32, 32, 1);
+  const world = new World(280, 200, 1);
   createFreshMapSession(world, sandboxMap);
 
   let progress = computeMapGoalProgress(world, sandboxMap);
-  assert.equal(progress.mapLabel, 'Sandbox');
+  assert.equal(progress.mapLabel, 'Tutorial');
   assert.equal(progress.gems?.[0]?.collected, 0);
-  assert.equal(progress.gems?.[0]?.target, 3);
+  assert.equal(progress.gems?.[0]?.target, 2);
   assert.equal(progress.allComplete, false);
 
-  tryCollectGem(world, 120, 40);
+  const gem = world.gemPickups[0];
+  tryCollectGem(world, gem.x, gem.y);
   progress = computeMapGoalProgress(world, sandboxMap);
   assert.equal(progress.gems?.[0]?.collected, 1);
   assert.equal(progress.allComplete, false);
 });
 
 test('computeMapGoalProgress marks level complete when all gems stored', () => {
-  const world = new World(32, 32, 1);
+  const world = new World(280, 200, 1);
   createFreshMapSession(world, sandboxMap);
 
   for (const gem of [...world.gemPickups]) {
@@ -32,8 +33,7 @@ test('computeMapGoalProgress marks level complete when all gems stored', () => {
   }
 
   const progress = computeMapGoalProgress(world, sandboxMap);
-  assert.equal(progress.gems?.[0]?.collected, 3);
-  assert.equal(progress.gems?.[0]?.complete, true);
+  assert.equal(progress.gems?.find((g) => g.itemId === 'diamond')?.collected, 2);
   assert.equal(progress.allComplete, true);
 });
 

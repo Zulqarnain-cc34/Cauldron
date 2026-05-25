@@ -23,6 +23,7 @@
  * @property {Record<string, boolean>} [defaultRules] per-map rule toggles
  * @property {boolean} [resetClearsInventory] clear backpack/jar on Reset (default false)
  * @property {{ gems?: Record<string, number> }} [goals] collect targets per gem item id
+ * @property {boolean} [randomSeedOnReset] new procedural layout each Reset (R)
  * @property {MapHooks} [hooks] optional custom session data
  */
 

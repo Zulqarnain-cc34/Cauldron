@@ -34,3 +34,6 @@ export {
 } from './goals.js';
 
 export { BUILTIN_MAPS, sandboxMap, workshopMap } from './definitions/index.js';
+
+export { generateShaftWorld } from './generators/shaft.js';
+export { shaftMap } from './definitions/shaft.js';

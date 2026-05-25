@@ -42,8 +42,11 @@ export {
   createMapManager,
   BUILTIN_MAPS,
   sandboxMap,
+  shaftMap,
   workshopMap,
 } from '../game/maps/index.js';
+
+export { generateShaftWorld } from '../game/maps/generators/shaft.js';
 
 export {
   computeMapGoalProgress,

@@ -15,7 +15,7 @@ test('switchTo keeps separate map sessions like two apps', () => {
   clearMapRegistry();
   registerMapDefinitions([sandboxMap, workshopMap]);
 
-  const world = new World(32, 32, 1);
+  const world = new World(280, 200, 1);
   const manager = createMapManager({ world, initialMapId: 'sandbox' });
   manager.init('sandbox');
 
@@ -38,7 +38,7 @@ test('switchTo keeps separate map sessions like two apps', () => {
   assert.deepEqual(world.cells, sandboxCells);
   assert.equal(world.tick, sandboxTick);
   assert.equal(world.backpack.slots.find(Boolean)?.count, 2);
-  assert.equal(world.gemPickups.length, 4);
+  assert.equal(world.gemPickups.length, 5);
 
   manager.switchTo('workshop');
   assert.equal(world.tick, workshopTick);

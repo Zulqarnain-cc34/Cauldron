@@ -115,7 +115,11 @@ export class MapManager {
       : null;
 
     this.world.reset();
-    this.world.seed = def.seed ?? this.world.seed;
+    if (def.randomSeedOnReset) {
+      this.world.seed = ((Date.now() & 0xffffffff) ^ (def.seed ?? 0)) >>> 0;
+    } else {
+      this.world.seed = def.seed ?? this.world.seed;
+    }
     clearGemPickups(this.world);
 
     if (def.defaultRules) {
