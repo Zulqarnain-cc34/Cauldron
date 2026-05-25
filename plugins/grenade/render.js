@@ -1,6 +1,6 @@
 /** Draw in-flight grenades using grenade.png sprite overlay. */
 
-import { displayCellPx } from '../../js/world.js';
+import { displayCellPx } from '../../js/cauldron/plugin.js';
 
 /** @type {import('p5').Image | null} */
 let sprite = null;

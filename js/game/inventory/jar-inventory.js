@@ -12,7 +12,7 @@ export function createJarInventory(cols = JAR_COLS, rows = JAR_ROWS) {
 }
 
 /**
- * @param {import('../world.js').World} world
+ * @param {import('../../world.js').World} world
  * @param {string} itemId
  * @param {number} [amount]
  * @returns {number} leftover that did not fit

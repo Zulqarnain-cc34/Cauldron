@@ -1,8 +1,7 @@
-import { getItemDef, itemSwatchColor } from '../sim/item-catalog.js';
-import { getSlot } from '../sim/slot-inventory.js';
+import { getItemDef, itemSwatchColor, getSlot } from '../cauldron/game.js';
 
 /**
- * @param {import('../sim/slot-inventory.js').SlotInventory} inv
+ * @param {import('../game/inventory/slot-inventory.js').SlotInventory} inv
  * @param {HTMLElement} grid
  * @returns {{ slot: HTMLButtonElement, iconEl: HTMLImageElement, swatchEl: HTMLSpanElement, labelEl: HTMLSpanElement, countEl: HTMLSpanElement }[]}
  */
@@ -50,7 +49,7 @@ export function buildInventoryGrid(inv, grid) {
 
 /**
  * @param {ReturnType<typeof buildInventoryGrid>} slotEls
- * @param {import('../sim/slot-inventory.js').SlotInventory} inv
+ * @param {import('../game/inventory/slot-inventory.js').SlotInventory} inv
  */
 export function refreshInventoryGrid(slotEls, inv) {
   slotEls.forEach(({ slot, iconEl, swatchEl, labelEl, countEl }, index) => {
@@ -114,7 +113,7 @@ export function isTypingTarget(target) {
  * @param {string} opts.hotkeyLabel
  * @param {string} [opts.hotkeyCode]
  * @param {string} opts.hint
- * @param {() => import('../sim/slot-inventory.js').SlotInventory} opts.getInventory
+ * @param {() => import('../game/inventory/slot-inventory.js').SlotInventory} opts.getInventory
  * @param {HTMLElement} opts.toolbar
  * @param {string} [opts.toggleClass] extra class on toolbar button
  * @param {(open: boolean) => void} [opts.onOpenChange]

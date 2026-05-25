@@ -23,4 +23,6 @@ export {
   getPluginTestSuites,
 } from '../plugins/host.js';
 export { getToggleableRules } from '../sim/test-registry.js';
+export { ruleMatchesQuery } from '../catalog/rule-toggle-catalog.js';
 export { BRUSH_TOOLS, buildBrushTools, setupInput, queueBrush, applyBrushQueue } from '../input.js';
+export { renderWorld, canvasSize } from '../render.js';

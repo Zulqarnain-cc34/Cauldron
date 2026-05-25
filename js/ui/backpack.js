@@ -2,7 +2,7 @@ import {
   BACKPACK_COLS,
   BACKPACK_ROWS,
   createBackpackInventory,
-} from '../sim/backpack-inventory.js';
+} from '../cauldron/game.js';
 import { mountInventoryContainer } from './inventory-ui.js';
 
 const BACKPACK_ICON = '/assets/backpack.png';

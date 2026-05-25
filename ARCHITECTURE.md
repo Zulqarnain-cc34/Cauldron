@@ -8,10 +8,11 @@ Cauldron is a **layered library** for falling-sand simulation. Each layer talks 
 ├─────────────────────────────────────────────────────────────┤
 │  L6 Plugins    plugins/grenade, plugins/your-thing/         │  ← you build here
 ├─────────────────────────────────────────────────────────────┤
-│  L5 App        sketch.js, js/ui/, js/input.js, js/app/     │
+│  L5 App        sketch.js, js/ui/, js/input.js, js/render.js, js/app/ │
+│                js/game/  (maps, inventory — per-map sessions)        │
 ├─────────────────────────────────────────────────────────────┤
 │  L4 SDK        js/cauldron/   ◄── PUBLIC API                │
-│                plugin.js | app.js | tooling.js | bootstrap    │
+│                plugin.js | app.js | game.js | tooling.js | bootstrap │
 ├─────────────────────────────────────────────────────────────┤
 │  L3 Runtime    js/sim/, js/rules/                           │
 │                rule-store, manifest, toggle-registry, lifecycle│
@@ -29,7 +30,8 @@ Cauldron is a **layered library** for falling-sand simulation. Each layer talks 
 | Who | May import |
 |-----|------------|
 | **Plugins** (`plugins/`) | `js/cauldron/plugin.js` (or full `index.js`) |
-| **App** (`sketch.js`, `js/ui/`) | `js/cauldron/app.js` + L5 modules |
+| **App** (`sketch.js`, `js/ui/`, `js/input.js`, `js/render.js`) | `js/cauldron/app.js` + `js/cauldron/game.js` + other L5 peers |
+| **Game** (`js/game/`) | L0–L3 + `js/game/*` (maps, inventory — not core sim) |
 | **Tooling** (`docs/`, `tests/`) | `js/cauldron/tooling.js` + test helpers |
 | **Runtime** (L3) | L0–L2 only |
 | **Engine** (L2) | L0–L1 |
@@ -60,7 +62,8 @@ Behavior tests can assert internal state with an optional `inspect(world)` hook 
 | Module | Audience | Exports |
 |--------|----------|---------|
 | `cauldron/plugin.js` | Plugin authors | `Species`, `World`, `registerPlugin`, engine primitives |
-| `cauldron/app.js` | Host apps | `runRules`, `getToggleableRules`, `renderPlugins`, brush tools |
+| `cauldron/app.js` | Host apps | `runRules`, `getToggleableRules`, `renderPlugins`, brush, render |
+| `cauldron/game.js` | Host apps | maps, inventory, multi-tab sessions |
 | `cauldron/tooling.js` | Docs & tests | `buildDocCatalog`, `getAllTestSuites` |
 | `cauldron/extend.js` | **Library authors** | `registerMaterialPack`, `registerReaction`, `allocateSpecies` |
 | `cauldron/bootstrap.js` | Startup | `bootstrapSandbox()` — wires rules, plugins, lifecycle |
@@ -75,6 +78,15 @@ Behavior tests can assert internal state with an optional `inspect(world)` hook 
 | `sim/test-registry.js` | Compile rules, toggles, behaviors, test suites |
 | `sim/toggle-registry.js` | Plugin/extension UI toggles (no host cycle) |
 | `sim/lifecycle.js` | `onWorldReset()` — kernel stays plugin-agnostic |
+
+### L5 game modules (`js/game/`)
+
+| Module | Role |
+|--------|------|
+| `game/inventory/` | Item catalog, slot stacks, backpack & jar (not L3 sim) |
+| `game/maps/` | Map registry, session snapshots, tab switching |
+
+Register a new map unit: add `js/game/maps/definitions/your-map.js`, export from `definitions/index.js`, register via `registerMapDefinitions()` at startup.
 
 ### Add a core material (L1–L3)
 

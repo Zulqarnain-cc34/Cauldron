@@ -1,4 +1,4 @@
-import { Species } from '../catalog/species.js';
+import { Species } from '../../catalog/species.js';
 
 /** Classic sand-on-floor demo. */
 export function bootstrapSandbox(world) {

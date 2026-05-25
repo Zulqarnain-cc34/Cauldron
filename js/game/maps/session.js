@@ -1,5 +1,5 @@
-import { createBackpackInventory } from '../sim/backpack-inventory.js';
-import { createJarInventory } from '../sim/jar-inventory.js';
+import { createBackpackInventory } from '../inventory/backpack-inventory.js';
+import { createJarInventory } from '../inventory/jar-inventory.js';
 
 /**
  * Serializable snapshot of one map tab — grid, sim, inventories, settings.
@@ -14,12 +14,12 @@ import { createJarInventory } from '../sim/jar-inventory.js';
  * @property {{ species: number, radius: number }} brush
  * @property {Record<string, boolean>} ruleEnabled
  * @property {Record<string, unknown>} plugin
- * @property {import('../sim/slot-inventory.js').SlotInventory} backpack
- * @property {import('../sim/slot-inventory.js').SlotInventory} jar
+ * @property {import('../inventory/slot-inventory.js').SlotInventory} backpack
+ * @property {import('../inventory/slot-inventory.js').SlotInventory} jar
  * @property {Record<string, unknown>} [custom]
  */
 
-/** @param {import('../sim/slot-inventory.js').SlotInventory} inv */
+/** @param {import('../inventory/slot-inventory.js').SlotInventory} inv */
 export function cloneSlotInventory(inv) {
   return {
     cols: inv.cols,
@@ -28,7 +28,7 @@ export function cloneSlotInventory(inv) {
   };
 }
 
-/** @param {import('../world.js').World} world @param {{ mapId: string, label: string, custom?: Record<string, unknown> }} meta */
+/** @param {import('../../world.js').World} world @param {{ mapId: string, label: string, custom?: Record<string, unknown> }} meta */
 export function captureMapSession(world, meta) {
   return {
     mapId: meta.mapId,
@@ -55,7 +55,7 @@ export function captureMapSession(world, meta) {
 }
 
 /**
- * @param {import('../world.js').World} world
+ * @param {import('../../world.js').World} world
  * @param {MapSession} session
  */
 export function applyMapSession(world, session) {
@@ -80,7 +80,7 @@ export function applyMapSession(world, session) {
 }
 
 /**
- * @param {import('../world.js').World} world
+ * @param {import('../../world.js').World} world
  * @param {import('./registry.js').MapDefinition} def
  */
 export function createFreshMapSession(world, def) {
@@ -122,7 +122,7 @@ export function createFreshMapSession(world, def) {
 }
 
 /**
- * @param {import('../world.js').World} world
+ * @param {import('../../world.js').World} world
  * @param {MapSession} session
  * @param {import('./registry.js').MapDefinition} def
  */

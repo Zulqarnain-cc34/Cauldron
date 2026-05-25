@@ -1,5 +1,5 @@
 import { Species } from '../../catalog/species.js';
-import { addStack } from '../../sim/slot-inventory.js';
+import { addStack } from '../../inventory/slot-inventory.js';
 
 /** Stone chamber with water pocket — separate session defaults for Gem Digger prep. */
 export function bootstrapWorkshop(world) {

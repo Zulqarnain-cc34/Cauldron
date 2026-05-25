@@ -83,10 +83,36 @@ for (const file of walk(ROOT)) {
       }
     }
 
-    // L5 App UI — prefer cauldron/app over direct L3 sim imports
+    // L3 Sim — no game layer (inventory/maps are L5 game, not core sim)
+    if (rel.startsWith('js/sim/')) {
+      if (target.startsWith('js/game/')) {
+        violations.push(`${rel}: sim runtime must not import game layer (${spec}) → ${target}`);
+      }
+    }
+
+    // L5 Game — no UI (presentation mounts from sketch)
+    if (rel.startsWith('js/game/')) {
+      if (target.startsWith('js/ui/')) {
+        violations.push(`${rel}: game layer must not import UI (${spec}) → ${target}`);
+      }
+    }
+
+    // L5 App UI — use SDK barrels, not deep L1/L3/game paths
     if (rel.startsWith('js/ui/')) {
       if (target.startsWith('js/sim/test-registry') || target.startsWith('js/rules/registry')) {
         violations.push(`${rel}: UI should import cauldron/app.js, not ${target}`);
+      }
+      if (target.startsWith('js/catalog/')) {
+        violations.push(`${rel}: UI should import cauldron/app.js, not ${target}`);
+      }
+      if (target.startsWith('js/sim/') && !target.startsWith('js/sim/')) {
+        /* unreachable */
+      }
+      if (target.startsWith('js/sim/')) {
+        violations.push(`${rel}: UI should import cauldron/app.js or cauldron/game.js, not ${target}`);
+      }
+      if (target.startsWith('js/game/')) {
+        violations.push(`${rel}: UI should import cauldron/game.js, not ${target}`);
       }
     }
   }

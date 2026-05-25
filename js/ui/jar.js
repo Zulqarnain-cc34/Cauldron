@@ -1,4 +1,4 @@
-import { JAR_COLS, JAR_ROWS, createJarInventory } from '../sim/jar-inventory.js';
+import { JAR_COLS, JAR_ROWS, createJarInventory } from '../cauldron/game.js';
 import { mountInventoryContainer } from './inventory-ui.js';
 
 const JAR_ICON = '/assets/jar.png';

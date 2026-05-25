@@ -1,8 +1,8 @@
-import { getAllMapDefinitions } from '../maps/registry.js';
+import { getAllMapDefinitions } from '../cauldron/game.js';
 
 /**
  * Map tab bar — switch between registered map units (separate sessions).
- * @param {import('../maps/manager.js').MapManager} manager
+ * @param {import('../game/maps/manager.js').MapManager} manager
  * @param {HTMLElement | null} hostEl
  */
 export function mountMapTabs(manager, hostEl) {

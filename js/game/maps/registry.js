@@ -5,10 +5,10 @@
 
 /**
  * @typedef {object} MapHooks
- * @property {(world: import('../world.js').World) => void} [afterBootstrap]
- * @property {(world: import('../world.js').World) => Record<string, unknown>} [initialCustom]
- * @property {(world: import('../world.js').World, session: import('./session.js').MapSession) => void} [capture]
- * @property {(world: import('../world.js').World, session: import('./session.js').MapSession) => void} [apply]
+ * @property {(world: import('../../world.js').World) => void} [afterBootstrap]
+ * @property {(world: import('../../world.js').World) => Record<string, unknown>} [initialCustom]
+ * @property {(world: import('../../world.js').World, session: import('./session.js').MapSession) => void} [capture]
+ * @property {(world: import('../../world.js').World, session: import('./session.js').MapSession) => void} [apply]
  */
 
 /**
@@ -16,7 +16,7 @@
  * @property {string} id unique tab id (slug)
  * @property {string} label tab title
  * @property {string} [description]
- * @property {(world: import('../world.js').World) => void} bootstrap paint terrain / spawns on fresh load
+ * @property {(world: import('../../world.js').World) => void} bootstrap paint terrain / spawns on fresh load
  * @property {number} [seed] default RNG seed when map first opens
  * @property {boolean} [defaultPaused]
  * @property {{ species?: number, radius?: number }} [defaultBrush]

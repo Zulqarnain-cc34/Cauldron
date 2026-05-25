@@ -1,6 +1,13 @@
-import { World, GRID_W, GRID_H, runRules, renderPlugins } from './js/cauldron/app.js';
+import {
+  World,
+  GRID_W,
+  GRID_H,
+  runRules,
+  renderPlugins,
+  renderWorld,
+  canvasSize,
+} from './js/cauldron/app.js';
 import { bootstrapSandbox } from './js/cauldron/bootstrap.js';
-import { renderWorld, canvasSize } from './js/render.js';
 import { setupInput } from './js/input.js';
 import { mountPanel, bindKeyboard } from './js/ui/panel.js';
 import { mountBackpack } from './js/ui/backpack.js';
@@ -10,7 +17,7 @@ import {
   registerMapDefinitions,
   createMapManager,
   BUILTIN_MAPS,
-} from './js/maps/index.js';
+} from './js/cauldron/game.js';
 
 let world;
 let ui;

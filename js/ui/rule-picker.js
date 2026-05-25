@@ -1,5 +1,4 @@
-import { getMaterial } from '../catalog/materials.js';
-import { ruleMatchesQuery } from '../catalog/rule-toggle-catalog.js';
+import { getMaterial, ruleMatchesQuery } from '../cauldron/app.js';
 
 const MAX_VISIBLE = 80;
 

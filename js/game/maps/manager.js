@@ -5,12 +5,12 @@ import {
   applyMapSessionWithHooks,
   cloneSlotInventory,
 } from './session.js';
-import { createBackpackInventory } from '../sim/backpack-inventory.js';
-import { createJarInventory } from '../sim/jar-inventory.js';
+import { createBackpackInventory } from '../inventory/backpack-inventory.js';
+import { createJarInventory } from '../inventory/jar-inventory.js';
 
 /**
  * @typedef {object} MapManagerOptions
- * @property {import('../world.js').World} world
+ * @property {import('../../world.js').World} world
  * @property {string} [initialMapId]
  * @property {(ctx: { mapId: string, previousMapId: string | null }) => void} [onSwitch]
  */

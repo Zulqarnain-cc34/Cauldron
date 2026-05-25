@@ -14,6 +14,8 @@ export * from './app.js';
 export * from './tooling.js';
 export * from './extend.js';
 
+export * from './game.js';
+
 export { bootstrapSandbox, bootstrapPlugins, loadPlugins } from './bootstrap.js';
 
 /** Back-compat alias */
