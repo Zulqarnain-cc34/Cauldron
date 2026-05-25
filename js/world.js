@@ -24,6 +24,9 @@ export class World {
     this.ruleEnabled = {
       sand: true,
       water: true,
+      fire: true,
+      organic: true,
+      stone: true,
       reactions: true,
       life: false,
       boids: false,

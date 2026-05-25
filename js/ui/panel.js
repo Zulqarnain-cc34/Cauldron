@@ -119,7 +119,10 @@ export function mountPanel(world, callbacks) {
   const rulesEl = root.querySelector('#rule-toggles');
   const ruleDefs = [
     { key: 'sand', label: 'Sand' },
-    { key: 'water', label: 'Water' },
+    { key: 'water', label: 'Water / Steam' },
+    { key: 'fire', label: 'Fire' },
+    { key: 'organic', label: 'Organic' },
+    { key: 'stone', label: 'Stone' },
     { key: 'reactions', label: 'Reactions' },
     { key: 'life', label: 'Life (soon)' },
     { key: 'boids', label: 'Boids (soon)' },

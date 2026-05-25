@@ -39,4 +39,23 @@ export class CellApi {
   randDir() {
     return this.world.randDir();
   }
+
+  randInt(n) {
+    return this.world.randInt(n);
+  }
+
+  /** Random 8-neighbor offset (Sandspiel-style rand_vec). */
+  randVec8() {
+    const dirs = [
+      [0, 1],
+      [0, -1],
+      [1, 0],
+      [-1, 0],
+      [1, 1],
+      [1, -1],
+      [-1, 1],
+      [-1, -1],
+    ];
+    return dirs[this.world.randInt(8)];
+  }
 }

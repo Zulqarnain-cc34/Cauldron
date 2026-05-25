@@ -2,9 +2,20 @@ import { defineMaterial } from './define-material.js';
 import { sandRuleDef } from '../rules/materials/sand.js';
 import { waterRuleDef } from '../rules/materials/water.js';
 import { steamRuleDef } from '../rules/materials/steam.js';
+import { fireRuleDef } from '../rules/materials/fire.js';
+import { organicRuleDef } from '../rules/materials/organic.js';
+import { stoneRuleDef } from '../rules/materials/stone.js';
 import { reactionRuleDef } from '../rules/reactions-module.js';
 
-const RULE_DEFS = [sandRuleDef, waterRuleDef, steamRuleDef, reactionRuleDef];
+const RULE_DEFS = [
+  sandRuleDef,
+  waterRuleDef,
+  steamRuleDef,
+  fireRuleDef,
+  organicRuleDef,
+  stoneRuleDef,
+  reactionRuleDef,
+];
 
 /** @type {import('./define-material.js').RuleModule[] | null} */
 let compiled = null;
