@@ -48,8 +48,19 @@ function runSuite(label = 'test') {
           shell: true,
         });
         beh.on('close', (behCode) => {
-          if (behCode === 0) console.log('\n[test:watch] OK — waiting for changes…');
-          else console.log('\n[test:watch] behavior quality check failed');
+          if (behCode !== 0) {
+            console.log('\n[test:watch] behavior quality check failed');
+            return;
+          }
+          const snap = spawn('npm', ['run', 'check:snapshots', '--silent'], {
+            cwd: ROOT,
+            stdio: 'inherit',
+            shell: true,
+          });
+          snap.on('close', (snapCode) => {
+            if (snapCode === 0) console.log('\n[test:watch] OK — waiting for changes…');
+            else console.log('\n[test:watch] snapshot drift — run npm run snapshot:update if intentional');
+          });
         });
       });
     } else {

@@ -1,0 +1,1414 @@
+{
+  "version": 1,
+  "behaviorCount": 86,
+  "ids": [
+    "acid-corrodes-sand",
+    "acid-fall-straight",
+    "dust-blocked-below",
+    "dust-diagonal-right",
+    "dust-fall-straight",
+    "dust-floats-on-water",
+    "fire-blocked-surrounded",
+    "fire-burns-out",
+    "fire-drifts-to-empty",
+    "fire-extinguish-water",
+    "fire-ignites-organic",
+    "fungus-burns-away",
+    "fungus-grows-on-wood",
+    "fungus-ignite-fire",
+    "gas-blocked-above",
+    "gas-diagonal-up-left",
+    "gas-one-cell-per-tick",
+    "gas-rise-straight",
+    "ice-freezes-water",
+    "ice-melts-fire",
+    "ice-static",
+    "lava-falls",
+    "lava-ignites-gas",
+    "lava-water-stone",
+    "oil-burns-away",
+    "oil-floats-water",
+    "oil-ignite-lava",
+    "oil-spreads-fire",
+    "organic-burns-away",
+    "organic-grows-near-water",
+    "organic-ignite-fire",
+    "organic-spreads-fire-while-burning",
+    "reaction-fire-fungus",
+    "reaction-fire-oil",
+    "reaction-fire-organic-ignites",
+    "reaction-fire-water-horizontal",
+    "reaction-fire-wood",
+    "reaction-no-op-when-separated",
+    "reaction-water-fire-steam",
+    "reaction-water-fire-vertical",
+    "rocket-fall-straight",
+    "sand-blocked-below",
+    "sand-diagonal-blocked-no-retry",
+    "sand-diagonal-left",
+    "sand-diagonal-right",
+    "sand-fall-straight",
+    "sand-fall-two-steps",
+    "sand-flat-floor-center",
+    "sand-no-move-rand-zero",
+    "sand-on-floor",
+    "sand-on-sand-on-wall",
+    "sand-one-cell-per-tick",
+    "sand-rest-on-water",
+    "sand-stack-settles",
+    "sand-three-stack-settles",
+    "seed-fall-straight",
+    "seed-germinates-sand",
+    "steam-blocked-above",
+    "steam-diagonal-up-left",
+    "steam-diagonal-up-right",
+    "steam-one-cell-per-tick",
+    "steam-rise-straight",
+    "steam-rise-two-steps",
+    "stone-blocked-below",
+    "stone-diagonal-left",
+    "stone-diagonal-right",
+    "stone-fall-straight",
+    "stone-flat-floor-center",
+    "stone-on-floor",
+    "stone-sinks-steam",
+    "stone-sinks-water",
+    "stone-stack-settles",
+    "water-blocked-below",
+    "water-boxed-no-spread",
+    "water-fall-straight",
+    "water-fall-two-steps",
+    "water-one-cell-per-tick",
+    "water-rest-on-sand",
+    "water-rest-on-stone",
+    "water-sinks-steam",
+    "water-spread-left",
+    "water-spread-right",
+    "water-stack-settles",
+    "wood-burns-away",
+    "wood-ignite-fire",
+    "wood-spreads-fire"
+  ],
+  "behaviors": {
+    "sand-fall-straight": {
+      "suite": "sand",
+      "name": "Falls straight down",
+      "pass": true,
+      "before": [
+        "S",
+        "."
+      ],
+      "after": [
+        ".",
+        "S"
+      ],
+      "rb": "0,1:0",
+      "inspectError": null
+    },
+    "sand-blocked-below": {
+      "suite": "sand",
+      "name": "Stays when blocked below",
+      "pass": true,
+      "before": [
+        "S",
+        "#"
+      ],
+      "after": [
+        "S",
+        "#"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "sand-stack-settles": {
+      "suite": "sand",
+      "name": "Stack settles one step",
+      "pass": true,
+      "before": [
+        "S",
+        "S",
+        "."
+      ],
+      "after": [
+        ".",
+        "S",
+        "S"
+      ],
+      "rb": "0,1:0|0,2:0",
+      "inspectError": null
+    },
+    "sand-on-floor": {
+      "suite": "sand",
+      "name": "Does not pass through wall",
+      "pass": true,
+      "before": [
+        ".",
+        "S",
+        "#"
+      ],
+      "after": [
+        ".",
+        "S",
+        "#"
+      ],
+      "rb": "0,1:0|0,2:0",
+      "inspectError": null
+    },
+    "sand-fall-two-steps": {
+      "suite": "sand",
+      "name": "Falls two cells in two ticks",
+      "pass": true,
+      "before": [
+        "S",
+        ".",
+        "."
+      ],
+      "after": [
+        ".",
+        ".",
+        "S"
+      ],
+      "rb": "0,2:0",
+      "inspectError": null
+    },
+    "sand-diagonal-left": {
+      "suite": "sand",
+      "name": "Slides down-left",
+      "pass": true,
+      "before": [
+        "..S..",
+        "..#..",
+        "..#.."
+      ],
+      "after": [
+        ".....",
+        ".S#..",
+        "..#.."
+      ],
+      "rb": "1,1:0|2,1:0|2,2:0",
+      "inspectError": null
+    },
+    "sand-diagonal-right": {
+      "suite": "sand",
+      "name": "Slides down-right",
+      "pass": true,
+      "before": [
+        "..S..",
+        "..#..",
+        "..#.."
+      ],
+      "after": [
+        ".....",
+        "..#S.",
+        "..#.."
+      ],
+      "rb": "2,1:0|2,2:0|3,1:0",
+      "inspectError": null
+    },
+    "sand-diagonal-blocked-no-retry": {
+      "suite": "sand",
+      "name": "Stays when chosen diagonal is blocked",
+      "pass": true,
+      "before": [
+        "..S..",
+        ".##..",
+        "....."
+      ],
+      "after": [
+        "..S..",
+        ".##..",
+        "....."
+      ],
+      "rb": "1,1:0|2,0:0|2,1:0",
+      "inspectError": null
+    },
+    "sand-no-move-rand-zero": {
+      "suite": "sand",
+      "name": "Stays when rand picks straight (0)",
+      "pass": true,
+      "before": [
+        "S",
+        "#",
+        "."
+      ],
+      "after": [
+        "S",
+        "#",
+        "."
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "sand-one-cell-per-tick": {
+      "suite": "sand",
+      "name": "Moves at most one cell per tick",
+      "pass": true,
+      "before": [
+        "S",
+        ".",
+        ".",
+        "."
+      ],
+      "after": [
+        ".",
+        "S",
+        ".",
+        "."
+      ],
+      "rb": "0,1:0",
+      "inspectError": null
+    },
+    "sand-on-sand-on-wall": {
+      "suite": "sand",
+      "name": "Stack on wall with no gap stays put",
+      "pass": true,
+      "before": [
+        "S",
+        "S",
+        "#"
+      ],
+      "after": [
+        "S",
+        "S",
+        "#"
+      ],
+      "rb": "0,0:0|0,1:0|0,2:0",
+      "inspectError": null
+    },
+    "sand-flat-floor-center": {
+      "suite": "sand",
+      "name": "Rests on flat floor without sliding",
+      "pass": true,
+      "before": [
+        "...",
+        ".S.",
+        "###"
+      ],
+      "after": [
+        "...",
+        ".S.",
+        "###"
+      ],
+      "rb": "0,2:0|1,1:0|1,2:0|2,2:0",
+      "inspectError": null
+    },
+    "sand-three-stack-settles": {
+      "suite": "sand",
+      "name": "Three-grain stack settles one step",
+      "pass": true,
+      "before": [
+        "S",
+        "S",
+        "S",
+        "."
+      ],
+      "after": [
+        ".",
+        "S",
+        "S",
+        "S"
+      ],
+      "rb": "0,1:0|0,2:0|0,3:0",
+      "inspectError": null
+    },
+    "sand-rest-on-water": {
+      "suite": "sand",
+      "name": "Sinks through water",
+      "pass": true,
+      "before": [
+        "S",
+        "W",
+        "."
+      ],
+      "after": [
+        "W",
+        "S",
+        "."
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "water-fall-straight": {
+      "suite": "water",
+      "name": "Falls straight down",
+      "pass": true,
+      "before": [
+        "W",
+        "."
+      ],
+      "after": [
+        ".",
+        "W"
+      ],
+      "rb": "0,1:0",
+      "inspectError": null
+    },
+    "water-blocked-below": {
+      "suite": "water",
+      "name": "Stays when blocked below",
+      "pass": true,
+      "before": [
+        "W",
+        "#"
+      ],
+      "after": [
+        "W",
+        "#"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "water-fall-two-steps": {
+      "suite": "water",
+      "name": "Falls two cells in two ticks",
+      "pass": true,
+      "before": [
+        "W",
+        ".",
+        "."
+      ],
+      "after": [
+        ".",
+        ".",
+        "W"
+      ],
+      "rb": "0,2:0",
+      "inspectError": null
+    },
+    "water-rest-on-sand": {
+      "suite": "water",
+      "name": "Rests on denser sand",
+      "pass": true,
+      "before": [
+        "W",
+        "S"
+      ],
+      "after": [
+        "W",
+        "S"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "water-spread-right": {
+      "suite": "water",
+      "name": "Spreads horizontally",
+      "pass": true,
+      "before": [
+        ".....",
+        "..W..",
+        "#####"
+      ],
+      "after": [
+        ".....",
+        "...W.",
+        "#####"
+      ],
+      "rb": "0,2:0|1,2:0|2,2:0|3,1:1|3,2:0|4,2:0",
+      "inspectError": null
+    },
+    "water-spread-left": {
+      "suite": "water",
+      "name": "Spreads left when blocked right",
+      "pass": true,
+      "before": [
+        ".....",
+        "..W#.",
+        "#####"
+      ],
+      "after": [
+        ".....",
+        ".W.#.",
+        "#####"
+      ],
+      "rb": "0,2:0|1,1:1|1,2:0|2,2:0|3,1:0|3,2:0|4,2:0",
+      "inspectError": null
+    },
+    "water-one-cell-per-tick": {
+      "suite": "water",
+      "name": "Moves at most one cell per tick",
+      "pass": true,
+      "before": [
+        "W",
+        ".",
+        ".",
+        "."
+      ],
+      "after": [
+        ".",
+        "W",
+        ".",
+        "."
+      ],
+      "rb": "0,1:0",
+      "inspectError": null
+    },
+    "water-sinks-steam": {
+      "suite": "water",
+      "name": "Sinks through lighter steam",
+      "pass": true,
+      "before": [
+        "W",
+        "^",
+        "."
+      ],
+      "after": [
+        "^",
+        "W",
+        "."
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "water-stack-settles": {
+      "suite": "water",
+      "name": "Stack settles one step",
+      "pass": true,
+      "before": [
+        "W",
+        "W",
+        "."
+      ],
+      "after": [
+        ".",
+        "W",
+        "W"
+      ],
+      "rb": "0,1:0|0,2:0",
+      "inspectError": null
+    },
+    "water-boxed-no-spread": {
+      "suite": "water",
+      "name": "Stays when fully boxed",
+      "pass": true,
+      "before": [
+        "###",
+        "#W#",
+        "###"
+      ],
+      "after": [
+        "###",
+        "#W#",
+        "###"
+      ],
+      "rb": "0,0:0|0,1:0|0,2:0|1,0:0|1,1:0|1,2:0|2,0:0|2,1:0|2,2:0",
+      "inspectError": null
+    },
+    "water-rest-on-stone": {
+      "suite": "water",
+      "name": "Rests on denser stone",
+      "pass": true,
+      "before": [
+        "W",
+        "T"
+      ],
+      "after": [
+        "W",
+        "T"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "steam-rise-straight": {
+      "suite": "steam",
+      "name": "Rises straight up",
+      "pass": true,
+      "before": [
+        ".",
+        "^"
+      ],
+      "after": [
+        "^",
+        "."
+      ],
+      "rb": "0,0:0",
+      "inspectError": null
+    },
+    "steam-blocked-above": {
+      "suite": "steam",
+      "name": "Stays when blocked above",
+      "pass": true,
+      "before": [
+        "#",
+        "^"
+      ],
+      "after": [
+        "#",
+        "^"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "steam-rise-two-steps": {
+      "suite": "steam",
+      "name": "Rises two cells in two ticks",
+      "pass": true,
+      "before": [
+        ".",
+        ".",
+        "^"
+      ],
+      "after": [
+        "^",
+        ".",
+        "."
+      ],
+      "rb": "0,0:0",
+      "inspectError": null
+    },
+    "steam-diagonal-up-right": {
+      "suite": "steam",
+      "name": "Rises diagonally up-right",
+      "pass": true,
+      "before": [
+        "..#..",
+        "..^..",
+        "....."
+      ],
+      "after": [
+        "..#^.",
+        ".....",
+        "....."
+      ],
+      "rb": "2,0:0|3,0:0",
+      "inspectError": null
+    },
+    "steam-diagonal-up-left": {
+      "suite": "steam",
+      "name": "Rises diagonally up-left",
+      "pass": true,
+      "before": [
+        "..#..",
+        "..^..",
+        "....."
+      ],
+      "after": [
+        ".^#..",
+        ".....",
+        "....."
+      ],
+      "rb": "1,0:0|2,0:0",
+      "inspectError": null
+    },
+    "steam-one-cell-per-tick": {
+      "suite": "steam",
+      "name": "Moves at most one cell per tick",
+      "pass": true,
+      "before": [
+        ".",
+        ".",
+        ".",
+        "^"
+      ],
+      "after": [
+        ".",
+        ".",
+        "^",
+        "."
+      ],
+      "rb": "0,2:0",
+      "inspectError": null
+    },
+    "fire-burns-out": {
+      "suite": "fire",
+      "name": "Burns out when heat is low",
+      "pass": true,
+      "before": [
+        "F"
+      ],
+      "after": [
+        "."
+      ],
+      "rb": "",
+      "inspectError": null
+    },
+    "fire-extinguish-water": {
+      "suite": "fire",
+      "name": "Dies on contact with water",
+      "pass": true,
+      "before": [
+        "WWW",
+        "WFW",
+        "WWW"
+      ],
+      "after": [
+        "WWW",
+        "W.W",
+        "WWW"
+      ],
+      "rb": "0,0:0|0,1:0|0,2:0|1,0:0|1,2:0|2,0:0|2,1:0|2,2:0",
+      "inspectError": null
+    },
+    "fire-drifts-to-empty": {
+      "suite": "fire",
+      "name": "Drifts into empty neighbor",
+      "pass": true,
+      "before": [
+        "#F.",
+        "###"
+      ],
+      "after": [
+        "#.F",
+        "###"
+      ],
+      "rb": "0,0:0|0,1:0|1,1:0|2,0:0|2,1:0",
+      "inspectError": null
+    },
+    "fire-ignites-organic": {
+      "suite": "fire",
+      "name": "Ignites organic neighbor",
+      "pass": true,
+      "before": [
+        "FO"
+      ],
+      "after": [
+        "FF"
+      ],
+      "rb": "0,0:0|1,0:0",
+      "inspectError": null
+    },
+    "fire-blocked-surrounded": {
+      "suite": "fire",
+      "name": "Stays when surrounded by walls",
+      "pass": true,
+      "before": [
+        "###",
+        "#F#",
+        "###"
+      ],
+      "after": [
+        "###",
+        "#F#",
+        "###"
+      ],
+      "rb": "0,0:0|0,1:0|0,2:0|1,0:0|1,1:0|1,2:0|2,0:0|2,1:0|2,2:0",
+      "inspectError": null
+    },
+    "organic-ignite-fire": {
+      "suite": "organic",
+      "name": "Ignites when touching fire",
+      "pass": true,
+      "before": [
+        "OF"
+      ],
+      "after": [
+        "OF"
+      ],
+      "rb": "0,0:20|1,0:0",
+      "inspectError": null
+    },
+    "organic-burns-away": {
+      "suite": "organic",
+      "name": "Burns away at end of countdown",
+      "pass": true,
+      "before": [
+        "O"
+      ],
+      "after": [
+        "."
+      ],
+      "rb": "",
+      "inspectError": null
+    },
+    "organic-spreads-fire-while-burning": {
+      "suite": "organic",
+      "name": "Spreads fire while burning",
+      "pass": true,
+      "before": [
+        "O."
+      ],
+      "after": [
+        "OF"
+      ],
+      "rb": "0,0:19|1,0:0",
+      "inspectError": null
+    },
+    "organic-grows-near-water": {
+      "suite": "organic",
+      "name": "Grows toward water",
+      "pass": true,
+      "before": [
+        ".....",
+        "..OW.",
+        "....."
+      ],
+      "after": [
+        ".....",
+        ".OOW.",
+        "....."
+      ],
+      "rb": "1,1:0|2,1:0|3,1:0",
+      "inspectError": null
+    },
+    "stone-fall-straight": {
+      "suite": "stone",
+      "name": "Falls straight down",
+      "pass": true,
+      "before": [
+        "T",
+        "."
+      ],
+      "after": [
+        ".",
+        "T"
+      ],
+      "rb": "0,1:0",
+      "inspectError": null
+    },
+    "stone-sinks-water": {
+      "suite": "stone",
+      "name": "Sinks through water",
+      "pass": true,
+      "before": [
+        "T",
+        "W",
+        "."
+      ],
+      "after": [
+        "W",
+        "T",
+        "."
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "stone-blocked-below": {
+      "suite": "stone",
+      "name": "Stays when blocked below",
+      "pass": true,
+      "before": [
+        "T",
+        "#"
+      ],
+      "after": [
+        "T",
+        "#"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "stone-on-floor": {
+      "suite": "stone",
+      "name": "Does not pass through wall",
+      "pass": true,
+      "before": [
+        ".",
+        "T",
+        "#"
+      ],
+      "after": [
+        ".",
+        "T",
+        "#"
+      ],
+      "rb": "0,1:0|0,2:0",
+      "inspectError": null
+    },
+    "stone-stack-settles": {
+      "suite": "stone",
+      "name": "Stack settles one step",
+      "pass": true,
+      "before": [
+        "T",
+        "T",
+        "."
+      ],
+      "after": [
+        ".",
+        "T",
+        "T"
+      ],
+      "rb": "0,1:0|0,2:0",
+      "inspectError": null
+    },
+    "stone-diagonal-right": {
+      "suite": "stone",
+      "name": "Slides down-right",
+      "pass": true,
+      "before": [
+        "..T..",
+        "..#..",
+        "..#.."
+      ],
+      "after": [
+        ".....",
+        "..#T.",
+        "..#.."
+      ],
+      "rb": "2,1:0|2,2:0|3,1:0",
+      "inspectError": null
+    },
+    "stone-diagonal-left": {
+      "suite": "stone",
+      "name": "Slides down-left",
+      "pass": true,
+      "before": [
+        "..T..",
+        "..#..",
+        "..#.."
+      ],
+      "after": [
+        ".....",
+        ".T#..",
+        "..#.."
+      ],
+      "rb": "1,1:0|2,1:0|2,2:0",
+      "inspectError": null
+    },
+    "stone-sinks-steam": {
+      "suite": "stone",
+      "name": "Sinks through steam",
+      "pass": true,
+      "before": [
+        "T",
+        "^",
+        "."
+      ],
+      "after": [
+        "^",
+        "T",
+        "."
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "stone-flat-floor-center": {
+      "suite": "stone",
+      "name": "Rests on flat floor without sliding",
+      "pass": true,
+      "before": [
+        "...",
+        ".T.",
+        "###"
+      ],
+      "after": [
+        "...",
+        ".T.",
+        "###"
+      ],
+      "rb": "0,2:0|1,1:0|1,2:0|2,2:0",
+      "inspectError": null
+    },
+    "dust-fall-straight": {
+      "suite": "dust",
+      "name": "Falls straight down",
+      "pass": true,
+      "before": [
+        "d",
+        "."
+      ],
+      "after": [
+        ".",
+        "d"
+      ],
+      "rb": "0,1:0",
+      "inspectError": null
+    },
+    "dust-blocked-below": {
+      "suite": "dust",
+      "name": "Stays when blocked below",
+      "pass": true,
+      "before": [
+        "d",
+        "#"
+      ],
+      "after": [
+        "d",
+        "#"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "dust-floats-on-water": {
+      "suite": "dust",
+      "name": "Rests above water",
+      "pass": true,
+      "before": [
+        "d",
+        "W"
+      ],
+      "after": [
+        "d",
+        "W"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "dust-diagonal-right": {
+      "suite": "dust",
+      "name": "Slides down-right when blocked below",
+      "pass": true,
+      "before": [
+        "..d..",
+        "..#..",
+        "..#.."
+      ],
+      "after": [
+        ".....",
+        "..#d.",
+        "..#.."
+      ],
+      "rb": "2,1:0|2,2:0|3,1:0",
+      "inspectError": null
+    },
+    "oil-floats-water": {
+      "suite": "oil",
+      "name": "Rests above water",
+      "pass": true,
+      "before": [
+        "l",
+        "W"
+      ],
+      "after": [
+        "l",
+        "W"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "oil-ignite-lava": {
+      "suite": "oil",
+      "name": "Ignites when touching lava",
+      "pass": true,
+      "before": [
+        "lV"
+      ],
+      "after": [
+        "lV"
+      ],
+      "rb": "0,0:50|1,0:0",
+      "inspectError": null
+    },
+    "oil-burns-away": {
+      "suite": "oil",
+      "name": "Burns away at end of countdown",
+      "pass": true,
+      "before": [
+        "l"
+      ],
+      "after": [
+        "."
+      ],
+      "rb": "",
+      "inspectError": null
+    },
+    "oil-spreads-fire": {
+      "suite": "oil",
+      "name": "Spreads fire while burning",
+      "pass": true,
+      "before": [
+        "l."
+      ],
+      "after": [
+        "lF"
+      ],
+      "rb": "0,0:4|1,0:0",
+      "inspectError": null
+    },
+    "gas-rise-straight": {
+      "suite": "gas",
+      "name": "Rises straight up",
+      "pass": true,
+      "before": [
+        ".",
+        "g"
+      ],
+      "after": [
+        "g",
+        "."
+      ],
+      "rb": "0,0:0",
+      "inspectError": null
+    },
+    "gas-blocked-above": {
+      "suite": "gas",
+      "name": "Stays when blocked above",
+      "pass": true,
+      "before": [
+        "#",
+        "g"
+      ],
+      "after": [
+        "#",
+        "g"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "gas-diagonal-up-left": {
+      "suite": "gas",
+      "name": "Rises diagonally when blocked straight",
+      "pass": true,
+      "before": [
+        "..#..",
+        "..g..",
+        "....."
+      ],
+      "after": [
+        ".g#..",
+        ".....",
+        "....."
+      ],
+      "rb": "1,0:0|2,0:0",
+      "inspectError": null
+    },
+    "gas-one-cell-per-tick": {
+      "suite": "gas",
+      "name": "Moves at most one cell per tick",
+      "pass": true,
+      "before": [
+        ".",
+        ".",
+        ".",
+        "g"
+      ],
+      "after": [
+        ".",
+        ".",
+        "g",
+        "."
+      ],
+      "rb": "0,2:0",
+      "inspectError": null
+    },
+    "ice-melts-fire": {
+      "suite": "ice",
+      "name": "Melts into water near fire",
+      "pass": true,
+      "before": [
+        "IF"
+      ],
+      "after": [
+        "WF"
+      ],
+      "rb": "0,0:0|1,0:0",
+      "inspectError": null
+    },
+    "ice-static": {
+      "suite": "ice",
+      "name": "Does not fall",
+      "pass": true,
+      "before": [
+        "I",
+        "."
+      ],
+      "after": [
+        "I",
+        "."
+      ],
+      "rb": "0,0:0",
+      "inspectError": null
+    },
+    "ice-freezes-water": {
+      "suite": "ice",
+      "name": "Freezes adjacent water",
+      "pass": true,
+      "before": [
+        "IW"
+      ],
+      "after": [
+        "II"
+      ],
+      "rb": "0,0:0|1,0:0",
+      "inspectError": null
+    },
+    "lava-water-stone": {
+      "suite": "lava",
+      "name": "Water contact becomes stone",
+      "pass": true,
+      "before": [
+        "VW"
+      ],
+      "after": [
+        "T."
+      ],
+      "rb": "0,0:0",
+      "inspectError": null
+    },
+    "lava-falls": {
+      "suite": "lava",
+      "name": "Falls when space below",
+      "pass": true,
+      "before": [
+        "V",
+        "."
+      ],
+      "after": [
+        ".",
+        "V"
+      ],
+      "rb": "0,1:0",
+      "inspectError": null
+    },
+    "lava-ignites-gas": {
+      "suite": "lava",
+      "name": "Ignites adjacent gas",
+      "pass": true,
+      "before": [
+        "gV"
+      ],
+      "after": [
+        "FV"
+      ],
+      "rb": "0,0:0|1,0:0",
+      "inspectError": null
+    },
+    "wood-ignite-fire": {
+      "suite": "wood",
+      "name": "Ignites when touching fire",
+      "pass": true,
+      "before": [
+        "BF"
+      ],
+      "after": [
+        "BF"
+      ],
+      "rb": "0,0:90|1,0:0",
+      "inspectError": null
+    },
+    "wood-burns-away": {
+      "suite": "wood",
+      "name": "Burns away at end of countdown",
+      "pass": true,
+      "before": [
+        "B"
+      ],
+      "after": [
+        "."
+      ],
+      "rb": "",
+      "inspectError": null
+    },
+    "wood-spreads-fire": {
+      "suite": "wood",
+      "name": "Spreads fire while burning",
+      "pass": true,
+      "before": [
+        "B."
+      ],
+      "after": [
+        "BF"
+      ],
+      "rb": "0,0:3|1,0:0",
+      "inspectError": null
+    },
+    "acid-fall-straight": {
+      "suite": "acid",
+      "name": "Falls when space below",
+      "pass": true,
+      "before": [
+        "A",
+        "."
+      ],
+      "after": [
+        ".",
+        "A"
+      ],
+      "rb": "0,1:0",
+      "inspectError": null
+    },
+    "acid-corrodes-sand": {
+      "suite": "acid",
+      "name": "Corrodes sand neighbor",
+      "pass": true,
+      "before": [
+        "AS"
+      ],
+      "after": [
+        ".."
+      ],
+      "rb": "",
+      "inspectError": null
+    },
+    "seed-fall-straight": {
+      "suite": "seed",
+      "name": "Falls straight down",
+      "pass": true,
+      "before": [
+        "e",
+        "."
+      ],
+      "after": [
+        ".",
+        "e"
+      ],
+      "rb": "0,1:0",
+      "inspectError": null
+    },
+    "seed-germinates-sand": {
+      "suite": "seed",
+      "name": "Germinates into plant on sand",
+      "pass": true,
+      "before": [
+        "e",
+        "S"
+      ],
+      "after": [
+        "O",
+        "S"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "fungus-ignite-fire": {
+      "suite": "fungus",
+      "name": "Ignites when touching fire",
+      "pass": true,
+      "before": [
+        "uF"
+      ],
+      "after": [
+        "uF"
+      ],
+      "rb": "0,0:20|1,0:0",
+      "inspectError": null
+    },
+    "fungus-burns-away": {
+      "suite": "fungus",
+      "name": "Burns away at end of countdown",
+      "pass": true,
+      "before": [
+        "u"
+      ],
+      "after": [
+        "."
+      ],
+      "rb": "",
+      "inspectError": null
+    },
+    "fungus-grows-on-wood": {
+      "suite": "fungus",
+      "name": "Spreads into empty cell beside wood",
+      "pass": true,
+      "before": [
+        "Bu."
+      ],
+      "after": [
+        "Buu"
+      ],
+      "rb": "0,0:0|1,0:0|2,0:0",
+      "inspectError": null
+    },
+    "rocket-fall-straight": {
+      "suite": "rocket",
+      "name": "Falls straight down leaving sand",
+      "pass": true,
+      "before": [
+        "R",
+        "."
+      ],
+      "after": [
+        "S",
+        "R"
+      ],
+      "rb": "0,0:0|0,1:0",
+      "inspectError": null
+    },
+    "reaction-water-fire-steam": {
+      "suite": "reactions",
+      "name": "Water and fire make steam",
+      "pass": true,
+      "before": [
+        "WF"
+      ],
+      "after": [
+        ".^"
+      ],
+      "rb": "1,0:0",
+      "inspectError": null
+    },
+    "reaction-fire-organic-ignites": {
+      "suite": "reactions",
+      "name": "Fire ignites organic",
+      "pass": true,
+      "before": [
+        "FO"
+      ],
+      "after": [
+        "FF"
+      ],
+      "rb": "0,0:0|1,0:0",
+      "inspectError": null
+    },
+    "reaction-no-op-when-separated": {
+      "suite": "reactions",
+      "name": "No reaction without contact",
+      "pass": true,
+      "before": [
+        "W.F"
+      ],
+      "after": [
+        "W.F"
+      ],
+      "rb": "0,0:0|2,0:0",
+      "inspectError": null
+    },
+    "reaction-water-fire-vertical": {
+      "suite": "reactions",
+      "name": "Water above fire makes steam",
+      "pass": true,
+      "before": [
+        "W",
+        "F"
+      ],
+      "after": [
+        ".",
+        "^"
+      ],
+      "rb": "0,1:0",
+      "inspectError": null
+    },
+    "reaction-fire-water-horizontal": {
+      "suite": "reactions",
+      "name": "Fire left of water makes steam",
+      "pass": true,
+      "before": [
+        "FW"
+      ],
+      "after": [
+        "^."
+      ],
+      "rb": "0,0:0",
+      "inspectError": null
+    },
+    "reaction-fire-wood": {
+      "suite": "reactions",
+      "name": "Fire ignites wood",
+      "pass": true,
+      "before": [
+        "FB"
+      ],
+      "after": [
+        "FF"
+      ],
+      "rb": "0,0:0|1,0:0",
+      "inspectError": null
+    },
+    "reaction-fire-fungus": {
+      "suite": "reactions",
+      "name": "Fire ignites fungus",
+      "pass": true,
+      "before": [
+        "Fu"
+      ],
+      "after": [
+        "FF"
+      ],
+      "rb": "0,0:0|1,0:0",
+      "inspectError": null
+    },
+    "reaction-fire-oil": {
+      "suite": "reactions",
+      "name": "Fire ignites oil",
+      "pass": true,
+      "before": [
+        "Fl"
+      ],
+      "after": [
+        "FF"
+      ],
+      "rb": "0,0:0|1,0:0",
+      "inspectError": null
+    }
+  }
+}

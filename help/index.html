@@ -69,6 +69,14 @@ npm start</code></pre>
     </section>
 
     <section class="help-card">
+      <h2>Release & tests</h2>
+      <p>Before production, run one command — no need to click through every test:</p>
+      <pre><code>npm run release</code></pre>
+      <p>Green <strong>READY FOR RELEASE</strong> means headless tests, quality gates, catalog coverage, and golden snapshots for all behaviors passed.</p>
+      <p>While coding: <code>npm run test:watch</code> in a background terminal. See <a href="/TESTING.md">TESTING.md</a>.</p>
+    </section>
+
+    <section class="help-card">
       <h2>Documentation & tests</h2>
       <p>Every <code>behaviors[]</code> entry is the spec — write it once in your rule or plugin file.</p>
       <ul>

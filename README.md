@@ -22,15 +22,15 @@ No build step. Static files + ES modules.
 ## Commands
 
 ```bash
-npm start          # sandbox server (port 3456)
-npm test           # 92 behavior + extension tests + layer check
-npm run test:watch # rerun tests when js/plugins/tests change (background)
-npm run verify     # alias for npm test
-npm run setup:hooks # optional: run tests before each git commit
-npm run check:layers  # import boundary enforcement
+npm start              # sandbox server (port 3456)
+npm run release        # ← before production: one verdict, all gates
+npm test               # same checks, plain output
+npm run test:watch     # background auto-rerun while coding
+npm run snapshot:update  # after intentional sim changes
+npm run setup:hooks    # optional git pre-commit + pre-push gates
 ```
 
-**You don't need to open `/tests/` every time.** Use CI (GitHub Actions), `test:watch` in a terminal tab, or optional git hooks. See [TESTING.md](TESTING.md).
+**You never review tests one by one.** `npm run release` runs headless tests, quality gates, catalog coverage, and golden snapshots for all 86 behaviors. See [TESTING.md](TESTING.md).
 
 ## Extend the library
 
