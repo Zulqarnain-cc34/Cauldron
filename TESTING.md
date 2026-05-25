@@ -1,6 +1,18 @@
 # Testing & integration
 
-You do **not** need to open `/tests/` in the browser to know things work. Pick one background safety net and code as usual.
+You do **not** need an LLM to verify tests, and you do **not** need to open `/tests/` in the browser.
+
+Cauldron uses **deterministic slice tests** + **mechanical quality gates** (`check:behaviors`). If a test claims "falls" but nothing moves, CI fails — no AI required.
+
+## Why no small LLM in the loop
+
+| Approach | Problem |
+|----------|---------|
+| LLM reviews tests | Non-deterministic, costs money, can miss bugs or hallucinate pass |
+| LLM generates tests | Still need mechanical verification |
+| **ASCII grid + inspect() + check:behaviors** | Deterministic, fast, runs in CI, catches no-op tests |
+
+Use AI to **write** `behaviors[]` drafts if you want — but **`npm test` is the judge**, not the model.
 
 ## Three ways to stay green (pick what fits)
 
@@ -10,12 +22,13 @@ You do **not** need to open `/tests/` in the browser to know things work. Pick o
 | **`npm run test:watch`** | While coding | One terminal tab; reruns on `js/`, `plugins/`, `tests/` changes |
 | **Git pre-commit** | Before each commit | Run once: `npm run setup:hooks` |
 
-All three run the same suite: **92 behavior tests + extension API + layer check**.
+All three run the same suite: **92 behavior tests + extension API + layer check + behavior quality gate**.
 
 ```bash
-npm test              # run once (what CI runs)
-npm run test:watch    # background while you edit
-npm run setup:hooks   # optional local gate before commit
+npm test                 # run once (what CI runs)
+npm run test:watch       # background while you edit
+npm run setup:hooks      # optional local gate before commit
+npm run check:behaviors  # no-op / weak-test detector (included in npm test)
 ```
 
 ## Single source of truth: `behaviors[]`
@@ -91,8 +104,14 @@ Docs and brush picker update from the registry — no hand-written doc page.
 ## Layer boundaries
 
 ```bash
-npm run check:layers   # included in npm test
+npm run check:layers     # included in npm test
+npm run check:behaviors  # included in npm test
 ```
+
+`check:behaviors` flags tests that:
+- Claim movement/change but leave the grid unchanged (no `inspect()`)
+- Claim ignite/burn but only check ASCII (need `inspect()` for `rb`)
+- Pass even when expect is deliberately wrong (no-op)
 
 Import rules are enforced so plugins stay on the SDK surface. See [ARCHITECTURE.md](ARCHITECTURE.md).
 

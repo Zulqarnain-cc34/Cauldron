@@ -38,8 +38,19 @@ function runSuite(label = 'test') {
         shell: true,
       });
       layer.on('close', (layerCode) => {
-        if (layerCode === 0) console.log('\n[test:watch] OK — waiting for changes…');
-        else console.log('\n[test:watch] layer check failed');
+        if (layerCode !== 0) {
+          console.log('\n[test:watch] layer check failed');
+          return;
+        }
+        const beh = spawn('npm', ['run', 'check:behaviors', '--silent'], {
+          cwd: ROOT,
+          stdio: 'inherit',
+          shell: true,
+        });
+        beh.on('close', (behCode) => {
+          if (behCode === 0) console.log('\n[test:watch] OK — waiting for changes…');
+          else console.log('\n[test:watch] behavior quality check failed');
+        });
       });
     } else {
       console.log(`\n[test:watch] failed (exit ${code}) — waiting for changes…`);

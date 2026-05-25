@@ -56,13 +56,15 @@ export const oilRuleDef = {
     {
       id: 'oil-ignite-lava',
       name: 'Ignites when touching lava',
+      description: 'Lava contact starts oil burn timer (rb); species stays oil on tick 1.',
       slice: { rows: ['lV'] },
       expect: ['lV'],
       scope: SCOPE,
       steps: 1,
-      setup(w) {
-        w.seed = 7;
-        w.randInt = (n) => (n === 8 ? 0 : 0);
+      inspect(w) {
+        if (w.get(0, 0).rb <= 1) {
+          throw new Error(`expected oil rb > 1 after lava ignite, got ${w.get(0, 0).rb}`);
+        }
       },
     },
     {

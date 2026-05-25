@@ -14,11 +14,12 @@
   "scripts": {
     "start": "npx --yes serve . -p 3456",
     "dev": "npm start",
-    "test": "node --test tests/run-node.js tests/extension-api.test.js && npm run check:layers",
+    "test": "node --test tests/run-node.js tests/extension-api.test.js && npm run check:layers && npm run check:behaviors",
     "test:watch": "node scripts/test-watch.mjs",
     "test:visual": "npm start",
     "verify": "npm test",
     "check:layers": "node scripts/check-layers.mjs",
+    "check:behaviors": "node scripts/check-behaviors.mjs",
     "setup:hooks": "bash scripts/install-hooks.sh"
   }
 }
