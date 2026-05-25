@@ -24,6 +24,8 @@ function updateOil(cell, api) {
   wrapped(cell, api);
 }
 
+const SCOPE = { rules: ['oil'] };
+
 export const oilRuleDef = {
   id: 'oil',
   label: 'Oil',
@@ -38,8 +40,43 @@ export const oilRuleDef = {
       description: 'Less dense than water — does not sink through water below.',
       slice: { rows: ['l', 'W'] },
       expect: ['l', 'W'],
-      scope: { rules: ['oil'] },
+      scope: SCOPE,
       steps: 1,
+    },
+    {
+      id: 'oil-ignite-lava',
+      name: 'Ignites when touching lava',
+      slice: { rows: ['lV'] },
+      expect: ['lV'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.seed = 7;
+        w.randInt = (n) => (n === 8 ? 0 : 0);
+      },
+    },
+    {
+      id: 'oil-burns-away',
+      name: 'Burns away at end of countdown',
+      slice: { rows: ['l'] },
+      expect: ['.'],
+      scope: SCOPE,
+      steps: 2,
+      setup(w) {
+        w.set(0, 0, { species: Species.OIL, flags: 0, ra: 128, rb: 2 });
+      },
+    },
+    {
+      id: 'oil-spreads-fire',
+      name: 'Spreads fire while burning',
+      slice: { rows: ['l.'] },
+      expect: ['lF'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.seed = 36;
+        w.set(0, 0, { species: Species.OIL, flags: 0, ra: 128, rb: 5 });
+      },
     },
   ],
 };

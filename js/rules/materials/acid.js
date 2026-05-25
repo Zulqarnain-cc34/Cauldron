@@ -54,5 +54,18 @@ export const acidRuleDef = {
       scope: { rules: ['acid'] },
       steps: 1,
     },
+    {
+      id: 'acid-corrodes-sand',
+      name: 'Corrodes sand neighbor',
+      description: 'Touches sand → sand dissolves, acid consumed.',
+      slice: { rows: ['AS'] },
+      expect: ['..'],
+      scope: { rules: ['acid'] },
+      steps: 1,
+      setup(w) {
+        w.set(1, 0, { species: Species.SAND, flags: 0, ra: 80, rb: 0 });
+        w.randDir = () => 1;
+      },
+    },
   ],
 };

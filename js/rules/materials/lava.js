@@ -58,5 +58,24 @@ export const lavaRuleDef = {
         w.seed = 0;
       },
     },
+    {
+      id: 'lava-falls',
+      name: 'Falls when space below',
+      slice: { rows: ['V', '.'] },
+      expect: ['.', 'V'],
+      scope: { rules: ['lava'] },
+      steps: 1,
+    },
+    {
+      id: 'lava-ignites-gas',
+      name: 'Ignites adjacent gas',
+      slice: { rows: ['gV'] },
+      expect: ['FV'],
+      scope: { rules: ['lava'] },
+      steps: 1,
+      setup(w) {
+        w.randInt = (n) => (n === 8 ? 3 : 0);
+      },
+    },
   ],
 };

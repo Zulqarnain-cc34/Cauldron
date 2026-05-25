@@ -53,5 +53,25 @@ export const iceRuleDef = {
         w.seed = 0;
       },
     },
+    {
+      id: 'ice-static',
+      name: 'Does not fall',
+      description: 'Static solid — stays when empty below.',
+      slice: { rows: ['I', '.'] },
+      expect: ['I', '.'],
+      scope: { rules: ['ice'] },
+      steps: 1,
+    },
+    {
+      id: 'ice-freezes-water',
+      name: 'Freezes adjacent water',
+      slice: { rows: ['IW'] },
+      expect: ['II'],
+      scope: { rules: ['ice'] },
+      steps: 1,
+      setup(w) {
+        w.randInt = (n) => (n === 4 ? 2 : 0);
+      },
+    },
   ],
 };

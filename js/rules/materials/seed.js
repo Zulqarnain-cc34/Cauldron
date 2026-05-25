@@ -21,6 +21,8 @@ function updateSeed(cell, api) {
   }
 }
 
+const SCOPE = { rules: ['seed'] };
+
 export const seedRuleDef = {
   id: 'seed',
   label: 'Seed',
@@ -34,8 +36,20 @@ export const seedRuleDef = {
       name: 'Falls straight down',
       slice: { rows: ['e', '.'] },
       expect: ['.', 'e'],
-      scope: { rules: ['seed'] },
+      scope: SCOPE,
       steps: 1,
+    },
+    {
+      id: 'seed-germinates-sand',
+      name: 'Germinates into plant on sand',
+      description: 'Resting on sand with lucky roll → organic.',
+      slice: { rows: ['e', 'S'] },
+      expect: ['O', 'S'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.randInt = (n) => (n === 100 ? 93 : 0);
+      },
     },
   ],
 };

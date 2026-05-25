@@ -23,7 +23,7 @@ No build step. Static files + ES modules.
 
 ```bash
 npm start          # sandbox server (port 3456)
-npm test           # 70 behavior + extension tests + layer check
+npm test           # 92 behavior + extension tests + layer check
 npm run check:layers  # import boundary enforcement
 npm run test:visual  # same as start — use /tests/ in browser
 ```
