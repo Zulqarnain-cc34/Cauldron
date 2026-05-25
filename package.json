@@ -1,0 +1,9 @@
+{
+  "name": "cauldron",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/run-node.js",
+    "test:visual": "npx --yes serve . -p 3456"
+  }
+}

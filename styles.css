@@ -1,0 +1,197 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #0d0d12;
+  color: #e8e8f0;
+  font-family: system-ui, sans-serif;
+  overflow: hidden;
+  height: 100%;
+}
+
+#sim-host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 3rem 5rem;
+  box-sizing: border-box;
+}
+
+#sim-host canvas {
+  display: block;
+  border: 1px solid #2a2a38;
+  border-radius: 4px;
+  cursor: crosshair;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+#cauldron-ui {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+#cauldron-ui .bar {
+  pointer-events: auto;
+  position: fixed;
+  background: rgba(13, 13, 18, 0.92);
+  border: 1px solid #2a2a38;
+  border-radius: 8px;
+  padding: 0.5rem 0.75rem;
+}
+
+.bar-top {
+  top: 0.75rem;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.bar-top h1 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.tick {
+  font-size: 0.75rem;
+  color: #8888a0;
+  font-variant-numeric: tabular-nums;
+}
+
+.bar-left {
+  left: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 9.5rem;
+}
+
+.bar-right {
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+
+#cauldron-ui button {
+  background: #1a1a24;
+  color: #e8e8f0;
+  border: 1px solid #3a3a4a;
+  border-radius: 4px;
+  padding: 0.35rem 0.6rem;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+#cauldron-ui button:hover {
+  background: #252532;
+}
+
+#cauldron-ui button.active {
+  border-color: #6a8cff;
+  background: #1e2848;
+}
+
+.material-swatch {
+  display: inline-block;
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  flex-shrink: 0;
+}
+
+.material-swatch-erase {
+  background:
+    linear-gradient(135deg, transparent 46%, #c44 46%, #c44 54%, transparent 54%),
+    rgb(8, 8, 14) !important;
+}
+
+.brush-picker {
+  position: relative;
+  width: 100%;
+}
+
+.brush-picker-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  text-align: left;
+}
+
+.brush-picker-label {
+  flex: 1;
+}
+
+.brush-picker-caret {
+  font-size: 0.65rem;
+  color: #8888a0;
+}
+
+.brush-picker-menu {
+  display: none;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 0.25rem);
+  z-index: 20;
+  background: rgba(13, 13, 18, 0.98);
+  border: 1px solid #3a3a4a;
+  border-radius: 6px;
+  padding: 0.25rem;
+  max-height: 14rem;
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.brush-picker.open .brush-picker-menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.brush-picker-option {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 1px solid transparent;
+}
+
+.brush-picker-option:hover {
+  background: #252532;
+}
+
+.brush-picker-option.active {
+  border-color: #6a8cff;
+  background: #1e2848;
+}
+
+#brush-tools label.brush-size {
+  font-size: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+#rule-toggles label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
