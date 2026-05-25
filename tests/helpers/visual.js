@@ -1,9 +1,17 @@
-import { PALETTE } from '../../js/materials.js';
-import { CHAR_TO_SPECIES } from './grid.js';
+import { PALETTE } from '../../js/catalog/materials.js';
+import { resolveCharToSpecies } from '../../js/catalog/ascii-map.js';
 
-const CELL = 14;
 const GAP = 1;
 const LABEL_H = 14;
+
+function cellSizeForGrid(width, height) {
+  const longest = Math.max(width, height, 1);
+  if (longest <= 2) return 28;
+  if (longest <= 4) return 22;
+  if (longest <= 8) return 16;
+  if (longest <= 14) return 12;
+  return 10;
+}
 
 /**
  * Draw ASCII rows as a pixel grid on canvas.
@@ -15,6 +23,7 @@ export function drawAsciiGrid(canvas, rows, opts = {}) {
   const highlight = new Set((opts.highlight ?? []).map((c) => `${c.x},${c.y}`));
   const height = rows.length;
   const width = rows.reduce((m, r) => Math.max(m, r.length), 0);
+  const CELL = cellSizeForGrid(width, height);
 
   canvas.width = width * (CELL + GAP) + GAP;
   canvas.height = height * (CELL + GAP) + GAP + (opts.label ? LABEL_H : 0);
@@ -35,7 +44,7 @@ export function drawAsciiGrid(canvas, rows, opts = {}) {
     const row = rows[y].padEnd(width, '.');
     for (let x = 0; x < width; x++) {
       const ch = row[x];
-      const species = CHAR_TO_SPECIES[ch] ?? CHAR_TO_SPECIES['.'];
+      const species = resolveCharToSpecies(ch) ?? resolveCharToSpecies('.');
       const [r, g, b] = PALETTE[species] ?? [255, 0, 255];
 
       const px = GAP + x * (CELL + GAP);
@@ -50,6 +59,23 @@ export function drawAsciiGrid(canvas, rows, opts = {}) {
         ctx.strokeRect(px + 1, py + 1, CELL - 2, CELL - 2);
       }
     }
+  }
+
+  if (width * height <= 16 && CELL >= 12) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 0; x <= width; x++) {
+      const px = GAP + x * (CELL + GAP) - GAP / 2;
+      ctx.moveTo(px, offsetY);
+      ctx.lineTo(px, canvas.height);
+    }
+    for (let y = 0; y <= height; y++) {
+      const py = offsetY + GAP + y * (CELL + GAP) - GAP / 2;
+      ctx.moveTo(0, py);
+      ctx.lineTo(canvas.width, py);
+    }
+    ctx.stroke();
   }
 }
 

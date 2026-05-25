@@ -132,6 +132,7 @@ function initDemo() {
     engineEl: document.getElementById('demo-engine'),
     rulesEl: document.getElementById('demo-rules'),
     sliceEl: document.getElementById('demo-slice'),
+    sizeEl: document.getElementById('demo-size'),
     ticksEl: document.getElementById('demo-ticks'),
   });
 

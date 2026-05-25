@@ -45,6 +45,21 @@ export function renderWorldToCanvas(ctx, world, opts = {}) {
       }
     }
   }
+
+  if (opts.showGrid && cellPx >= 8 && world.width * world.height <= 64) {
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    for (let x = 0; x <= world.width; x++) {
+      ctx.moveTo(x * cellPx + 0.5, 0);
+      ctx.lineTo(x * cellPx + 0.5, h);
+    }
+    for (let y = 0; y <= world.height; y++) {
+      ctx.moveTo(0, y * cellPx + 0.5);
+      ctx.lineTo(w, y * cellPx + 0.5);
+    }
+    ctx.stroke();
+  }
 }
 
 export function canvasPixelSize(world, cellPx = 2) {
@@ -52,6 +67,38 @@ export function canvasPixelSize(world, cellPx = 2) {
     width: world.width * cellPx,
     height: world.height * cellPx,
   };
+}
+
+/**
+ * Pick cell pixel size for live demo viewports — small slices stay readable without blowing up.
+ * @param {import('./world.js').World} world
+ * @param {{ maxCanvasWidth?: number, maxCanvasHeight?: number, minCellPx?: number, maxCellPx?: number }} [opts]
+ */
+export function computeDemoCellPx(world, opts = {}) {
+  const {
+    maxCanvasWidth = 320,
+    maxCanvasHeight = 280,
+    minCellPx = 10,
+    maxCellPx = 36,
+    idealShortSide = 168,
+  } = opts;
+
+  const cols = world.width;
+  const rows = world.height;
+  if (!cols || !rows) return minCellPx;
+
+  const byMaxW = Math.floor(maxCanvasWidth / cols);
+  const byMaxH = Math.floor(maxCanvasHeight / rows);
+  const longest = Math.max(cols, rows);
+
+  let cellPx = Math.min(byMaxW, byMaxH, maxCellPx);
+
+  if (longest <= 8) {
+    const byIdeal = Math.floor(idealShortSide / longest);
+    cellPx = Math.min(byIdeal, maxCellPx, byMaxW, byMaxH);
+  }
+
+  return Math.max(minCellPx, cellPx);
 }
 
 export { speciesColor };

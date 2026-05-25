@@ -1,7 +1,6 @@
-import { renderWorldToCanvas } from '../../js/render-canvas.js';
+import { renderWorldToCanvas, computeDemoCellPx, canvasPixelSize } from '../../js/render-canvas.js';
 import { prepareScenario, stepScenario, finishScenario, runScenario } from './harness.js';
 
-const DEFAULT_CELL_PX = 20;
 const DEFAULT_DELAY_MS = 350;
 
 export class LiveDemoPlayer {
@@ -9,12 +8,45 @@ export class LiveDemoPlayer {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.ui = ui;
-    this.cellPx = DEFAULT_CELL_PX;
+    this.cellPx = 16;
     this.delayMs = DEFAULT_DELAY_MS;
     this.timer = null;
     this.prep = null;
     this.tick = 0;
     this.playing = false;
+    this._resizeObserver = null;
+
+    const wrap = canvas.closest('.demo-canvas-wrap');
+    if (wrap && typeof ResizeObserver !== 'undefined') {
+      this._resizeObserver = new ResizeObserver(() => this._refit());
+      this._resizeObserver.observe(wrap);
+    }
+  }
+
+  _containerLimits() {
+    const wrap = this.canvas.closest('.demo-canvas-wrap');
+    const maxCanvasWidth = wrap?.clientWidth ? Math.max(120, wrap.clientWidth - 16) : 320;
+    return { maxCanvasWidth, maxCanvasHeight: 280 };
+  }
+
+  _refit() {
+    if (!this.prep) return;
+    const { world } = this.prep.slice;
+    if (this.test?.demoCellPx != null) return;
+    const next = computeDemoCellPx(world, this._containerLimits());
+    if (next !== this.cellPx) {
+      this.cellPx = next;
+      this._updateSizeMeta(world);
+      this.draw();
+    }
+  }
+
+  _updateSizeMeta(world) {
+    const px = canvasPixelSize(world, this.cellPx);
+    this.setMeta({
+      slice: `${world.width}×${world.height} cells`,
+      size: `${px.width}×${px.height} px · ${this.cellPx} px/cell`,
+    });
   }
 
   load(test) {
@@ -22,17 +54,18 @@ export class LiveDemoPlayer {
     this.prep = prepareScenario(test);
     this.tick = 0;
     this.test = test;
-    this.cellPx = test.demoCellPx ?? DEFAULT_CELL_PX;
     this.delayMs = test.demoDelayMs ?? DEFAULT_DELAY_MS;
 
     const { world } = this.prep.slice;
+    this.cellPx =
+      test.demoCellPx ?? computeDemoCellPx(world, this._containerLimits());
+
     const rules = this.prep.scope.rules?.join(', ') ?? 'all enabled';
     this.setMeta({
-      engine: 'World + runRules() · production registry',
       rules,
-      slice: `${world.width}×${world.height} cells`,
       ticks: `0 / ${this.prep.steps}`,
     });
+    this._updateSizeMeta(world);
     this.setStatus(`${test.name} — ready`);
     this.clearResult();
     this.clearVerify();
@@ -44,6 +77,7 @@ export class LiveDemoPlayer {
     renderWorldToCanvas(this.ctx, this.prep.slice.world, {
       cellPx: this.cellPx,
       highlight,
+      showGrid: true,
     });
   }
 
@@ -107,7 +141,6 @@ export class LiveDemoPlayer {
     this.draw(live.pass ? [] : live.diffs);
     this.setResult(live.pass ? 'PASS' : 'FAIL', live.pass);
 
-    // Cross-check: live path must match headless runScenario (same harness).
     const headless = runScenario(this.test);
     const match = headless.pass === live.pass && headless.pass;
     this.setVerify(
@@ -118,10 +151,11 @@ export class LiveDemoPlayer {
     );
   }
 
-  setMeta({ engine, rules, slice, ticks }) {
+  setMeta({ engine, rules, slice, size, ticks }) {
     if (engine != null && this.ui.engineEl) this.ui.engineEl.textContent = engine;
     if (rules != null && this.ui.rulesEl) this.ui.rulesEl.textContent = rules;
     if (slice != null && this.ui.sliceEl) this.ui.sliceEl.textContent = slice;
+    if (size != null && this.ui.sizeEl) this.ui.sizeEl.textContent = size;
     if (ticks != null && this.ui.ticksEl) this.ui.ticksEl.textContent = ticks;
   }
 

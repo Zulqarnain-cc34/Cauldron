@@ -154,6 +154,10 @@ function runLiveTest(testRef, autoplay = true) {
   state.selectedTestId = testRef.id;
   if (state.selectedId) location.hash = `#${state.selectedId}/${testRef.id}`;
 
+  document.querySelectorAll('.run-live-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.testId === testRef.id);
+  });
+
   demo.load(testRef.test);
   document.getElementById('demo-test-id').textContent = testRef.id;
   if (autoplay) demo.play();
@@ -173,6 +177,7 @@ function initDemo() {
     verifyEl: document.getElementById('demo-verify'),
     rulesEl: document.getElementById('demo-rules'),
     sliceEl: document.getElementById('demo-slice'),
+    sizeEl: document.getElementById('demo-size'),
     ticksEl: document.getElementById('demo-ticks'),
   });
 

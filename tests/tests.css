@@ -156,12 +156,30 @@ a {
   color: #8888a0;
 }
 
+.demo-canvas-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 5.5rem;
+  padding: 0.65rem;
+  margin-bottom: 0.5rem;
+  border: 1px solid #2a2a38;
+  border-radius: 8px;
+  background:
+    repeating-conic-gradient(#101018 0% 25%, #0c0c12 0% 50%) 50% / 12px 12px;
+  overflow: auto;
+}
+
 #demo-canvas {
   display: block;
-  border: 1px solid #2a2a38;
+  width: auto;
+  height: auto;
+  max-width: 100%;
   border-radius: 4px;
   image-rendering: pixelated;
-  max-width: 100%;
+  image-rendering: crisp-edges;
+  background: #08080c;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 
 .demo-result {
