@@ -13,7 +13,7 @@ function ensureSprite(p) {
   if (sprite || spriteFailed || spriteLoading) return;
   spriteLoading = true;
   p.loadImage(
-    '/grenade.png',
+    '/assets/grenade.png',
     (img) => {
       sprite = img;
       spriteLoading = false;

@@ -3,6 +3,8 @@ import { bootstrapSandbox } from './js/cauldron/bootstrap.js';
 import { renderWorld, canvasSize } from './js/render.js';
 import { setupInput } from './js/input.js';
 import { mountPanel, bindKeyboard } from './js/ui/panel.js';
+import { mountBackpack } from './js/ui/backpack.js';
+import { mountJar } from './js/ui/jar.js';
 
 let world;
 let ui;
@@ -37,6 +39,8 @@ new window.p5((p) => {
 
     setupInput(world, canvas.elt);
     await bootstrapSandbox({ world, canvas: canvas.elt });
+    mountBackpack(world);
+    mountJar(world);
     ui = mountPanel(world, {
       onPauseChange(paused) {
         ui?.setPaused(paused);
