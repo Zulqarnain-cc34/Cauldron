@@ -1,4 +1,5 @@
 import { defineMaterial } from './define-material.js';
+import { buildToggleableRules } from '../catalog/rule-toggle-catalog.js';
 import { sandRuleDef } from '../rules/materials/sand.js';
 import { waterRuleDef } from '../rules/materials/water.js';
 import { steamRuleDef } from '../rules/materials/steam.js';
@@ -52,6 +53,11 @@ export function getRuleModules() {
 
 export function getMaterialModules() {
   return getRuleModules().filter((m) => m.phase === 'materials' && m.update);
+}
+
+/** All rules exposed in the UI toggle picker (materials + system). */
+export function getToggleableRules() {
+  return buildToggleableRules(getRuleModules());
 }
 
 export function getAllBehaviors() {
