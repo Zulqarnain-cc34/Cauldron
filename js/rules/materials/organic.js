@@ -102,5 +102,17 @@ export const organicRuleDef = {
         w.set(0, 0, { species: Species.ORGANIC, flags: 0, ra: 128, rb: 20 });
       },
     },
+    {
+      id: 'organic-grows-near-water',
+      name: 'Grows toward water',
+      description: 'Near water + growth roll → new organic cell in empty neighbor.',
+      slice: { rows: ['.....', '..OW.', '.....'] },
+      expect: ['.....', '.OOW.', '.....'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.randInt = (max) => (max === 8 ? 2 : max === 100 ? 90 : 0);
+      },
+    },
   ],
 };

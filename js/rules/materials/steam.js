@@ -51,5 +51,26 @@ export const steamRuleDef = {
         w.randDir = () => 1;
       },
     },
+    {
+      id: 'steam-diagonal-up-left',
+      name: 'Rises diagonally up-left',
+      description: 'Blocked straight up; randDir left → up-left empty cell.',
+      slice: { rows: ['..#..', '..^..', '.....'] },
+      expect: ['.^#..', '.....', '.....'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.randDir = () => -1;
+      },
+    },
+    {
+      id: 'steam-one-cell-per-tick',
+      name: 'Moves at most one cell per tick',
+      description: 'Tall empty column above — one cell per tick.',
+      slice: { rows: ['.', '.', '.', '^'] },
+      expect: ['.', '.', '^', '.'],
+      scope: SCOPE,
+      steps: 1,
+    },
   ],
 };

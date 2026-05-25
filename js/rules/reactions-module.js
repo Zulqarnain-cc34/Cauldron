@@ -76,5 +76,23 @@ export const reactionRuleDef = {
       scope: { rules: ['reactions'] },
       steps: 1,
     },
+    {
+      id: 'reaction-water-fire-vertical',
+      name: 'Water above fire makes steam',
+      description: 'Stacked water + fire → steam at fire, water cleared.',
+      slice: { rows: ['W', 'F'] },
+      expect: ['.', '^'],
+      scope: { rules: ['reactions'] },
+      steps: 1,
+    },
+    {
+      id: 'reaction-fire-water-horizontal',
+      name: 'Fire left of water makes steam',
+      description: 'Fire as cell a still reacts when water is neighbor b.',
+      slice: { rows: ['FW'] },
+      expect: ['^.'],
+      scope: { rules: ['reactions'] },
+      steps: 1,
+    },
   ],
 };

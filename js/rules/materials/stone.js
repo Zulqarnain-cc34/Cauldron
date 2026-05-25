@@ -68,5 +68,35 @@ export const stoneRuleDef = {
         w.randDir = () => 1;
       },
     },
+    {
+      id: 'stone-diagonal-left',
+      name: 'Slides down-left',
+      description: 'Blocked below; randDir forced left → down-left empty cell.',
+      slice: { rows: ['..T..', '..#..', '..#..'] },
+      expect: ['.....', '.T#..', '..#..'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.randDir = () => -1;
+      },
+    },
+    {
+      id: 'stone-sinks-steam',
+      name: 'Sinks through steam',
+      description: 'Denser stone swaps with lighter steam below.',
+      slice: { rows: ['T', '^', '.'] },
+      expect: ['^', 'T', '.'],
+      scope: SCOPE,
+      steps: 1,
+    },
+    {
+      id: 'stone-flat-floor-center',
+      name: 'Rests on flat floor without sliding',
+      description: 'Centered on floor — diagonals blocked, stays put.',
+      slice: { rows: ['...', '.T.', '###'] },
+      expect: ['...', '.T.', '###'],
+      scope: SCOPE,
+      steps: 1,
+    },
   ],
 };

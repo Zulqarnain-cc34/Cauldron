@@ -97,5 +97,18 @@ export const fireRuleDef = {
         w.set(0, 0, { species: Species.FIRE, flags: 0, ra: 150, rb: 0 });
       },
     },
+    {
+      id: 'fire-blocked-surrounded',
+      name: 'Stays when surrounded by walls',
+      description: 'No empty neighbor — fire remains (heat still decays internally).',
+      slice: { rows: ['###', '#F#', '###'] },
+      expect: ['###', '#F#', '###'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.seed = 99;
+        w.set(1, 1, { species: Species.FIRE, flags: 0, ra: 100, rb: 0 });
+      },
+    },
   ],
 };

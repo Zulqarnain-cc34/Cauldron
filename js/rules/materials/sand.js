@@ -144,5 +144,14 @@ export const sandRuleDef = {
       scope: SCOPE,
       steps: 1,
     },
+    {
+      id: 'sand-rest-on-water',
+      name: 'Rests on water without sinking',
+      description: 'Granular sand has sinkThroughLighter off — floats on water surface.',
+      slice: { rows: ['S', 'W'] },
+      expect: ['S', 'W'],
+      scope: SCOPE,
+      steps: 1,
+    },
   ],
 };
