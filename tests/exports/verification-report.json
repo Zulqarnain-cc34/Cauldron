@@ -1,0 +1,2856 @@
+{
+  "documentType": "cauldron-verification-export",
+  "version": 1,
+  "generatedAt": "2026-05-25T18:17:28.303Z",
+  "project": {
+    "name": "cauldron",
+    "description": "Layered falling-sand simulation library"
+  },
+  "reviewerInstructions": "You are reviewing a Cauldron falling-sand simulation test audit export.\n\nYour job:\n1. Confirm every behavior marked \"verdict\": \"PASS\" has a logically consistent setup:\n   - \"expectedGrid\" should match what the test name/description claims (e.g. \"falls\" → material moved down).\n   - \"actualGrid\" must equal \"expectedGrid\" for PASS rows.\n   - If grid unchanged but name implies ignite/burn, \"inspectPassed\" must be true and rbState should show burn timers.\n2. Flag any PASS that looks like a no-op (nothing changed when change was promised, no inspect).\n3. Flag any expected result that violates physics intuition (sand falling up, fire freezing water as ice, etc.).\n4. Summarize: total reviewed, count OK, count suspicious, list suspicious behavior ids with one-line reason.\n\nDo NOT re-run code. Judge only from this JSON. Be concise.",
+  "summary": {
+    "overallVerdict": "ALL_PASS",
+    "behaviorTests": {
+      "total": 86,
+      "pass": 86,
+      "fail": 0
+    },
+    "headlessTests": {
+      "pass": null,
+      "fail": null
+    },
+    "rulesRegistered": 17,
+    "pluginsRegistered": 1,
+    "qualityGatesAllPass": true,
+    "goldenSnapshotVersion": 1
+  },
+  "qualityGates": {
+    "headlessTests": {
+      "pass": true,
+      "passCount": null,
+      "failCount": null,
+      "exitCode": 0
+    },
+    "checkLayers": {
+      "pass": true,
+      "detail": null
+    },
+    "checkBehaviors": {
+      "pass": true,
+      "detail": null
+    },
+    "checkCoverage": {
+      "pass": true,
+      "detail": null
+    },
+    "checkSnapshots": {
+      "pass": true,
+      "detail": null
+    }
+  },
+  "asciiLegend": {
+    ".": "empty",
+    "#": "wall",
+    "S": "sand",
+    "W": "water",
+    "F": "fire",
+    "u": "fungus",
+    "B": "wood",
+    "l": "oil",
+    "V": "lava",
+    "O": "plant/organic",
+    "note": "Full char map in js/catalog/materials.js ascii field per species"
+  },
+  "rules": [
+    {
+      "id": "sand",
+      "label": "Sand",
+      "phase": "materials",
+      "species": "sand",
+      "behaviorCount": 14,
+      "behaviorIds": [
+        "sand-fall-straight",
+        "sand-blocked-below",
+        "sand-stack-settles",
+        "sand-on-floor",
+        "sand-fall-two-steps",
+        "sand-diagonal-left",
+        "sand-diagonal-right",
+        "sand-diagonal-blocked-no-retry",
+        "sand-no-move-rand-zero",
+        "sand-one-cell-per-tick",
+        "sand-on-sand-on-wall",
+        "sand-flat-floor-center",
+        "sand-three-stack-settles",
+        "sand-rest-on-water"
+      ]
+    },
+    {
+      "id": "water",
+      "label": "Water",
+      "phase": "materials",
+      "species": "water",
+      "behaviorCount": 11,
+      "behaviorIds": [
+        "water-fall-straight",
+        "water-blocked-below",
+        "water-fall-two-steps",
+        "water-rest-on-sand",
+        "water-spread-right",
+        "water-spread-left",
+        "water-one-cell-per-tick",
+        "water-sinks-steam",
+        "water-stack-settles",
+        "water-boxed-no-spread",
+        "water-rest-on-stone"
+      ]
+    },
+    {
+      "id": "steam",
+      "label": "Steam",
+      "phase": "materials",
+      "species": "steam",
+      "behaviorCount": 6,
+      "behaviorIds": [
+        "steam-rise-straight",
+        "steam-blocked-above",
+        "steam-rise-two-steps",
+        "steam-diagonal-up-right",
+        "steam-diagonal-up-left",
+        "steam-one-cell-per-tick"
+      ]
+    },
+    {
+      "id": "fire",
+      "label": "Fire",
+      "phase": "materials",
+      "species": "fire",
+      "behaviorCount": 5,
+      "behaviorIds": [
+        "fire-burns-out",
+        "fire-extinguish-water",
+        "fire-drifts-to-empty",
+        "fire-ignites-organic",
+        "fire-blocked-surrounded"
+      ]
+    },
+    {
+      "id": "organic",
+      "label": "Organic",
+      "phase": "materials",
+      "species": "plant",
+      "behaviorCount": 4,
+      "behaviorIds": [
+        "organic-ignite-fire",
+        "organic-burns-away",
+        "organic-spreads-fire-while-burning",
+        "organic-grows-near-water"
+      ]
+    },
+    {
+      "id": "stone",
+      "label": "Stone",
+      "phase": "materials",
+      "species": "stone",
+      "behaviorCount": 9,
+      "behaviorIds": [
+        "stone-fall-straight",
+        "stone-sinks-water",
+        "stone-blocked-below",
+        "stone-on-floor",
+        "stone-stack-settles",
+        "stone-diagonal-right",
+        "stone-diagonal-left",
+        "stone-sinks-steam",
+        "stone-flat-floor-center"
+      ]
+    },
+    {
+      "id": "dust",
+      "label": "Dust",
+      "phase": "materials",
+      "species": "dust",
+      "behaviorCount": 4,
+      "behaviorIds": [
+        "dust-fall-straight",
+        "dust-blocked-below",
+        "dust-floats-on-water",
+        "dust-diagonal-right"
+      ]
+    },
+    {
+      "id": "oil",
+      "label": "Oil",
+      "phase": "materials",
+      "species": "oil",
+      "behaviorCount": 4,
+      "behaviorIds": [
+        "oil-floats-water",
+        "oil-ignite-lava",
+        "oil-burns-away",
+        "oil-spreads-fire"
+      ]
+    },
+    {
+      "id": "gas",
+      "label": "Gas",
+      "phase": "materials",
+      "species": "gas",
+      "behaviorCount": 4,
+      "behaviorIds": [
+        "gas-rise-straight",
+        "gas-blocked-above",
+        "gas-diagonal-up-left",
+        "gas-one-cell-per-tick"
+      ]
+    },
+    {
+      "id": "ice",
+      "label": "Ice",
+      "phase": "materials",
+      "species": "ice",
+      "behaviorCount": 3,
+      "behaviorIds": [
+        "ice-melts-fire",
+        "ice-static",
+        "ice-freezes-water"
+      ]
+    },
+    {
+      "id": "lava",
+      "label": "Lava",
+      "phase": "materials",
+      "species": "lava",
+      "behaviorCount": 3,
+      "behaviorIds": [
+        "lava-water-stone",
+        "lava-falls",
+        "lava-ignites-gas"
+      ]
+    },
+    {
+      "id": "wood",
+      "label": "Wood",
+      "phase": "materials",
+      "species": "wood",
+      "behaviorCount": 3,
+      "behaviorIds": [
+        "wood-ignite-fire",
+        "wood-burns-away",
+        "wood-spreads-fire"
+      ]
+    },
+    {
+      "id": "acid",
+      "label": "Acid",
+      "phase": "materials",
+      "species": "acid",
+      "behaviorCount": 2,
+      "behaviorIds": [
+        "acid-fall-straight",
+        "acid-corrodes-sand"
+      ]
+    },
+    {
+      "id": "seed",
+      "label": "Seed",
+      "phase": "materials",
+      "species": "seed",
+      "behaviorCount": 2,
+      "behaviorIds": [
+        "seed-fall-straight",
+        "seed-germinates-sand"
+      ]
+    },
+    {
+      "id": "fungus",
+      "label": "Fungus",
+      "phase": "materials",
+      "species": "fungus",
+      "behaviorCount": 3,
+      "behaviorIds": [
+        "fungus-ignite-fire",
+        "fungus-burns-away",
+        "fungus-grows-on-wood"
+      ]
+    },
+    {
+      "id": "rocket",
+      "label": "Rocket",
+      "phase": "materials",
+      "species": "rocket",
+      "behaviorCount": 1,
+      "behaviorIds": [
+        "rocket-fall-straight"
+      ]
+    },
+    {
+      "id": "reactions",
+      "label": "Reactions",
+      "phase": "reactions",
+      "species": null,
+      "behaviorCount": 8,
+      "behaviorIds": [
+        "reaction-water-fire-steam",
+        "reaction-fire-organic-ignites",
+        "reaction-no-op-when-separated",
+        "reaction-water-fire-vertical",
+        "reaction-fire-water-horizontal",
+        "reaction-fire-wood",
+        "reaction-fire-fungus",
+        "reaction-fire-oil"
+      ]
+    }
+  ],
+  "plugins": [
+    {
+      "id": "grenade",
+      "behaviorCount": 3,
+      "behaviorIds": [
+        "grenade-ignites-organic",
+        "grenade-spares-stone",
+        "grenade-direct-apply"
+      ]
+    }
+  ],
+  "behaviors": [
+    {
+      "id": "sand-fall-straight",
+      "suite": "sand",
+      "name": "Falls straight down",
+      "description": "One grain above empty space moves down one cell.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "S",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "S"
+      ],
+      "actualGrid": [
+        ".",
+        "S"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-blocked-below",
+      "suite": "sand",
+      "name": "Stays when blocked below",
+      "description": "Wall under sand — no escape, grain stays.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "S",
+        "#"
+      ],
+      "expectedGrid": [
+        "S",
+        "#"
+      ],
+      "actualGrid": [
+        "S",
+        "#"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-stack-settles",
+      "suite": "sand",
+      "name": "Stack settles one step",
+      "description": "Two grains above empty — both fall one cell.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "S",
+        "S",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "S",
+        "S"
+      ],
+      "actualGrid": [
+        ".",
+        "S",
+        "S"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0|0,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-on-floor",
+      "suite": "sand",
+      "name": "Does not pass through wall",
+      "description": "Sand sitting on wall stays put.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".",
+        "S",
+        "#"
+      ],
+      "expectedGrid": [
+        ".",
+        "S",
+        "#"
+      ],
+      "actualGrid": [
+        ".",
+        "S",
+        "#"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0|0,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-fall-two-steps",
+      "suite": "sand",
+      "name": "Falls two cells in two ticks",
+      "description": "Keeps falling while empty space is below.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 2,
+      "startGrid": [
+        "S",
+        ".",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        ".",
+        "S"
+      ],
+      "actualGrid": [
+        ".",
+        ".",
+        "S"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-diagonal-left",
+      "suite": "sand",
+      "name": "Slides down-left",
+      "description": "Blocked below; randDir forced left → down-left empty cell.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "..S..",
+        "..#..",
+        "..#.."
+      ],
+      "expectedGrid": [
+        ".....",
+        ".S#..",
+        "..#.."
+      ],
+      "actualGrid": [
+        ".....",
+        ".S#..",
+        "..#.."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "1,1:0|2,1:0|2,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-diagonal-right",
+      "suite": "sand",
+      "name": "Slides down-right",
+      "description": "Blocked below; randDir forced right → down-right empty cell.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "..S..",
+        "..#..",
+        "..#.."
+      ],
+      "expectedGrid": [
+        ".....",
+        "..#S.",
+        "..#.."
+      ],
+      "actualGrid": [
+        ".....",
+        "..#S.",
+        "..#.."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "2,1:0|2,2:0|3,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-diagonal-blocked-no-retry",
+      "suite": "sand",
+      "name": "Stays when chosen diagonal is blocked",
+      "description": "One random try per tick — open other diagonal is not attempted.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "..S..",
+        ".##..",
+        "....."
+      ],
+      "expectedGrid": [
+        "..S..",
+        ".##..",
+        "....."
+      ],
+      "actualGrid": [
+        "..S..",
+        ".##..",
+        "....."
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "1,1:0|2,0:0|2,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-no-move-rand-zero",
+      "suite": "sand",
+      "name": "Stays when rand picks straight (0)",
+      "description": "randDir=0 checks down-diagonal only — still blocked.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "S",
+        "#",
+        "."
+      ],
+      "expectedGrid": [
+        "S",
+        "#",
+        "."
+      ],
+      "actualGrid": [
+        "S",
+        "#",
+        "."
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-one-cell-per-tick",
+      "suite": "sand",
+      "name": "Moves at most one cell per tick",
+      "description": "Tall empty column — one cell per tick, not teleport to bottom.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "S",
+        ".",
+        ".",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "S",
+        ".",
+        "."
+      ],
+      "actualGrid": [
+        ".",
+        "S",
+        ".",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-on-sand-on-wall",
+      "suite": "sand",
+      "name": "Stack on wall with no gap stays put",
+      "description": "Sand on sand on wall — no empty cell, nothing moves.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "S",
+        "S",
+        "#"
+      ],
+      "expectedGrid": [
+        "S",
+        "S",
+        "#"
+      ],
+      "actualGrid": [
+        "S",
+        "S",
+        "#"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0|0,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-flat-floor-center",
+      "suite": "sand",
+      "name": "Rests on flat floor without sliding",
+      "description": "Centered on floor — diagonals blocked, stays put.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "...",
+        ".S.",
+        "###"
+      ],
+      "expectedGrid": [
+        "...",
+        ".S.",
+        "###"
+      ],
+      "actualGrid": [
+        "...",
+        ".S.",
+        "###"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,2:0|1,1:0|1,2:0|2,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-three-stack-settles",
+      "suite": "sand",
+      "name": "Three-grain stack settles one step",
+      "description": "Bottom-up scan: stack drops one cell when space below.",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "S",
+        "S",
+        "S",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "S",
+        "S",
+        "S"
+      ],
+      "actualGrid": [
+        ".",
+        "S",
+        "S",
+        "S"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0|0,2:0|0,3:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "sand-rest-on-water",
+      "suite": "sand",
+      "name": "Sinks through water",
+      "description": "Denser sand swaps with lighter water below (Sandspiel-aligned).",
+      "rulesEnabled": [
+        "sand"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "S",
+        "W",
+        "."
+      ],
+      "expectedGrid": [
+        "W",
+        "S",
+        "."
+      ],
+      "actualGrid": [
+        "W",
+        "S",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-fall-straight",
+      "suite": "water",
+      "name": "Falls straight down",
+      "description": "Water above empty space moves down one cell.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "W",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "W"
+      ],
+      "actualGrid": [
+        ".",
+        "W"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-blocked-below",
+      "suite": "water",
+      "name": "Stays when blocked below",
+      "description": "Wall under water — no movement.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "W",
+        "#"
+      ],
+      "expectedGrid": [
+        "W",
+        "#"
+      ],
+      "actualGrid": [
+        "W",
+        "#"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-fall-two-steps",
+      "suite": "water",
+      "name": "Falls two cells in two ticks",
+      "description": "Keeps falling while empty space is below.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 2,
+      "startGrid": [
+        "W",
+        ".",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        ".",
+        "W"
+      ],
+      "actualGrid": [
+        ".",
+        ".",
+        "W"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-rest-on-sand",
+      "suite": "water",
+      "name": "Rests on denser sand",
+      "description": "Less-dense water does not swap through sand below.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "W",
+        "S"
+      ],
+      "expectedGrid": [
+        "W",
+        "S"
+      ],
+      "actualGrid": [
+        "W",
+        "S"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-spread-right",
+      "suite": "water",
+      "name": "Spreads horizontally",
+      "description": "On flat floor with empty to the right → flows sideways.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".....",
+        "..W..",
+        "#####"
+      ],
+      "expectedGrid": [
+        ".....",
+        "...W.",
+        "#####"
+      ],
+      "actualGrid": [
+        ".....",
+        "...W.",
+        "#####"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,2:0|1,2:0|2,2:0|3,1:1|3,2:0|4,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-spread-left",
+      "suite": "water",
+      "name": "Spreads left when blocked right",
+      "description": "Wall on the right → flows left.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".....",
+        "..W#.",
+        "#####"
+      ],
+      "expectedGrid": [
+        ".....",
+        ".W.#.",
+        "#####"
+      ],
+      "actualGrid": [
+        ".....",
+        ".W.#.",
+        "#####"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,2:0|1,1:1|1,2:0|2,2:0|3,1:0|3,2:0|4,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-one-cell-per-tick",
+      "suite": "water",
+      "name": "Moves at most one cell per tick",
+      "description": "Tall empty column — one cell per tick.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "W",
+        ".",
+        ".",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "W",
+        ".",
+        "."
+      ],
+      "actualGrid": [
+        ".",
+        "W",
+        ".",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-sinks-steam",
+      "suite": "water",
+      "name": "Sinks through lighter steam",
+      "description": "Denser water swaps with buoyant steam below.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "W",
+        "^",
+        "."
+      ],
+      "expectedGrid": [
+        "^",
+        "W",
+        "."
+      ],
+      "actualGrid": [
+        "^",
+        "W",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-stack-settles",
+      "suite": "water",
+      "name": "Stack settles one step",
+      "description": "Two water cells above empty — both fall one cell.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "W",
+        "W",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "W",
+        "W"
+      ],
+      "actualGrid": [
+        ".",
+        "W",
+        "W"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0|0,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-boxed-no-spread",
+      "suite": "water",
+      "name": "Stays when fully boxed",
+      "description": "Surrounded by walls — no horizontal escape.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "###",
+        "#W#",
+        "###"
+      ],
+      "expectedGrid": [
+        "###",
+        "#W#",
+        "###"
+      ],
+      "actualGrid": [
+        "###",
+        "#W#",
+        "###"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0|0,2:0|1,0:0|1,1:0|1,2:0|2,0:0|2,1:0|2,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "water-rest-on-stone",
+      "suite": "water",
+      "name": "Rests on denser stone",
+      "description": "Water does not swap through stone below.",
+      "rulesEnabled": [
+        "water"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "W",
+        "T"
+      ],
+      "expectedGrid": [
+        "W",
+        "T"
+      ],
+      "actualGrid": [
+        "W",
+        "T"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "steam-rise-straight",
+      "suite": "steam",
+      "name": "Rises straight up",
+      "description": "Empty above → move up one cell.",
+      "rulesEnabled": [
+        "steam"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".",
+        "^"
+      ],
+      "expectedGrid": [
+        "^",
+        "."
+      ],
+      "actualGrid": [
+        "^",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "steam-blocked-above",
+      "suite": "steam",
+      "name": "Stays when blocked above",
+      "description": "Wall above — cannot rise.",
+      "rulesEnabled": [
+        "steam"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "#",
+        "^"
+      ],
+      "expectedGrid": [
+        "#",
+        "^"
+      ],
+      "actualGrid": [
+        "#",
+        "^"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "steam-rise-two-steps",
+      "suite": "steam",
+      "name": "Rises two cells in two ticks",
+      "description": "Keeps rising while empty space is above.",
+      "rulesEnabled": [
+        "steam"
+      ],
+      "steps": 2,
+      "startGrid": [
+        ".",
+        ".",
+        "^"
+      ],
+      "expectedGrid": [
+        "^",
+        ".",
+        "."
+      ],
+      "actualGrid": [
+        "^",
+        ".",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "steam-diagonal-up-right",
+      "suite": "steam",
+      "name": "Rises diagonally up-right",
+      "description": "Blocked straight up; randDir right → up-right empty cell.",
+      "rulesEnabled": [
+        "steam"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "..#..",
+        "..^..",
+        "....."
+      ],
+      "expectedGrid": [
+        "..#^.",
+        ".....",
+        "....."
+      ],
+      "actualGrid": [
+        "..#^.",
+        ".....",
+        "....."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "2,0:0|3,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "steam-diagonal-up-left",
+      "suite": "steam",
+      "name": "Rises diagonally up-left",
+      "description": "Blocked straight up; randDir left → up-left empty cell.",
+      "rulesEnabled": [
+        "steam"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "..#..",
+        "..^..",
+        "....."
+      ],
+      "expectedGrid": [
+        ".^#..",
+        ".....",
+        "....."
+      ],
+      "actualGrid": [
+        ".^#..",
+        ".....",
+        "....."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "1,0:0|2,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "steam-one-cell-per-tick",
+      "suite": "steam",
+      "name": "Moves at most one cell per tick",
+      "description": "Tall empty column above — one cell per tick.",
+      "rulesEnabled": [
+        "steam"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".",
+        ".",
+        ".",
+        "^"
+      ],
+      "expectedGrid": [
+        ".",
+        ".",
+        "^",
+        "."
+      ],
+      "actualGrid": [
+        ".",
+        ".",
+        "^",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "fire-burns-out",
+      "suite": "fire",
+      "name": "Burns out when heat is low",
+      "description": "ra below 5 → cell clears (extinguished / spent).",
+      "rulesEnabled": [
+        "fire"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "F"
+      ],
+      "expectedGrid": [
+        "."
+      ],
+      "actualGrid": [
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": null,
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "fire-extinguish-water",
+      "suite": "fire",
+      "name": "Dies on contact with water",
+      "description": "Random neighbor is water → fire clears.",
+      "rulesEnabled": [
+        "fire"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "WWW",
+        "WFW",
+        "WWW"
+      ],
+      "expectedGrid": [
+        "WWW",
+        "W.W",
+        "WWW"
+      ],
+      "actualGrid": [
+        "WWW",
+        "W.W",
+        "WWW"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0|0,2:0|1,0:0|1,2:0|2,0:0|2,1:0|2,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "fire-drifts-to-empty",
+      "suite": "fire",
+      "name": "Drifts into empty neighbor",
+      "description": "Hot fire moves into adjacent empty cell.",
+      "rulesEnabled": [
+        "fire"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "#F.",
+        "###"
+      ],
+      "expectedGrid": [
+        "#.F",
+        "###"
+      ],
+      "actualGrid": [
+        "#.F",
+        "###"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0|1,1:0|2,0:0|2,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "fire-ignites-organic",
+      "suite": "fire",
+      "name": "Ignites organic neighbor",
+      "description": "Random neighbor is organic → spawns fire there.",
+      "rulesEnabled": [
+        "fire"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "FO"
+      ],
+      "expectedGrid": [
+        "FF"
+      ],
+      "actualGrid": [
+        "FF"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "fire-blocked-surrounded",
+      "suite": "fire",
+      "name": "Stays when surrounded by walls",
+      "description": "No empty neighbor — fire remains (heat still decays internally).",
+      "rulesEnabled": [
+        "fire"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "###",
+        "#F#",
+        "###"
+      ],
+      "expectedGrid": [
+        "###",
+        "#F#",
+        "###"
+      ],
+      "actualGrid": [
+        "###",
+        "#F#",
+        "###"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0|0,2:0|1,0:0|1,1:0|1,2:0|2,0:0|2,1:0|2,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "organic-ignite-fire",
+      "suite": "organic",
+      "name": "Ignites when touching fire",
+      "description": "Adjacent fire sets rb burn countdown; renderer tints while rb > 0.",
+      "rulesEnabled": [
+        "organic"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "OF"
+      ],
+      "expectedGrid": [
+        "OF"
+      ],
+      "actualGrid": [
+        "OF"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": true,
+      "inspectPassed": true,
+      "rbState": "0,0:20|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "organic-burns-away",
+      "suite": "organic",
+      "name": "Burns away at end of countdown",
+      "description": "rb counts down to 1 → cell clears.",
+      "rulesEnabled": [
+        "organic"
+      ],
+      "steps": 2,
+      "startGrid": [
+        "O"
+      ],
+      "expectedGrid": [
+        "."
+      ],
+      "actualGrid": [
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": null,
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "organic-spreads-fire-while-burning",
+      "suite": "organic",
+      "name": "Spreads fire while burning",
+      "description": "rb > 1 and empty neighbor → spawns fire.",
+      "rulesEnabled": [
+        "organic"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "O."
+      ],
+      "expectedGrid": [
+        "OF"
+      ],
+      "actualGrid": [
+        "OF"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:19|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "organic-grows-near-water",
+      "suite": "organic",
+      "name": "Grows toward water",
+      "description": "Near water + growth roll → new organic cell in empty neighbor.",
+      "rulesEnabled": [
+        "organic"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".....",
+        "..OW.",
+        "....."
+      ],
+      "expectedGrid": [
+        ".....",
+        ".OOW.",
+        "....."
+      ],
+      "actualGrid": [
+        ".....",
+        ".OOW.",
+        "....."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "1,1:0|2,1:0|3,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "stone-fall-straight",
+      "suite": "stone",
+      "name": "Falls straight down",
+      "description": "Stone above empty space moves down one cell.",
+      "rulesEnabled": [
+        "stone"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "T",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "T"
+      ],
+      "actualGrid": [
+        ".",
+        "T"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "stone-sinks-water",
+      "suite": "stone",
+      "name": "Sinks through water",
+      "description": "Denser stone swaps upward with lighter water below.",
+      "rulesEnabled": [
+        "stone"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "T",
+        "W",
+        "."
+      ],
+      "expectedGrid": [
+        "W",
+        "T",
+        "."
+      ],
+      "actualGrid": [
+        "W",
+        "T",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "stone-blocked-below",
+      "suite": "stone",
+      "name": "Stays when blocked below",
+      "description": "Wall under stone — no movement.",
+      "rulesEnabled": [
+        "stone"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "T",
+        "#"
+      ],
+      "expectedGrid": [
+        "T",
+        "#"
+      ],
+      "actualGrid": [
+        "T",
+        "#"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "stone-on-floor",
+      "suite": "stone",
+      "name": "Does not pass through wall",
+      "description": "Stone sitting on wall stays put.",
+      "rulesEnabled": [
+        "stone"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".",
+        "T",
+        "#"
+      ],
+      "expectedGrid": [
+        ".",
+        "T",
+        "#"
+      ],
+      "actualGrid": [
+        ".",
+        "T",
+        "#"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0|0,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "stone-stack-settles",
+      "suite": "stone",
+      "name": "Stack settles one step",
+      "description": "Two stones above empty — both fall one cell.",
+      "rulesEnabled": [
+        "stone"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "T",
+        "T",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "T",
+        "T"
+      ],
+      "actualGrid": [
+        ".",
+        "T",
+        "T"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0|0,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "stone-diagonal-right",
+      "suite": "stone",
+      "name": "Slides down-right",
+      "description": "Blocked below; randDir forced right → down-right empty cell.",
+      "rulesEnabled": [
+        "stone"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "..T..",
+        "..#..",
+        "..#.."
+      ],
+      "expectedGrid": [
+        ".....",
+        "..#T.",
+        "..#.."
+      ],
+      "actualGrid": [
+        ".....",
+        "..#T.",
+        "..#.."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "2,1:0|2,2:0|3,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "stone-diagonal-left",
+      "suite": "stone",
+      "name": "Slides down-left",
+      "description": "Blocked below; randDir forced left → down-left empty cell.",
+      "rulesEnabled": [
+        "stone"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "..T..",
+        "..#..",
+        "..#.."
+      ],
+      "expectedGrid": [
+        ".....",
+        ".T#..",
+        "..#.."
+      ],
+      "actualGrid": [
+        ".....",
+        ".T#..",
+        "..#.."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "1,1:0|2,1:0|2,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "stone-sinks-steam",
+      "suite": "stone",
+      "name": "Sinks through steam",
+      "description": "Denser stone swaps with lighter steam below.",
+      "rulesEnabled": [
+        "stone"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "T",
+        "^",
+        "."
+      ],
+      "expectedGrid": [
+        "^",
+        "T",
+        "."
+      ],
+      "actualGrid": [
+        "^",
+        "T",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "stone-flat-floor-center",
+      "suite": "stone",
+      "name": "Rests on flat floor without sliding",
+      "description": "Centered on floor — diagonals blocked, stays put.",
+      "rulesEnabled": [
+        "stone"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "...",
+        ".T.",
+        "###"
+      ],
+      "expectedGrid": [
+        "...",
+        ".T.",
+        "###"
+      ],
+      "actualGrid": [
+        "...",
+        ".T.",
+        "###"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,2:0|1,1:0|1,2:0|2,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "dust-fall-straight",
+      "suite": "dust",
+      "name": "Falls straight down",
+      "description": null,
+      "rulesEnabled": [
+        "dust"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "d",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "d"
+      ],
+      "actualGrid": [
+        ".",
+        "d"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "dust-blocked-below",
+      "suite": "dust",
+      "name": "Stays when blocked below",
+      "description": null,
+      "rulesEnabled": [
+        "dust"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "d",
+        "#"
+      ],
+      "expectedGrid": [
+        "d",
+        "#"
+      ],
+      "actualGrid": [
+        "d",
+        "#"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "dust-floats-on-water",
+      "suite": "dust",
+      "name": "Rests above water",
+      "description": "Lighter than water — stays on top.",
+      "rulesEnabled": [
+        "dust"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "d",
+        "W"
+      ],
+      "expectedGrid": [
+        "d",
+        "W"
+      ],
+      "actualGrid": [
+        "d",
+        "W"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "dust-diagonal-right",
+      "suite": "dust",
+      "name": "Slides down-right when blocked below",
+      "description": "Blocked below; randDir forced right → down-right empty cell.",
+      "rulesEnabled": [
+        "dust"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "..d..",
+        "..#..",
+        "..#.."
+      ],
+      "expectedGrid": [
+        ".....",
+        "..#d.",
+        "..#.."
+      ],
+      "actualGrid": [
+        ".....",
+        "..#d.",
+        "..#.."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "2,1:0|2,2:0|3,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "oil-floats-water",
+      "suite": "oil",
+      "name": "Rests above water",
+      "description": "Less dense than water — does not sink through water below.",
+      "rulesEnabled": [
+        "oil"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "l",
+        "W"
+      ],
+      "expectedGrid": [
+        "l",
+        "W"
+      ],
+      "actualGrid": [
+        "l",
+        "W"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "oil-ignite-lava",
+      "suite": "oil",
+      "name": "Ignites when touching lava",
+      "description": "Lava contact starts oil burn timer (rb); species stays oil on tick 1.",
+      "rulesEnabled": [
+        "oil"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "lV"
+      ],
+      "expectedGrid": [
+        "lV"
+      ],
+      "actualGrid": [
+        "lV"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": true,
+      "inspectPassed": true,
+      "rbState": "0,0:50|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "oil-burns-away",
+      "suite": "oil",
+      "name": "Burns away at end of countdown",
+      "description": null,
+      "rulesEnabled": [
+        "oil"
+      ],
+      "steps": 2,
+      "startGrid": [
+        "l"
+      ],
+      "expectedGrid": [
+        "."
+      ],
+      "actualGrid": [
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": null,
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "oil-spreads-fire",
+      "suite": "oil",
+      "name": "Spreads fire while burning",
+      "description": null,
+      "rulesEnabled": [
+        "oil"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "l."
+      ],
+      "expectedGrid": [
+        "lF"
+      ],
+      "actualGrid": [
+        "lF"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:4|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "gas-rise-straight",
+      "suite": "gas",
+      "name": "Rises straight up",
+      "description": null,
+      "rulesEnabled": [
+        "gas"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".",
+        "g"
+      ],
+      "expectedGrid": [
+        "g",
+        "."
+      ],
+      "actualGrid": [
+        "g",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "gas-blocked-above",
+      "suite": "gas",
+      "name": "Stays when blocked above",
+      "description": null,
+      "rulesEnabled": [
+        "gas"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "#",
+        "g"
+      ],
+      "expectedGrid": [
+        "#",
+        "g"
+      ],
+      "actualGrid": [
+        "#",
+        "g"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "gas-diagonal-up-left",
+      "suite": "gas",
+      "name": "Rises diagonally when blocked straight",
+      "description": null,
+      "rulesEnabled": [
+        "gas"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "..#..",
+        "..g..",
+        "....."
+      ],
+      "expectedGrid": [
+        ".g#..",
+        ".....",
+        "....."
+      ],
+      "actualGrid": [
+        ".g#..",
+        ".....",
+        "....."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "1,0:0|2,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "gas-one-cell-per-tick",
+      "suite": "gas",
+      "name": "Moves at most one cell per tick",
+      "description": null,
+      "rulesEnabled": [
+        "gas"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".",
+        ".",
+        ".",
+        "g"
+      ],
+      "expectedGrid": [
+        ".",
+        ".",
+        "g",
+        "."
+      ],
+      "actualGrid": [
+        ".",
+        ".",
+        "g",
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "ice-melts-fire",
+      "suite": "ice",
+      "name": "Melts into water near fire",
+      "description": null,
+      "rulesEnabled": [
+        "ice"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "IF"
+      ],
+      "expectedGrid": [
+        "WF"
+      ],
+      "actualGrid": [
+        "WF"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "ice-static",
+      "suite": "ice",
+      "name": "Does not fall",
+      "description": "Static solid — stays when empty below.",
+      "rulesEnabled": [
+        "ice"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "I",
+        "."
+      ],
+      "expectedGrid": [
+        "I",
+        "."
+      ],
+      "actualGrid": [
+        "I",
+        "."
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "ice-freezes-water",
+      "suite": "ice",
+      "name": "Freezes adjacent water",
+      "description": null,
+      "rulesEnabled": [
+        "ice"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "IW"
+      ],
+      "expectedGrid": [
+        "II"
+      ],
+      "actualGrid": [
+        "II"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "lava-water-stone",
+      "suite": "lava",
+      "name": "Water contact becomes stone",
+      "description": null,
+      "rulesEnabled": [
+        "lava"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "VW"
+      ],
+      "expectedGrid": [
+        "T."
+      ],
+      "actualGrid": [
+        "T."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "lava-falls",
+      "suite": "lava",
+      "name": "Falls when space below",
+      "description": null,
+      "rulesEnabled": [
+        "lava"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "V",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "V"
+      ],
+      "actualGrid": [
+        ".",
+        "V"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "lava-ignites-gas",
+      "suite": "lava",
+      "name": "Ignites adjacent gas",
+      "description": null,
+      "rulesEnabled": [
+        "lava"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "gV"
+      ],
+      "expectedGrid": [
+        "FV"
+      ],
+      "actualGrid": [
+        "FV"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "wood-ignite-fire",
+      "suite": "wood",
+      "name": "Ignites when touching fire",
+      "description": "Burn timer rb starts; cell tints ember while species stays wood.",
+      "rulesEnabled": [
+        "wood"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "BF"
+      ],
+      "expectedGrid": [
+        "BF"
+      ],
+      "actualGrid": [
+        "BF"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": true,
+      "inspectPassed": true,
+      "rbState": "0,0:90|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "wood-burns-away",
+      "suite": "wood",
+      "name": "Burns away at end of countdown",
+      "description": "rb counts down to 1 → cell clears.",
+      "rulesEnabled": [
+        "wood"
+      ],
+      "steps": 2,
+      "startGrid": [
+        "B"
+      ],
+      "expectedGrid": [
+        "."
+      ],
+      "actualGrid": [
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": null,
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "wood-spreads-fire",
+      "suite": "wood",
+      "name": "Spreads fire while burning",
+      "description": "rb divisible by spreadEvery → spawns fire in empty neighbor.",
+      "rulesEnabled": [
+        "wood"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "B."
+      ],
+      "expectedGrid": [
+        "BF"
+      ],
+      "actualGrid": [
+        "BF"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:3|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "acid-fall-straight",
+      "suite": "acid",
+      "name": "Falls when space below",
+      "description": null,
+      "rulesEnabled": [
+        "acid"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "A",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "A"
+      ],
+      "actualGrid": [
+        ".",
+        "A"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "acid-corrodes-sand",
+      "suite": "acid",
+      "name": "Corrodes sand neighbor",
+      "description": "Touches sand → sand dissolves, acid consumed.",
+      "rulesEnabled": [
+        "acid"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "AS"
+      ],
+      "expectedGrid": [
+        ".."
+      ],
+      "actualGrid": [
+        ".."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": null,
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "seed-fall-straight",
+      "suite": "seed",
+      "name": "Falls straight down",
+      "description": null,
+      "rulesEnabled": [
+        "seed"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "e",
+        "."
+      ],
+      "expectedGrid": [
+        ".",
+        "e"
+      ],
+      "actualGrid": [
+        ".",
+        "e"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "seed-germinates-sand",
+      "suite": "seed",
+      "name": "Germinates into plant on sand",
+      "description": "Resting on sand with lucky roll → organic.",
+      "rulesEnabled": [
+        "seed"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "e",
+        "S"
+      ],
+      "expectedGrid": [
+        "O",
+        "S"
+      ],
+      "actualGrid": [
+        "O",
+        "S"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "fungus-ignite-fire",
+      "suite": "fungus",
+      "name": "Ignites when touching fire",
+      "description": "Species stays fungus; rb burn timer starts and renderer tints toward ember (rb > 0).",
+      "rulesEnabled": [
+        "fungus"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "uF"
+      ],
+      "expectedGrid": [
+        "uF"
+      ],
+      "actualGrid": [
+        "uF"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": true,
+      "inspectPassed": true,
+      "rbState": "0,0:20|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "fungus-burns-away",
+      "suite": "fungus",
+      "name": "Burns away at end of countdown",
+      "description": null,
+      "rulesEnabled": [
+        "fungus"
+      ],
+      "steps": 2,
+      "startGrid": [
+        "u"
+      ],
+      "expectedGrid": [
+        "."
+      ],
+      "actualGrid": [
+        "."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": null,
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "fungus-grows-on-wood",
+      "suite": "fungus",
+      "name": "Spreads into empty cell beside wood",
+      "description": null,
+      "rulesEnabled": [
+        "fungus"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "Bu."
+      ],
+      "expectedGrid": [
+        "Buu"
+      ],
+      "actualGrid": [
+        "Buu"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|1,0:0|2,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "rocket-fall-straight",
+      "suite": "rocket",
+      "name": "Falls straight down leaving sand",
+      "description": "Rocket moves down and leaves a sand grain behind (Sandspiel-style exhaust).",
+      "rulesEnabled": [
+        "rocket"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "R",
+        "."
+      ],
+      "expectedGrid": [
+        "S",
+        "R"
+      ],
+      "actualGrid": [
+        "S",
+        "R"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "reaction-water-fire-steam",
+      "suite": "reactions",
+      "name": "Water and fire make steam",
+      "description": "Adjacent water + fire → steam at fire cell, water cleared.",
+      "rulesEnabled": [
+        "reactions"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "WF"
+      ],
+      "expectedGrid": [
+        ".^"
+      ],
+      "actualGrid": [
+        ".^"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "reaction-fire-organic-ignites",
+      "suite": "reactions",
+      "name": "Fire ignites organic",
+      "description": "Adjacent fire + organic → organic becomes fire.",
+      "rulesEnabled": [
+        "reactions"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "FO"
+      ],
+      "expectedGrid": [
+        "FF"
+      ],
+      "actualGrid": [
+        "FF"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "reaction-no-op-when-separated",
+      "suite": "reactions",
+      "name": "No reaction without contact",
+      "description": "Water and fire with gap → unchanged.",
+      "rulesEnabled": [
+        "reactions"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "W.F"
+      ],
+      "expectedGrid": [
+        "W.F"
+      ],
+      "actualGrid": [
+        "W.F"
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|2,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "reaction-water-fire-vertical",
+      "suite": "reactions",
+      "name": "Water above fire makes steam",
+      "description": "Stacked water + fire → steam at fire, water cleared.",
+      "rulesEnabled": [
+        "reactions"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "W",
+        "F"
+      ],
+      "expectedGrid": [
+        ".",
+        "^"
+      ],
+      "actualGrid": [
+        ".",
+        "^"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,1:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "reaction-fire-water-horizontal",
+      "suite": "reactions",
+      "name": "Fire left of water makes steam",
+      "description": "Fire as cell a still reacts when water is neighbor b.",
+      "rulesEnabled": [
+        "reactions"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "FW"
+      ],
+      "expectedGrid": [
+        "^."
+      ],
+      "actualGrid": [
+        "^."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "reaction-fire-wood",
+      "suite": "reactions",
+      "name": "Fire ignites wood",
+      "description": "Adjacent fire + wood → wood becomes fire.",
+      "rulesEnabled": [
+        "reactions"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "FB"
+      ],
+      "expectedGrid": [
+        "FF"
+      ],
+      "actualGrid": [
+        "FF"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "reaction-fire-fungus",
+      "suite": "reactions",
+      "name": "Fire ignites fungus",
+      "description": null,
+      "rulesEnabled": [
+        "reactions"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "Fu"
+      ],
+      "expectedGrid": [
+        "FF"
+      ],
+      "actualGrid": [
+        "FF"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "reaction-fire-oil",
+      "suite": "reactions",
+      "name": "Fire ignites oil",
+      "description": null,
+      "rulesEnabled": [
+        "reactions"
+      ],
+      "steps": 1,
+      "startGrid": [
+        "Fl"
+      ],
+      "expectedGrid": [
+        "FF"
+      ],
+      "actualGrid": [
+        "FF"
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "0,0:0|1,0:0",
+      "verdict": "PASS",
+      "failure": null
+    }
+  ]
+}

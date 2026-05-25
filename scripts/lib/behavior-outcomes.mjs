@@ -39,6 +39,10 @@ export async function collectBehaviorSnapshots() {
 
   for (const behavior of getAllBehaviors()) {
     const id = behavior.id ?? `${behavior.suite}-${behavior.name}`;
+    const rows = behavior.slice?.rows ?? behavior.rows ?? [];
+    const expect = behavior.expect ?? [];
+    const scope = behavior.scope ?? { rules: [behavior.suite] };
+
     try {
       const prep = prepareScenario(behavior);
       const steps = behavior.steps ?? 1;
@@ -61,22 +65,36 @@ export async function collectBehaviorSnapshots() {
       }
 
       const after = asciiFromWorld(prep.slice.world);
-      const gridPass = rowsEqual(after, prep.expect);
+      const gridPass = rowsEqual(after, expect);
+      const pass = gridPass && !inspectError;
+      const digest = worldDigest(prep.slice.world);
+
       snapshots[id] = {
+        id,
         suite: behavior.suite,
         name: behavior.name,
-        pass: gridPass && !inspectError,
-        before: prep.before,
-        after,
-        rb: worldDigest(prep.slice.world).rb,
-        inspectError,
+        description: behavior.description ?? null,
+        rulesEnabled: scope.rules ?? [],
+        steps,
+        startGrid: rows,
+        expectedGrid: expect,
+        actualGrid: after,
+        gridChanged: rows.join('|') !== after.join('|'),
+        gridMatchesExpected: gridPass,
+        hasInspect: typeof behavior.inspect === 'function',
+        inspectPassed: pass && typeof behavior.inspect === 'function',
+        rbState: digest.rb || null,
+        verdict: pass ? 'PASS' : 'FAIL',
+        failure: pass ? null : (inspectError ?? 'grid mismatch'),
       };
     } catch (err) {
       snapshots[id] = {
+        id,
         suite: behavior.suite,
         name: behavior.name,
-        pass: false,
-        error: err.message,
+        description: behavior.description ?? null,
+        verdict: 'FAIL',
+        failure: err.message,
       };
     }
   }

@@ -27,6 +27,8 @@ npm run release        # ← before production: one verdict, all gates
 npm test               # same checks, plain output
 npm run test:watch     # background auto-rerun while coding
 npm run snapshot:update  # after intentional sim changes
+npm run export:verification  # JSON audit for LLM second opinion
+npm run copy:llm             # same + copies prompt+JSON to clipboard
 npm run setup:hooks    # optional git pre-commit + pre-push gates
 ```
 

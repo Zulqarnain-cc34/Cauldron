@@ -24,6 +24,8 @@
     "check:coverage": "node scripts/check-coverage.mjs",
     "check:snapshots": "node scripts/behavior-snapshot.mjs",
     "snapshot:update": "node scripts/behavior-snapshot.mjs --write",
+    "export:verification": "node scripts/export-verification.mjs",
+    "copy:llm": "node scripts/copy-llm-review.mjs",
     "setup:hooks": "bash scripts/install-hooks.sh"
   }
 }

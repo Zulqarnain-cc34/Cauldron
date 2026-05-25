@@ -1,0 +1,24 @@
+You are reviewing a Cauldron falling-sand simulation test audit export.
+
+Your job:
+1. Confirm every behavior marked "verdict": "PASS" has a logically consistent setup:
+   - "expectedGrid" should match what the test name/description claims (e.g. "falls" → material moved down).
+   - "actualGrid" must equal "expectedGrid" for PASS rows.
+   - If grid unchanged but name implies ignite/burn, "inspectPassed" must be true and rbState should show burn timers.
+2. Flag any PASS that looks like a no-op (nothing changed when change was promised, no inspect).
+3. Flag any expected result that violates physics intuition (sand falling up, fire freezing water as ice, etc.).
+4. Summarize: total reviewed, count OK, count suspicious, list suspicious behavior ids with one-line reason.
+
+Do NOT re-run code. Judge only from this JSON. Be concise.
+
+---
+Paste the JSON below this line (from verification-report.json) or attach the file.
+---
+
+SUMMARY FROM EXPORT:
+- Overall: ALL_PASS
+- Behaviors: 86/86 PASS
+- Headless: null pass, null fail
+- Quality gates: all pass
+
+Then review each behavior in the "behaviors" array.
