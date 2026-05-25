@@ -51,6 +51,9 @@ export const reactionRuleDef = {
   phase: 'reactions',
   customUpdate: null,
   run: applyReactions,
+  doc: {
+    summary: 'Adjacency chemistry — water extinguishes fire into steam, fire ignites burnables.',
+  },
 
   behaviors: [
     {

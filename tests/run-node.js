@@ -1,9 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { getTestSuites } from '../js/sim/test-registry.js';
+import { World } from '../js/world.js';
+import { getAllTestSuites } from '../js/doc/build-catalog.js';
+import { initPlugins } from '../js/plugins/host.js';
 import { runScenario } from './helpers/harness.js';
+import '../plugins/index.js';
 
-for (const suite of getTestSuites()) {
+initPlugins({
+  world: new World(4, 4),
+  canvas: { addEventListener() {} },
+});
+
+for (const suite of getAllTestSuites()) {
   for (const scenario of suite.tests) {
     test(`${suite.label} › ${scenario.name}`, () => {
       const result = runScenario(scenario);

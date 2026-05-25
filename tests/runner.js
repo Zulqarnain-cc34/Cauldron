@@ -1,7 +1,15 @@
-import { getTestSuites } from '../js/sim/test-registry.js';
+import { getAllTestSuites } from '../js/doc/build-catalog.js';
 import { runSuite } from './helpers/harness.js';
 import { drawAsciiGrid, rowsToPre } from './helpers/visual.js';
 import { LiveDemoPlayer } from './helpers/live-demo.js';
+import '../plugins/index.js';
+import { World } from '../js/world.js';
+import { initPlugins } from '../js/plugins/host.js';
+
+initPlugins({
+  world: new World(4, 4),
+  canvas: { addEventListener() {} },
+});
 
 let demo = null;
 let selectedId = null;
@@ -91,7 +99,7 @@ function runAll() {
   let totalPassed = 0;
   let totalTests = 0;
 
-  for (const suite of getTestSuites()) {
+  for (const suite of getAllTestSuites()) {
     const section = document.createElement('section');
     section.className = 'suite';
 

@@ -4,6 +4,8 @@ import { runRules } from './js/rules/registry.js';
 import { renderWorld, canvasSize } from './js/render.js';
 import { setupInput } from './js/input.js';
 import { mountPanel, bindKeyboard } from './js/ui/panel.js';
+import { initPlugins, renderPlugins } from './js/plugins/host.js';
+import './plugins/index.js';
 
 let world;
 let ui;
@@ -37,6 +39,7 @@ new window.p5((p) => {
     canvas.parent('sim-host');
 
     setupInput(world, canvas.elt);
+    initPlugins({ world, canvas: canvas.elt });
     ui = mountPanel(world, {
       onPauseChange(paused) {
         ui?.setPaused(paused);
@@ -68,6 +71,7 @@ new window.p5((p) => {
       runRules(world);
     }
     renderWorld(p, world);
+    renderPlugins(p, world);
     ui?.setTick(world.tick);
   };
 });

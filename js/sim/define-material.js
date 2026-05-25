@@ -45,6 +45,7 @@ export function defineMaterial(def) {
     scanDirection,
     speciesFilter: def.speciesFilter ?? new Set([def.species]),
     enabledKey: def.enabledKey ?? def.id,
+    doc: def.doc,
     update,
     behaviors: def.behaviors ?? [],
   };

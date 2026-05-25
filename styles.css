@@ -59,6 +59,16 @@ body {
   letter-spacing: 0.04em;
 }
 
+.bar-top a {
+  color: #6a8cff;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+.bar-top a:hover {
+  text-decoration: underline;
+}
+
 .tick {
   font-size: 0.75rem;
   color: #8888a0;

@@ -106,6 +106,7 @@ export function mountPanel(world, callbacks) {
   root.innerHTML = `
     <header class="bar bar-top">
       <h1>Cauldron</h1>
+      <a href="/docs/index.html">Docs</a>
       <span class="tick" id="tick-label">tick 0</span>
       <button type="button" id="btn-pause" title="Space">Pause</button>
       <button type="button" id="btn-step" title="Step one frame">&gt;</button>

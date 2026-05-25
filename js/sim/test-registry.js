@@ -1,5 +1,6 @@
 import { defineMaterial } from './define-material.js';
 import { buildToggleableRules } from '../catalog/rule-toggle-catalog.js';
+import { getPluginToggleRules } from '../plugins/host.js';
 import { sandRuleDef } from '../rules/materials/sand.js';
 import { waterRuleDef } from '../rules/materials/water.js';
 import { steamRuleDef } from '../rules/materials/steam.js';
@@ -55,9 +56,16 @@ export function getMaterialModules() {
   return getRuleModules().filter((m) => m.phase === 'materials' && m.update);
 }
 
-/** All rules exposed in the UI toggle picker (materials + system). */
+/** All rules exposed in the UI toggle picker (materials + system + plugins). */
 export function getToggleableRules() {
-  return buildToggleableRules(getRuleModules());
+  const out = buildToggleableRules(getRuleModules());
+  const seen = new Set(out.map((r) => r.key));
+  for (const toggle of getPluginToggleRules()) {
+    if (seen.has(toggle.key)) continue;
+    seen.add(toggle.key);
+    out.push(toggle);
+  }
+  return out;
 }
 
 export function getAllBehaviors() {
