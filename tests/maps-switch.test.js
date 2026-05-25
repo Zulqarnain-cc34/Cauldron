@@ -38,7 +38,7 @@ test('switchTo keeps separate map sessions like two apps', () => {
   assert.deepEqual(world.cells, sandboxCells);
   assert.equal(world.tick, sandboxTick);
   assert.equal(world.backpack.slots.find(Boolean)?.count, 2);
-  assert.equal(world.gemPickups.length, 3);
+  assert.equal(world.gemPickups.length, 4);
 
   manager.switchTo('workshop');
   assert.equal(world.tick, workshopTick);

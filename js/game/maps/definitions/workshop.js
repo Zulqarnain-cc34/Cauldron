@@ -55,8 +55,9 @@ export function bootstrapWorkshop(world) {
   }
 
   spawnGemPickups(world, [
-    { x: midX - 5, y: floorY - 20 },
-    { x: midX + 12, y: floorY - 32 },
+    { x: midX - 5, y: floorY - 20, itemId: 'diamond' },
+    { x: midX + 12, y: floorY - 32, itemId: 'topaz' },
+    { x: midX - 14, y: floorY - 26, itemId: 'ruby' },
   ]);
 }
 
@@ -64,10 +65,10 @@ export function bootstrapWorkshop(world) {
 export const workshopMap = {
   id: 'workshop',
   label: 'Workshop',
-  description: 'Dig through sand and water to collect 2 diamonds.',
+  description: 'Dig through sand and water — collect diamond, topaz, and ruby.',
   seed: 9001,
   bootstrap: bootstrapWorkshop,
-  goals: { gems: { diamond: 2 } },
+  goals: { gems: { diamond: 1, topaz: 1, ruby: 1 } },
   defaultRules: {
     grenade: true,
   },

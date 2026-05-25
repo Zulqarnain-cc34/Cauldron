@@ -50,7 +50,24 @@ export const ITEM_CATALOG = {
     stackSize: 99,
     icon: '/assets/diamond.png',
   },
+  topaz: {
+    id: 'topaz',
+    label: 'Topaz',
+    kind: 'gem',
+    stackSize: 99,
+    icon: '/assets/topaz.png',
+  },
+  ruby: {
+    id: 'ruby',
+    label: 'Ruby',
+    kind: 'gem',
+    stackSize: 99,
+    icon: '/assets/ruby.png',
+  },
 };
+
+/** All gemstone item ids (world pickups + inventory). */
+export const GEM_ITEM_IDS = ['diamond', 'topaz', 'ruby'];
 
 /** @param {string} itemId */
 export function getItemDef(itemId) {
@@ -85,4 +102,9 @@ export function itemSwatchColor(def) {
 /** @param {string} itemId */
 export function isStorableItem(itemId) {
   return itemId in ITEM_CATALOG;
+}
+
+/** @param {string} itemId */
+export function isGemItem(itemId) {
+  return getItemDef(itemId)?.kind === 'gem';
 }

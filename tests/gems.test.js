@@ -23,3 +23,15 @@ test('spawn and collect diamond are separate actions', () => {
   assert.equal(world.gemPickups.length, 0);
   assert.equal(world.backpack.slots.filter(Boolean).length, 1);
 });
+
+test('topaz and ruby collect into backpack like diamond', () => {
+  const world = new World(16, 16, 1);
+  world.backpack = createBackpackInventory();
+
+  spawnGemPickup(world, 4, 4, 'topaz', 1);
+  spawnGemPickup(world, 8, 8, 'ruby', 1);
+
+  assert.equal(tryCollectGem(world, 4, 4).itemId, 'topaz');
+  assert.equal(tryCollectGem(world, 8, 8).itemId, 'ruby');
+  assert.equal(world.backpack.slots.filter(Boolean).length, 2);
+});

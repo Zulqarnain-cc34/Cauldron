@@ -29,7 +29,7 @@ export function mountBackpack(world, opts = {}) {
     iconSrc,
     hotkeyLabel: 'E',
     hotkeyCode: 'KeyE',
-    hint: 'Collect items in the world — they will appear here.',
+    hint: 'Alt+click gemstones in the world to collect them here.',
     getInventory: () => world.backpack,
     toolbar,
     toggleClass: 'container-toggle-backpack',

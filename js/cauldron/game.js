@@ -9,6 +9,8 @@ export {
   itemIdForSpecies,
   itemSwatchColor,
   isStorableItem,
+  isGemItem,
+  GEM_ITEM_IDS,
   createSlotInventory,
   normalizeStack,
   getSlot,

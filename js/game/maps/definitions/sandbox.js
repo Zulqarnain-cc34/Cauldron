@@ -24,9 +24,10 @@ export function bootstrapSandbox(world) {
   }
 
   spawnGemPickups(world, [
-    { x: 120, y: 40 },
-    { x: 145, y: 55 },
-    { x: 165, y: 35 },
+    { x: 120, y: 40, itemId: 'diamond' },
+    { x: 145, y: 55, itemId: 'diamond' },
+    { x: 165, y: 35, itemId: 'topaz' },
+    { x: 130, y: 48, itemId: 'ruby' },
   ]);
 }
 
@@ -34,10 +35,10 @@ export function bootstrapSandbox(world) {
 export const sandboxMap = {
   id: 'sandbox',
   label: 'Sandbox',
-  description: 'Find 3 diamonds buried in the sand pile.',
+  description: 'Find diamonds, topaz, and ruby buried in the sand.',
   seed: 42,
   bootstrap: bootstrapSandbox,
-  goals: { gems: { diamond: 3 } },
+  goals: { gems: { diamond: 2, topaz: 1, ruby: 1 } },
   defaultRules: {
     grenade: true,
   },
