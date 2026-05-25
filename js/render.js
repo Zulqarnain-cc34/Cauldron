@@ -1,5 +1,5 @@
 import { PALETTE, Species } from './materials.js';
-import { CELL_PX } from './world.js';
+import { CELL_PX, DISPLAY_SCALE, canvasPixelSize } from './world.js';
 import { cellColor } from './catalog/cell-color.js';
 
 let pixelBuffer = null;
@@ -36,12 +36,11 @@ export function renderWorld(p, world) {
   }
 
   pixelBuffer.updatePixels();
-  p.image(pixelBuffer, 0, 0);
+  const displayW = Math.round(w * DISPLAY_SCALE);
+  const displayH = Math.round(h * DISPLAY_SCALE);
+  p.image(pixelBuffer, 0, 0, displayW, displayH);
 }
 
 export function canvasSize(world) {
-  return {
-    width: world.width * CELL_PX,
-    height: world.height * CELL_PX,
-  };
+  return canvasPixelSize(world);
 }

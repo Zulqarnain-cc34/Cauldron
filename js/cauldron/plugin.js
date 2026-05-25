@@ -16,7 +16,7 @@ export {
   isExtensionSpecies,
   PLUGIN_SPECIES_MIN,
 } from '../catalog/species-allocator.js';
-export { World, GRID_W, GRID_H, CELL_PX, WORLD } from '../world.js';
+export { World, GRID_W, GRID_H, CELL_PX, DISPLAY_SCALE, displayCellPx, canvasPixelSize, WORLD } from '../world.js';
 export {
   isEmpty,
   tryMoveDown,

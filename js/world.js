@@ -97,3 +97,19 @@ export class World {
 export const GRID_W = 280;
 export const GRID_H = 200;
 export const CELL_PX = 2;
+/** Canvas display scale relative to sim pixels (1.3 ≈ 30% larger). */
+export const DISPLAY_SCALE = 1.3;
+
+/** Screen pixels per grid cell (for canvas size, input, plugin overlays). */
+export function displayCellPx() {
+  return CELL_PX * DISPLAY_SCALE;
+}
+
+/** @param {World} world */
+export function canvasPixelSize(world) {
+  const px = displayCellPx();
+  return {
+    width: Math.round(world.width * px),
+    height: Math.round(world.height * px),
+  };
+}

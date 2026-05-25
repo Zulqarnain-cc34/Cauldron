@@ -13,7 +13,7 @@ export {
 export { Mobility, GRAVITY, scanDirectionFor, gravityFor } from '../catalog/physics.js';
 export { Tags } from '../catalog/tags.js';
 export { cellColor, speciesColor, BURN_GLOW } from '../catalog/cell-color.js';
-export { World, GRID_W, GRID_H, CELL_PX, WORLD } from '../world.js';
+export { World, GRID_W, GRID_H, CELL_PX, DISPLAY_SCALE, displayCellPx, canvasPixelSize, WORLD } from '../world.js';
 export { runRules, registerRule, PHASES } from '../rules/registry.js';
 export {
   initPlugins,

@@ -1,11 +1,12 @@
 import { Species } from './catalog/species.js';
 import { getBrushMaterials } from './catalog/materials.js';
 import { getExtensionBrushTools } from './sim/brush-registry.js';
-import { CELL_PX } from './world.js';
+import { displayCellPx } from './world.js';
 
 function gridFromMouse(world, mx, my) {
-  const gx = Math.floor(mx / CELL_PX);
-  const gy = Math.floor(my / CELL_PX);
+  const px = displayCellPx();
+  const gx = Math.floor(mx / px);
+  const gy = Math.floor(my / px);
   if (!world.inBounds(gx, gy)) return null;
   return { gx, gy };
 }

@@ -6,7 +6,7 @@ import {
   throwGrenade,
 } from './blast.js';
 import { renderFragments, renderGrenades } from './render.js';
-import { Species, CELL_PX } from '../../js/cauldron/plugin.js';
+import { Species, displayCellPx } from '../../js/cauldron/plugin.js';
 
 const PLUGIN_ID = 'grenade';
 const RULE_ID = 'grenade-blast';
@@ -57,8 +57,9 @@ export const grenadePlugin = {
       const rect = canvas.getBoundingClientRect();
       const mx = e.clientX - rect.left;
       const my = e.clientY - rect.top;
-      const gx = Math.floor(mx / CELL_PX);
-      const gy = Math.floor(my / CELL_PX);
+      const px = displayCellPx();
+      const gx = Math.floor(mx / px);
+      const gy = Math.floor(my / px);
       if (world.inBounds(gx, gy)) {
         mouseGx = gx;
         mouseGy = gy;
