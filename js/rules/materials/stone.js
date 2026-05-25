@@ -3,22 +3,13 @@ import { MATERIALS } from '../../catalog/materials.js';
 
 const SCOPE = { rules: ['stone'] };
 
-/**
- * Sandspiel-style stone: falls like sand and sinks through lighter fluids (water, steam).
- * Wall stays static — no rule module.
- */
+/** Motion from catalog mobility (granular + sinkThroughLighter). */
 export const stoneRuleDef = {
   id: 'stone',
   label: 'Stone',
   species: Species.STONE,
   material: MATERIALS[Species.STONE],
   phase: 'materials',
-  scanDirection: 'down',
-  movement: [
-    { op: 'moveDown', if: 'empty' },
-    { op: 'swapDenserBelow' },
-    { op: 'moveDiagRandom', if: 'empty' },
-  ],
 
   behaviors: [
     {

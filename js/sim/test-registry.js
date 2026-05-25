@@ -69,3 +69,27 @@ export function buildUpdaters() {
   }
   return updaters;
 }
+
+/**
+ * Which species to simulate this tick — respects rule toggles and test `only` scope.
+ * @param {import('../world.js').World} world
+ * @param {Set<string>|null} onlyRuleIds
+ * @returns {{ down: Set<number>, up: Set<number> }}
+ */
+export function resolveActiveSpecies(world, onlyRuleIds) {
+  const down = new Set();
+  const up = new Set();
+
+  for (const mod of getMaterialModules()) {
+    if (onlyRuleIds && !onlyRuleIds.has(mod.id)) continue;
+
+    const key = mod.enabledKey ?? mod.id;
+    if (!(world.ruleEnabled[key] ?? true)) continue;
+
+    const dir = mod.scanDirection ?? 'down';
+    if (dir === 'up') up.add(mod.species);
+    else down.add(mod.species);
+  }
+
+  return { down, up };
+}

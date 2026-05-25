@@ -5,8 +5,7 @@ import { MATERIALS } from '../../catalog/materials.js';
 const SCOPE = { rules: ['sand'] };
 
 /**
- * Sand — rule + tests
- * movement[] compiles to update(); behaviors[] are written by hand.
+ * Sand — tests + catalog registration. Motion from catalog mobility (granular).
  */
 export const sandRuleDef = {
   id: 'sand',
@@ -14,11 +13,6 @@ export const sandRuleDef = {
   species: Species.SAND,
   material: MATERIALS[Species.SAND],
   phase: 'materials',
-  scanDirection: 'down',
-  movement: [
-    { op: 'moveDown', if: 'empty' },
-    { op: 'moveDiagRandom', if: 'empty' },
-  ],
 
   behaviors: [
     {

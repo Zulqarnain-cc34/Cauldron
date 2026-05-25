@@ -2,6 +2,13 @@ import { Species, Flags } from './materials.js';
 
 const STRIDE = 4;
 
+/** World-wide simulation constants (see catalog/physics.js for material model). */
+export const WORLD = {
+  /** Water density reference = 1.0 in catalog. */
+  referenceDensity: 1.0,
+  gravity: 1,
+};
+
 /**
  * Dense grid: 4 bytes per cell (Sandspiel-style).
  * [0] species, [1] flags, [2] ra (aux / brightness), [3] clock (last tick processed)

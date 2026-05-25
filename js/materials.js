@@ -1,7 +1,19 @@
 /** Backward-compatible re-exports — prefer js/catalog/* in new code. */
 export { Species, SpeciesName, Flags } from './catalog/species.js';
-export { PALETTE, MATERIALS, getMaterial, isDenser } from './catalog/materials.js';
+export {
+  PALETTE,
+  MATERIALS,
+  getMaterial,
+  isDenser,
+  registerMaterial,
+} from './catalog/materials.js';
 export { Tags } from './catalog/tags.js';
+export {
+  Mobility,
+  GRAVITY,
+  scanDirectionFor,
+  gravityFor,
+} from './catalog/physics.js';
 
 import { Species } from './catalog/species.js';
 import { Tags } from './catalog/tags.js';
