@@ -19,12 +19,15 @@ export const woodRuleDef = {
     {
       id: 'wood-ignite-fire',
       name: 'Ignites when touching fire',
+      description: 'Burn timer rb starts; cell tints ember while species stays wood.',
       slice: { rows: ['BF'] },
       expect: ['BF'],
       scope: SCOPE,
       steps: 1,
-      setup(w) {
-        w.seed = 7;
+      inspect(w) {
+        if (w.get(0, 0).rb <= 1) {
+          throw new Error(`expected wood rb > 1 after ignite, got ${w.get(0, 0).rb}`);
+        }
       },
     },
     {

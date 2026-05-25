@@ -2,6 +2,8 @@
 
 This is a **library you build on**. Every extension type has one registration API — no god-files, no layer violations.
 
+**Testing workflow:** [TESTING.md](TESTING.md) — write `behaviors[]` once; CI / `test:watch` / hooks run them for you.
+
 ## Quick reference
 
 | You want to… | API | Import from |

@@ -15,7 +15,10 @@
     "start": "npx --yes serve . -p 3456",
     "dev": "npm start",
     "test": "node --test tests/run-node.js tests/extension-api.test.js && npm run check:layers",
+    "test:watch": "node scripts/test-watch.mjs",
     "test:visual": "npm start",
-    "check:layers": "node scripts/check-layers.mjs"
+    "verify": "npm test",
+    "check:layers": "node scripts/check-layers.mjs",
+    "setup:hooks": "bash scripts/install-hooks.sh"
   }
 }

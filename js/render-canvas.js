@@ -1,14 +1,4 @@
-import { PALETTE, Species } from './materials.js';
-
-function speciesColor(species, ra) {
-  const base = PALETTE[species] ?? [255, 0, 255];
-  const grain = (ra / 255 - 0.5) * 0.15;
-  return [
-    Math.min(255, Math.max(0, base[0] * (1 + grain))),
-    Math.min(255, Math.max(0, base[1] * (1 + grain))),
-    Math.min(255, Math.max(0, base[2] * (1 + grain))),
-  ];
-}
+import { cellColor } from './catalog/cell-color.js';
 
 /**
  * Draw World grid to a Canvas2D context (shared by game + test demo).
@@ -34,7 +24,7 @@ export function renderWorldToCanvas(ctx, world, opts = {}) {
   for (let gy = 0; gy < world.height; gy++) {
     for (let gx = 0; gx < world.width; gx++) {
       const cell = world.get(gx, gy);
-      const [r, g, b] = speciesColor(cell.species, cell.ra);
+      const [r, g, b] = cellColor(cell, { tick: world.tick });
       ctx.fillStyle = `rgb(${r},${g},${b})`;
       ctx.fillRect(gx * cellPx, gy * cellPx, cellPx, cellPx);
 
@@ -101,4 +91,4 @@ export function computeDemoCellPx(world, opts = {}) {
   return Math.max(minCellPx, cellPx);
 }
 
-export { speciesColor };
+export { cellColor, speciesColor } from './catalog/cell-color.js';

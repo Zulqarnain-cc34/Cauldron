@@ -2,7 +2,7 @@ import { Species, Flags } from './materials.js';
 import { defaultRuleEnabled } from './catalog/rule-defaults.js';
 import { runWorldResetHooks } from './sim/lifecycle.js';
 
-const STRIDE = 4;
+const STRIDE = 5;
 
 /** World-wide simulation constants (see catalog/physics.js for material model). */
 export const WORLD = {
@@ -13,7 +13,7 @@ export const WORLD = {
 
 /**
  * Dense grid: 4 bytes per cell (Sandspiel-style).
- * [0] species, [1] flags, [2] ra (aux / brightness), [3] clock (last tick processed)
+ * [0] species, [1] flags, [2] ra (aux / brightness), [3] rb (burn timer / aux state), [4] clock (last tick processed)
  */
 export class World {
   constructor(width, height, seed = 1) {
@@ -64,11 +64,11 @@ export class World {
   }
 
   markClock(x, y) {
-    this.cells[this.idx(x, y) + 3] = this.tick & 255;
+    this.cells[this.idx(x, y) + 4] = this.tick & 255;
   }
 
   wasProcessed(x, y) {
-    return this.cells[this.idx(x, y) + 3] === (this.tick & 255);
+    return this.cells[this.idx(x, y) + 4] === (this.tick & 255);
   }
 
   reset() {

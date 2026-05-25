@@ -37,6 +37,24 @@ Cauldron is a **layered library** for falling-sand simulation. Each layer talks 
 
 Run `npm run check:layers` to enforce boundaries in CI.
 
+## Cell model (L0)
+
+Each cell is **5 bytes**: `species`, `flags`, `ra` (brightness/aux), `rb` (burn timer / aux state), `clock` (scan dedup — separate from `rb`).
+
+| Field | Role |
+|-------|------|
+| `species` | Material id — what rules and ASCII tests assert |
+| `rb` | **Burn timer** on `burnable` materials: `0` = idle, `>0` = ignited (counts down each tick until ash) |
+| `ra` | Per-cell brightness grain (rendering + some rules) |
+
+**Ignition signal (simulation):** touching `FIRE`/`LAVA` sets `rb` to a material-specific start value (e.g. fungus `20`, wood `90`). Species often **stays the same** while smoldering — Sandspiel-style.
+
+**Ignition signal (rendering):** `cellColor()` in `js/catalog/cell-color.js` blends burnables toward ember orange when `rb > 0`. Export via `cauldron/app.js`. Hosts and plugins should use this instead of raw palette lookup.
+
+**Instant conversion:** the `reactions` phase can replace species immediately (e.g. `Fu` → `FF`). That is a separate, faster path from the smolder `rb` timer.
+
+Behavior tests can assert internal state with an optional `inspect(world)` hook alongside ASCII `expect`.
+
 ## SDK subpaths (L4)
 
 | Module | Audience | Exports |

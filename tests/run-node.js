@@ -17,7 +17,9 @@ for (const suite of getAllTestSuites()) {
       assert.equal(
         result.pass,
         true,
-        `\nExpected:\n${result.expected.join('\n')}\n\nActual:\n${result.actual.join('\n')}`
+        result.inspectError
+          ? `inspect: ${result.inspectError}`
+          : `\nExpected:\n${result.expected.join('\n')}\n\nActual:\n${result.actual.join('\n')}`
       );
     });
   }

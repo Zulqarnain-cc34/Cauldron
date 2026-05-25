@@ -40,11 +40,21 @@ export function runScenario(test) {
     stepScenario(prep.slice, prep.scope);
   }
   const result = finishScenario(prep.slice, prep.expect);
+  let inspectError = null;
+  if (test.inspect) {
+    try {
+      test.inspect(prep.slice.world, { ...result, before: prep.before, steps });
+    } catch (err) {
+      inspectError = err?.message ?? String(err);
+    }
+  }
+  const pass = result.pass && !inspectError;
   return {
     id: test.id,
     name: test.name,
     description: test.description ?? '',
-    pass: result.pass,
+    pass,
+    inspectError,
     before: prep.before,
     actual: result.actual,
     expected: result.expected,

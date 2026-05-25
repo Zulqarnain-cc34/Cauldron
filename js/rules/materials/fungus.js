@@ -42,12 +42,17 @@ export const fungusRuleDef = {
     {
       id: 'fungus-ignite-fire',
       name: 'Ignites when touching fire',
+      description:
+        'Species stays fungus; rb burn timer starts and renderer tints toward ember (rb > 0).',
       slice: { rows: ['uF'] },
       expect: ['uF'],
       scope: SCOPE,
       steps: 1,
-      setup(w) {
-        w.seed = 7;
+      inspect(w) {
+        const rb = w.get(0, 0).rb;
+        if (rb <= 1) {
+          throw new Error(`expected burn timer rb > 1 after ignite, got ${rb}`);
+        }
       },
     },
     {

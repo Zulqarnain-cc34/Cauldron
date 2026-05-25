@@ -1,6 +1,6 @@
 import { PALETTE, Species } from './materials.js';
 import { CELL_PX } from './world.js';
-import { speciesColor } from './render-canvas.js';
+import { cellColor } from './catalog/cell-color.js';
 
 let pixelBuffer = null;
 
@@ -19,7 +19,7 @@ export function renderWorld(p, world) {
   for (let gy = 0; gy < world.height; gy++) {
     for (let gx = 0; gx < world.width; gx++) {
       const cell = world.get(gx, gy);
-      const [r, g, b] = speciesColor(cell.species, cell.ra);
+      const [r, g, b] = cellColor(cell, { tick: world.tick });
 
       for (let dy = 0; dy < CELL_PX; dy++) {
         for (let dx = 0; dx < CELL_PX; dx++) {

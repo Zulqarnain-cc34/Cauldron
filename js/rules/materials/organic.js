@@ -6,13 +6,23 @@ const SCOPE = { rules: ['organic'] };
 /** Sandspiel-style plant: grows toward water, ignites and spreads fire when burning (rb). */
 function updateOrganic(cell, api) {
   let rb = cell.rb;
+
+  if (rb === 0) {
+    for (const [dx, dy] of [
+      [0, 1],
+      [0, -1],
+      [1, 0],
+      [-1, 0],
+    ]) {
+      if (api.get(dx, dy).species === Species.FIRE) {
+        api.set(0, 0, { ...cell, rb: 20 });
+        return;
+      }
+    }
+  }
+
   const [dx, dy] = api.randVec8();
   const nbr = api.get(dx, dy);
-
-  if (rb === 0 && nbr.species === Species.FIRE) {
-    api.set(0, 0, { ...cell, rb: 20 });
-    return;
-  }
 
   if (rb > 1) {
     api.set(0, 0, { ...cell, rb: rb - 1 });
@@ -68,13 +78,15 @@ export const organicRuleDef = {
     {
       id: 'organic-ignite-fire',
       name: 'Ignites when touching fire',
-      description: 'Adjacent fire sets rb burn countdown.',
+      description: 'Adjacent fire sets rb burn countdown; renderer tints while rb > 0.',
       slice: { rows: ['OF'] },
       expect: ['OF'],
       scope: SCOPE,
       steps: 1,
-      setup(w) {
-        w.seed = 7;
+      inspect(w) {
+        if (w.get(0, 0).rb <= 1) {
+          throw new Error(`expected organic rb > 1 after ignite, got ${w.get(0, 0).rb}`);
+        }
       },
     },
     {

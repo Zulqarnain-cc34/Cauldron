@@ -63,20 +63,21 @@ npm start</code></pre>
         <li>Add species in <code>js/catalog/species.js</code></li>
         <li>Add entry in <code>js/catalog/materials.js</code></li>
         <li>Create <code>js/rules/materials/your.js</code> with <code>behaviors[]</code></li>
-        <li>Register in <code>js/sim/test-registry.js</code></li>
+        <li>Register in <code>js/sim/manifest.js</code></li>
       </ol>
       <p>Docs and brush picker update automatically from the registry.</p>
     </section>
 
     <section class="help-card">
       <h2>Documentation & tests</h2>
-      <p>Every <code>behaviors[]</code> test is the spec. The same tests power:</p>
+      <p>Every <code>behaviors[]</code> entry is the spec — write it once in your rule or plugin file.</p>
       <ul>
-        <li><code>npm test</code> — CI headless runner</li>
-        <li><a href="/tests/index.html">Visual test runner</a></li>
-        <li><a href="/docs/index.html">Live docs</a> — search materials/plugins, run demos</li>
+        <li><code>npm test</code> — headless (same as CI)</li>
+        <li><code>npm run test:watch</code> — reruns while you edit (no browser needed)</li>
+        <li><a href="/docs/index.html">Live docs</a> — searchable catalog + runnable demos</li>
+        <li><a href="/tests/index.html">Visual runner</a> — optional, for debugging only</li>
       </ul>
-      <p>Designed to scale: search + capped lists handle huge catalogs later.</p>
+      <p>See <a href="/TESTING.md">TESTING.md</a> for the integration checklist and <code>inspect()</code> hook.</p>
     </section>
 
     <section class="help-card help-links">

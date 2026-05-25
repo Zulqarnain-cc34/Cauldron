@@ -18,13 +18,23 @@ export function stepCombust(cell, api, species, opts = {}) {
   const igniteFrom = opts.igniteFrom ?? HOT;
   const spreadEvery = opts.spreadEvery ?? 4;
   let rb = cell.rb;
+
+  if (rb === 0) {
+    for (const [dx, dy] of [
+      [0, 1],
+      [0, -1],
+      [1, 0],
+      [-1, 0],
+    ]) {
+      if (igniteFrom.has(api.get(dx, dy).species)) {
+        api.set(0, 0, { ...cell, species, rb: opts.igniteRb ?? 20 });
+        return true;
+      }
+    }
+  }
+
   const [dx, dy] = api.randVec8();
   const nbr = api.get(dx, dy);
-
-  if (rb === 0 && igniteFrom.has(nbr.species)) {
-    api.set(0, 0, { ...cell, species, rb: opts.igniteRb ?? 20 });
-    return true;
-  }
 
   if (rb > 1) {
     api.set(0, 0, { ...cell, species, rb: rb - 1 });

@@ -4,12 +4,22 @@ import { wrapFluidUpdate } from '../shared/combust.js';
 
 function updateOil(cell, api) {
   const wrapped = wrapFluidUpdate(Species.OIL);
+  if (cell.rb === 0) {
+    for (const [dx, dy] of [
+      [0, 1],
+      [0, -1],
+      [1, 0],
+      [-1, 0],
+    ]) {
+      const hot = api.get(dx, dy).species;
+      if (hot === Species.FIRE || hot === Species.LAVA) {
+        api.set(0, 0, { ...cell, rb: 50 });
+        return;
+      }
+    }
+  }
   const [dx, dy] = api.randVec8();
   const nbr = api.get(dx, dy);
-  if (cell.rb === 0 && (nbr.species === Species.FIRE || nbr.species === Species.LAVA)) {
-    api.set(0, 0, { ...cell, rb: 50 });
-    return;
-  }
   if (cell.rb > 1) {
     api.set(0, 0, { ...cell, rb: cell.rb - 1 });
     if (cell.rb % 4 !== 0 && nbr.species === Species.EMPTY) {

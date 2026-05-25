@@ -24,9 +24,13 @@ No build step. Static files + ES modules.
 ```bash
 npm start          # sandbox server (port 3456)
 npm test           # 92 behavior + extension tests + layer check
+npm run test:watch # rerun tests when js/plugins/tests change (background)
+npm run verify     # alias for npm test
+npm run setup:hooks # optional: run tests before each git commit
 npm run check:layers  # import boundary enforcement
-npm run test:visual  # same as start — use /tests/ in browser
 ```
+
+**You don't need to open `/tests/` every time.** Use CI (GitHub Actions), `test:watch` in a terminal tab, or optional git hooks. See [TESTING.md](TESTING.md).
 
 ## Extend the library
 
