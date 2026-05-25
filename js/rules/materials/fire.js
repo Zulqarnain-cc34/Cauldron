@@ -71,5 +71,31 @@ export const fireRuleDef = {
         w.set(1, 1, { species: Species.FIRE, flags: 0, ra: 150, rb: 0 });
       },
     },
+    {
+      id: 'fire-drifts-to-empty',
+      name: 'Drifts into empty neighbor',
+      description: 'Hot fire moves into adjacent empty cell.',
+      slice: { rows: ['#F.', '###'] },
+      expect: ['#.F', '###'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.seed = 100;
+        w.set(1, 0, { species: Species.FIRE, flags: 0, ra: 150, rb: 0 });
+      },
+    },
+    {
+      id: 'fire-ignites-organic',
+      name: 'Ignites organic neighbor',
+      description: 'Random neighbor is organic → spawns fire there.',
+      slice: { rows: ['FO'] },
+      expect: ['FF'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.seed = 0;
+        w.set(0, 0, { species: Species.FIRE, flags: 0, ra: 150, rb: 0 });
+      },
+    },
   ],
 };

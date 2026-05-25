@@ -77,5 +77,30 @@ export const organicRuleDef = {
         w.seed = 7;
       },
     },
+    {
+      id: 'organic-burns-away',
+      name: 'Burns away at end of countdown',
+      description: 'rb counts down to 1 → cell clears.',
+      slice: { rows: ['O'] },
+      expect: ['.'],
+      scope: SCOPE,
+      steps: 2,
+      setup(w) {
+        w.set(0, 0, { species: Species.ORGANIC, flags: 0, ra: 128, rb: 2 });
+      },
+    },
+    {
+      id: 'organic-spreads-fire-while-burning',
+      name: 'Spreads fire while burning',
+      description: 'rb > 1 and empty neighbor → spawns fire.',
+      slice: { rows: ['O.'] },
+      expect: ['OF'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.seed = 36;
+        w.set(0, 0, { species: Species.ORGANIC, flags: 0, ra: 128, rb: 20 });
+      },
+    },
   ],
 };

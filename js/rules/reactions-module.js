@@ -1,7 +1,7 @@
 import { Species } from '../catalog/species.js';
 
 const REACTIONS = [
-  { a: Species.WATER, b: Species.FIRE, result: Species.STEAM, clearA: true },
+  { a: Species.WATER, b: Species.FIRE, result: Species.STEAM, clearA: true, at: 'b' },
   { a: Species.FIRE, b: Species.ORGANIC, result: Species.FIRE, at: 'b' },
 ];
 
@@ -46,6 +46,35 @@ export const reactionRuleDef = {
   label: 'Reactions',
   phase: 'reactions',
   customUpdate: null,
-  behaviors: [],
   run: applyReactions,
+
+  behaviors: [
+    {
+      id: 'reaction-water-fire-steam',
+      name: 'Water and fire make steam',
+      description: 'Adjacent water + fire → steam at fire cell, water cleared.',
+      slice: { rows: ['WF'] },
+      expect: ['.^'],
+      scope: { rules: ['reactions'] },
+      steps: 1,
+    },
+    {
+      id: 'reaction-fire-organic-ignites',
+      name: 'Fire ignites organic',
+      description: 'Adjacent fire + organic → organic becomes fire.',
+      slice: { rows: ['FO'] },
+      expect: ['FF'],
+      scope: { rules: ['reactions'] },
+      steps: 1,
+    },
+    {
+      id: 'reaction-no-op-when-separated',
+      name: 'No reaction without contact',
+      description: 'Water and fire with gap → unchanged.',
+      slice: { rows: ['W.F'] },
+      expect: ['W.F'],
+      scope: { rules: ['reactions'] },
+      steps: 1,
+    },
+  ],
 };

@@ -3,7 +3,6 @@ import { MATERIALS } from '../../catalog/materials.js';
 
 const SCOPE = { rules: ['steam'] };
 
-/** Motion from catalog mobility (buoyant). Toggled via water rule. */
 export const steamRuleDef = {
   id: 'steam',
   label: 'Steam',
@@ -21,6 +20,36 @@ export const steamRuleDef = {
       expect: ['^', '.'],
       scope: SCOPE,
       steps: 1,
+    },
+    {
+      id: 'steam-blocked-above',
+      name: 'Stays when blocked above',
+      description: 'Wall above — cannot rise.',
+      slice: { rows: ['#', '^'] },
+      expect: ['#', '^'],
+      scope: SCOPE,
+      steps: 1,
+    },
+    {
+      id: 'steam-rise-two-steps',
+      name: 'Rises two cells in two ticks',
+      description: 'Keeps rising while empty space is above.',
+      slice: { rows: ['.', '.', '^'] },
+      expect: ['^', '.', '.'],
+      scope: SCOPE,
+      steps: 2,
+    },
+    {
+      id: 'steam-diagonal-up-right',
+      name: 'Rises diagonally up-right',
+      description: 'Blocked straight up; randDir right → up-right empty cell.',
+      slice: { rows: ['..#..', '..^..', '.....'] },
+      expect: ['..#^.', '.....', '.....'],
+      scope: SCOPE,
+      steps: 1,
+      setup(w) {
+        w.randDir = () => 1;
+      },
     },
   ],
 };
