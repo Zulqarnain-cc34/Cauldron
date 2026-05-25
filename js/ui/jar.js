@@ -28,5 +28,6 @@ export function mountJar(world, opts = {}) {
     hint: 'Store materials like sand, or tools like grenades.',
     getInventory: () => world.jar,
     toolbar,
+    toggleClass: 'container-toggle-jar',
   });
 }

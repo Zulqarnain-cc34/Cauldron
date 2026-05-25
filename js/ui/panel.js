@@ -119,7 +119,7 @@ export function mountPanel(world, callbacks) {
   mountBrushDropdown(world, brushEl);
 
   const rulesEl = root.querySelector('#rule-toggles');
-  mountRulePicker(world, rulesEl, { rules: getToggleableRules() });
+  const rulePicker = mountRulePicker(world, rulesEl, { rules: getToggleableRules() });
 
   const radiusLabel = document.createElement('label');
   radiusLabel.className = 'brush-size';
@@ -158,6 +158,7 @@ export function mountPanel(world, callbacks) {
       const btn = root.querySelector('#btn-pause');
       if (btn) btn.textContent = paused ? 'Play' : 'Pause';
     },
+    syncRules: rulePicker?.refresh,
   };
 }
 
