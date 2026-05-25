@@ -1,6 +1,6 @@
 import { Species, Flags } from './materials.js';
 import { defaultRuleEnabled } from './catalog/rule-defaults.js';
-import { resetPlugins } from './plugins/host.js';
+import { runWorldResetHooks } from './sim/lifecycle.js';
 
 const STRIDE = 4;
 
@@ -76,7 +76,7 @@ export class World {
     this.agents.length = 0;
     this.tick = 0;
     this.brush.queue.length = 0;
-    resetPlugins(this);
+    runWorldResetHooks(this);
   }
 
   /** Deterministic-ish RNG for rules (LCG). */

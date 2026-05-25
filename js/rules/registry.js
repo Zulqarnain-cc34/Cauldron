@@ -19,25 +19,28 @@ export const PHASES = [
   'brush',
 ];
 
-const UPDATERS = buildUpdaters();
+function getUpdaters() {
+  return buildUpdaters();
+}
 
-/** Rule ids that belong to the unified materials phase (for `only` filtering). */
-export const MATERIAL_RULE_IDS = new Set(
-  getMaterialModules().map((m) => m.id)
-);
+function getMaterialRuleIds() {
+  return new Set(getMaterialModules().map((m) => m.id));
+}
 
 function shouldRunMaterials(only) {
   if (!only) return true;
+  const ids = getMaterialRuleIds();
   for (const id of only) {
-    if (MATERIAL_RULE_IDS.has(id)) return true;
+    if (ids.has(id)) return true;
   }
   return false;
 }
 
 function runMaterialsPhase(world, only) {
+  const updaters = getUpdaters();
   const { down, up } = resolveActiveSpecies(world, only);
-  if (down.size > 0) scanMaterials(world, down, UPDATERS, 'down');
-  if (up.size > 0) scanMaterials(world, up, UPDATERS, 'up');
+  if (down.size > 0) scanMaterials(world, down, updaters, 'down');
+  if (up.size > 0) scanMaterials(world, up, updaters, 'up');
 }
 
 function buildRegistry() {

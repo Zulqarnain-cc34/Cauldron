@@ -1,50 +1,21 @@
 import { defineMaterial } from './define-material.js';
 import { buildToggleableRules } from '../catalog/rule-toggle-catalog.js';
-import { getPluginToggleRules } from '../plugins/host.js';
-import { sandRuleDef } from '../rules/materials/sand.js';
-import { waterRuleDef } from '../rules/materials/water.js';
-import { steamRuleDef } from '../rules/materials/steam.js';
-import { fireRuleDef } from '../rules/materials/fire.js';
-import { organicRuleDef } from '../rules/materials/organic.js';
-import { stoneRuleDef } from '../rules/materials/stone.js';
-import { dustRuleDef } from '../rules/materials/dust.js';
-import { oilRuleDef } from '../rules/materials/oil.js';
-import { gasRuleDef } from '../rules/materials/gas.js';
-import { iceRuleDef } from '../rules/materials/ice.js';
-import { lavaRuleDef } from '../rules/materials/lava.js';
-import { woodRuleDef } from '../rules/materials/wood.js';
-import { acidRuleDef } from '../rules/materials/acid.js';
-import { seedRuleDef } from '../rules/materials/seed.js';
-import { fungusRuleDef } from '../rules/materials/fungus.js';
-import { rocketRuleDef } from '../rules/materials/rocket.js';
-import { reactionRuleDef } from '../rules/reactions-module.js';
-
-const RULE_DEFS = [
-  sandRuleDef,
-  waterRuleDef,
-  steamRuleDef,
-  fireRuleDef,
-  organicRuleDef,
-  stoneRuleDef,
-  dustRuleDef,
-  oilRuleDef,
-  gasRuleDef,
-  iceRuleDef,
-  lavaRuleDef,
-  woodRuleDef,
-  acidRuleDef,
-  seedRuleDef,
-  fungusRuleDef,
-  rocketRuleDef,
-  reactionRuleDef,
-];
+import { getExtensionToggles, applyToggleDefault } from './toggle-registry.js';
+import { getRegisteredRuleDefs } from './rule-store.js';
+import './manifest.js';
+import './core-reactions.js';
 
 /** @type {import('./define-material.js').RuleModule[] | null} */
 let compiled = null;
 
+/** Drop compiled rule modules so new registrations take effect. */
+export function invalidateRuleCache() {
+  compiled = null;
+}
+
 export function getRuleModules() {
   if (!compiled) {
-    compiled = RULE_DEFS.map((def) => {
+    compiled = getRegisteredRuleDefs().map((def) => {
       if (def.run) return def;
       return defineMaterial(def);
     });
@@ -56,11 +27,11 @@ export function getMaterialModules() {
   return getRuleModules().filter((m) => m.phase === 'materials' && m.update);
 }
 
-/** All rules exposed in the UI toggle picker (materials + system + plugins). */
+/** All rules exposed in the UI toggle picker (materials + system + extensions). */
 export function getToggleableRules() {
   const out = buildToggleableRules(getRuleModules());
   const seen = new Set(out.map((r) => r.key));
-  for (const toggle of getPluginToggleRules()) {
+  for (const toggle of getExtensionToggles()) {
     if (seen.has(toggle.key)) continue;
     seen.add(toggle.key);
     out.push(toggle);
@@ -120,4 +91,19 @@ export function resolveActiveSpecies(world, onlyRuleIds) {
   }
 
   return { down, up };
+}
+
+/**
+ * Sync world.ruleEnabled keys from compiled modules + extension toggles.
+ * Call after plugins init so toggles exist before first sim tick.
+ * @param {import('../world.js').World} world
+ */
+export function syncRuleEnabledDefaults(world) {
+  for (const mod of getMaterialModules()) {
+    const key = mod.enabledKey ?? mod.id;
+    if (world.ruleEnabled[key] === undefined) world.ruleEnabled[key] = true;
+  }
+  for (const toggle of getExtensionToggles()) {
+    applyToggleDefault(world, toggle);
+  }
 }

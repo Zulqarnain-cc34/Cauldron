@@ -1,7 +1,7 @@
 import { Species } from './catalog/species.js';
 import { getBrushMaterials } from './catalog/materials.js';
+import { getExtensionBrushTools } from './sim/brush-registry.js';
 import { CELL_PX } from './world.js';
-import { registerRule } from './rules/registry.js';
 
 function gridFromMouse(world, mx, my) {
   const gx = Math.floor(mx / CELL_PX);
@@ -50,12 +50,6 @@ export function applyBrushQueue(world) {
 }
 
 export function setupInput(world, canvas) {
-  registerRule('brush', {
-    id: 'player-brush',
-    enabled: () => true,
-    run: applyBrushQueue,
-  });
-
   const onPaint = (e) => {
     const rect = canvas.getBoundingClientRect();
     const mx = e.clientX - rect.left;
@@ -70,16 +64,28 @@ export function setupInput(world, canvas) {
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 }
 
-/** Sandspiel-aligned brush list (sorted by label). */
-export const BRUSH_TOOLS = [
-  ...getBrushMaterials()
+/** Paint tools for brush dropdown (core + extensions). */
+export function buildBrushTools() {
+  const core = getBrushMaterials()
     .filter((m) => m.id !== Species.WALL)
     .sort((a, b) => a.name.localeCompare(b.name))
     .map((m) => ({
       id: m.name,
       species: m.id,
       label: m.name.charAt(0).toUpperCase() + m.name.slice(1),
-    })),
-  { id: 'wall', species: Species.WALL, label: 'Wall' },
-  { id: 'erase', species: Species.EMPTY, label: 'Eraser' },
-];
+    }));
+
+  const ext = getExtensionBrushTools()
+    .slice()
+    .sort((a, b) => a.label.localeCompare(b.label));
+
+  return [
+    ...core,
+    ...ext,
+    { id: 'wall', species: Species.WALL, label: 'Wall' },
+    { id: 'erase', species: Species.EMPTY, label: 'Eraser' },
+  ];
+}
+
+/** @deprecated Use buildBrushTools() for fresh list after runtime registration */
+export const BRUSH_TOOLS = buildBrushTools();

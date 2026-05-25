@@ -1,11 +1,4 @@
-import { World } from '../js/world.js';
-import { initPlugins } from '../js/plugins/host.js';
-import {
-  buildDocCatalog,
-  getDocEntry,
-  getDocStats,
-  searchDocEntries,
-} from '../js/doc/build-catalog.js';
+import { World, initPlugins, buildDocCatalog, getDocEntry, getDocStats, searchDocEntries } from '../js/cauldron/index.js';
 import { runScenario } from '../tests/helpers/harness.js';
 import { LiveDemoPlayer } from '../tests/helpers/live-demo.js';
 import '../plugins/index.js';

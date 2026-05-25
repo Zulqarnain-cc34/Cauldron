@@ -98,7 +98,7 @@ export const MATERIALS = {
     mobility: Mobility.GRANULAR,
     density: 0.3,
     sinkThroughLighter: true,
-    tags: ['granular', 'falling'],
+    tags: ['granular', 'falling', 'burnable'],
     color: [200, 170, 140],
     ascii: 'd',
   },
@@ -173,7 +173,7 @@ export const MATERIALS = {
     mobility: Mobility.LIFE,
     density: 1.1,
     sinkThroughLighter: true,
-    tags: ['granular', 'falling'],
+    tags: ['granular', 'falling', 'burnable'],
     color: [90, 130, 50],
     ascii: 'e',
   },
@@ -217,6 +217,7 @@ export function registerMaterial(def) {
     throw new Error(`Material id ${def.id} already registered`);
   }
   MATERIALS[def.id] = def;
+  PALETTE[def.id] = def.color;
 }
 
 /** All paintable brush species (excluding empty/wall optional). */

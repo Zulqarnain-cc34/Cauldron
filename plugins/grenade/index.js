@@ -6,12 +6,12 @@ import {
   throwGrenade,
 } from './blast.js';
 import { renderFragments, renderGrenades } from './render.js';
-import { CELL_PX } from '../../js/world.js';
+import { Species, CELL_PX } from '../../js/cauldron/plugin.js';
 
 const PLUGIN_ID = 'grenade';
 const RULE_ID = 'grenade-blast';
 
-/** @type {import('../../js/plugins/host.js').CauldronPlugin} */
+/** @type {import('../../js/cauldron/plugin.js').Plugin} */
 export const grenadePlugin = {
   id: PLUGIN_ID,
   suiteLabel: 'Grenade',

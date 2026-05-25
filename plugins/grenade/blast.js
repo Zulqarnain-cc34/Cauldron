@@ -1,23 +1,15 @@
-import { Species } from '../../js/catalog/species.js';
+import { Species, getBurnableSpecies, getBlastImmuneSpecies } from '../../js/cauldron/plugin.js';
 
 /** Pineapple grenade — fragmentation pattern (segments radiate outward). */
 export const FRAG_COUNT = 14;
 export const FRAG_SPEED = 2.2;
 export const FRAG_LIFE = 8;
 
-const BURNABLE = new Set([
-  Species.ORGANIC,
-  Species.WOOD,
-  Species.OIL,
-  Species.FUNGUS,
-  Species.DUST,
-  Species.SEED,
-]);
-
-const IMMUNE = new Set([Species.WALL, Species.STONE]);
+const BURNABLE = new Set(getBurnableSpecies());
+const IMMUNE = new Set([Species.WALL, Species.STONE, ...getBlastImmuneSpecies()]);
 
 /**
- * @param {import('../../js/world.js').World} world
+ * @param {import('../../js/cauldron/index.js').World} world
  * @param {number} cx
  * @param {number} cy
  * @param {{ radius?: number, power?: number, fragments?: boolean }} [opts]
@@ -84,7 +76,7 @@ export function applyGrenadeBlast(world, cx, cy, opts = {}) {
 }
 
 /**
- * @param {import('../../js/world.js').World} world
+ * @param {import('../../js/cauldron/index.js').World} world
  * @param {number} cx
  * @param {number} cy
  * @param {number} [power]
@@ -123,7 +115,7 @@ function pushOutward(world, x, y, cx, cy) {
 }
 
 /**
- * @param {import('../../js/world.js').World} world
+ * @param {import('../../js/cauldron/index.js').World} world
  * @param {number} cx
  * @param {number} cy
  * @param {{ radius?: number, power?: number, fuse?: number, vx?: number, vy?: number }} [opts]
@@ -156,7 +148,7 @@ export function queueGrenadeBlast(world, cx, cy, opts = {}) {
   });
 }
 
-/** @param {import('../../js/world.js').World} world */
+/** @param {import('../../js/cauldron/index.js').World} world */
 export function drainGrenadeBlastQueue(world) {
   const queue = world.plugin?.grenade?.blastQueue;
   if (!queue?.length) return;
@@ -180,7 +172,7 @@ function cellBlocksGrenade(cell) {
   );
 }
 
-/** @param {import('../../js/world.js').World} world */
+/** @param {import('../../js/cauldron/index.js').World} world */
 export function tickGrenadeAgents(world) {
   tickFragments(world);
 
@@ -219,7 +211,7 @@ export function tickGrenadeAgents(world) {
   }
 }
 
-/** @param {import('../../js/world.js').World} world */
+/** @param {import('../../js/cauldron/index.js').World} world */
 function tickFragments(world) {
   const frags = world.plugin?.grenade?.fragments;
   if (!frags?.length) return;
@@ -266,8 +258,7 @@ function tickFragments(world) {
 }
 
 /**
- * Throw a grenade from origin toward target with arc.
- * @param {import('../../js/world.js').World} world
+ * @param {import('../../js/cauldron/index.js').World} world
  * @param {number} fromX
  * @param {number} fromY
  * @param {number} toX

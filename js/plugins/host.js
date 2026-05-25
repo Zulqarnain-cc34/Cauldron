@@ -1,4 +1,12 @@
 import { registerRule } from '../rules/registry.js';
+import { registerExtensionToggle, applyToggleDefault } from '../sim/toggle-registry.js';
+import { onWorldReset } from '../sim/lifecycle.js';
+import { registerMaterialPack } from '../sim/material-pack.js';
+import { registerReaction } from '../sim/reaction-store.js';
+import { registerBrushTool } from '../sim/brush-registry.js';
+import { registerRuntimeRuleDef } from '../cauldron/extend.js';
+
+export const CAULDRON_API_VERSION = 1;
 
 /** @typedef {{ key: string, id: string, label: string, group?: string, defaultEnabled?: boolean, disabled?: boolean }} PluginToggle */
 
@@ -7,6 +15,10 @@ import { registerRule } from '../rules/registry.js';
  * @property {HTMLElement} canvas
  * @property {(phase: string, rule: object) => void} registerRule
  * @property {(toggle: PluginToggle) => void} registerToggle
+ * @property {(pack: import('../sim/material-pack.js').MaterialPack) => number} registerMaterialPack
+ * @property {(rxn: import('../sim/reaction-store.js').ReactionDef) => void} registerReaction
+ * @property {(tool: import('../sim/brush-registry.js').BrushTool) => void} registerBrushTool
+ * @property {(def: object) => void} registerRuleDef
  * @property {(fn: (p: object, world: import('../world.js').World) => void) => void} registerRender
  * @property {(fn: (world: import('../world.js').World) => void) => void} onReset
  * @property {(key: string) => Record<string, unknown>} getState
@@ -14,6 +26,7 @@ import { registerRule } from '../rules/registry.js';
 
 /** @typedef {Object} CauldronPlugin
  * @property {string} id
+ * @property {number} [apiVersion]
  * @property {(ctx: PluginSetupContext) => void} setup
  * @property {object[]} [behaviors]
  * @property {string} [suiteLabel]
@@ -22,12 +35,6 @@ import { registerRule } from '../rules/registry.js';
 
 /** @type {CauldronPlugin[]} */
 const plugins = [];
-
-/** @type {PluginToggle[]} */
-const pluginToggles = [];
-
-/** @type {((world: import('../world.js').World) => void)[]} */
-const resetHooks = [];
 
 /** @type {((p: object, world: import('../world.js').World) => void)[]} */
 const renderHooks = [];
@@ -40,6 +47,11 @@ export function registerPlugin(plugin) {
   if (plugins.some((p) => p.id === plugin.id)) {
     throw new Error(`Plugin "${plugin.id}" already registered`);
   }
+  if (plugin.apiVersion != null && plugin.apiVersion > CAULDRON_API_VERSION) {
+    console.warn(
+      `[cauldron] Plugin "${plugin.id}" targets API v${plugin.apiVersion}; runtime is v${CAULDRON_API_VERSION}`
+    );
+  }
   plugins.push(plugin);
 }
 
@@ -48,12 +60,9 @@ export function getRegisteredPlugins() {
   return plugins;
 }
 
-/** @returns {PluginToggle[]} */
+/** @deprecated Use getExtensionToggles from sim/toggle-registry */
 export function getPluginToggleRules() {
-  return pluginToggles.map((t) => ({
-    ...t,
-    group: t.group ?? 'plugin',
-  }));
+  return [];
 }
 
 /** @returns {{ id: string, label: string, tests: object[] }[]} */
@@ -91,21 +100,22 @@ export function initPlugins({ world, canvas }) {
       world,
       canvas,
       registerRule,
+      registerMaterialPack,
+      registerReaction,
+      registerBrushTool,
+      registerRuleDef: registerRuntimeRuleDef,
       registerToggle(toggle) {
-        if (!pluginToggles.some((t) => t.key === toggle.key)) {
-          pluginToggles.push(toggle);
-        }
-        if (world.ruleEnabled[toggle.key] === undefined) {
-          world.ruleEnabled[toggle.key] = toggle.defaultEnabled ?? true;
-        }
+        registerExtensionToggle(toggle);
+        applyToggleDefault(world, toggle);
       },
       onReset(fn) {
-        resetHooks.push(fn);
+        onWorldReset(fn);
       },
       registerRender(fn) {
         renderHooks.push(fn);
       },
       getState(key) {
+        if (!world.plugin[plugin.id]) world.plugin[plugin.id] = {};
         if (!world.plugin[plugin.id][key]) {
           world.plugin[plugin.id][key] = {};
         }
@@ -117,10 +127,9 @@ export function initPlugins({ world, canvas }) {
   }
 }
 
-/** Clear plugin-owned queues/state after a world reset. */
+/** Clear plugin-owned state after a world reset. Registered via bootstrap lifecycle. */
 export function resetPlugins(world) {
   world.plugin = {};
-  for (const fn of resetHooks) fn(world);
 }
 
 /** Draw plugin overlays after the grid render pass. */

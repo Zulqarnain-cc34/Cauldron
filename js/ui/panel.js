@@ -1,7 +1,4 @@
-import { Species } from '../catalog/species.js';
-import { getMaterial } from '../catalog/materials.js';
-import { BRUSH_TOOLS } from '../input.js';
-import { getToggleableRules } from '../sim/test-registry.js';
+import { Species, getMaterial, getToggleableRules, buildBrushTools } from '../cauldron/app.js';
 import { mountRulePicker } from './rule-picker.js';
 
 function materialColor(species) {
@@ -49,7 +46,8 @@ function mountBrushDropdown(world, brushEl) {
   menu.className = 'brush-picker-menu';
   menu.setAttribute('role', 'listbox');
 
-  let activeTool = BRUSH_TOOLS.find((t) => t.species === world.brush.species) ?? BRUSH_TOOLS[0];
+  const brushTools = buildBrushTools();
+  let activeTool = brushTools.find((t) => t.species === world.brush.species) ?? brushTools[0];
 
   function setSelection(tool) {
     activeTool = tool;
@@ -73,7 +71,7 @@ function mountBrushDropdown(world, brushEl) {
     trigger.setAttribute('aria-expanded', 'true');
   }
 
-  for (const tool of BRUSH_TOOLS) {
+  for (const tool of brushTools) {
     const option = createBrushRow(tool);
     option.setAttribute('role', 'option');
     option.addEventListener('click', () => {
@@ -106,6 +104,7 @@ export function mountPanel(world, callbacks) {
   root.innerHTML = `
     <header class="bar bar-top">
       <h1>Cauldron</h1>
+      <a href="/help/index.html">Help</a>
       <a href="/docs/index.html">Docs</a>
       <span class="tick" id="tick-label">tick 0</span>
       <button type="button" id="btn-pause" title="Space">Pause</button>

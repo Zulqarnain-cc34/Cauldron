@@ -1,12 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { World } from '../js/world.js';
-import { getAllTestSuites } from '../js/doc/build-catalog.js';
-import { initPlugins } from '../js/plugins/host.js';
+import { World } from '../js/cauldron/app.js';
+import { getAllTestSuites } from '../js/cauldron/tooling.js';
+import { bootstrapSandbox } from '../js/cauldron/bootstrap.js';
 import { runScenario } from './helpers/harness.js';
-import '../plugins/index.js';
 
-initPlugins({
+await bootstrapSandbox({
   world: new World(4, 4),
   canvas: { addEventListener() {} },
 });

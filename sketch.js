@@ -1,11 +1,8 @@
-import { World, GRID_W, GRID_H } from './js/world.js';
-import { Species } from './js/materials.js';
-import { runRules } from './js/rules/registry.js';
+import { World, GRID_W, GRID_H, Species, runRules, renderPlugins } from './js/cauldron/app.js';
+import { bootstrapSandbox } from './js/cauldron/bootstrap.js';
 import { renderWorld, canvasSize } from './js/render.js';
 import { setupInput } from './js/input.js';
 import { mountPanel, bindKeyboard } from './js/ui/panel.js';
-import { initPlugins, renderPlugins } from './js/plugins/host.js';
-import './plugins/index.js';
 
 let world;
 let ui;
@@ -32,14 +29,14 @@ function seedDemo(w) {
 }
 
 new window.p5((p) => {
-  p.setup = () => {
+  p.setup = async () => {
     world = new World(GRID_W, GRID_H, Date.now() & 0xffffffff);
     const { width, height } = canvasSize(world);
     const canvas = p.createCanvas(width, height);
     canvas.parent('sim-host');
 
     setupInput(world, canvas.elt);
-    initPlugins({ world, canvas: canvas.elt });
+    await bootstrapSandbox({ world, canvas: canvas.elt });
     ui = mountPanel(world, {
       onPauseChange(paused) {
         ui?.setPaused(paused);

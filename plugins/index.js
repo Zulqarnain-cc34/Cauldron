@@ -1,8 +1,7 @@
 /**
- * External plugins — not part of the core `js/` library.
- * Import and register plugins here; sketch.js loads this file at startup.
+ * External plugins — register here. Uses public SDK only.
  */
-import { registerPlugin } from '../js/plugins/host.js';
+import { registerPlugin } from '../js/cauldron/plugin.js';
 import { grenadePlugin } from './grenade/index.js';
 
 registerPlugin(grenadePlugin);
