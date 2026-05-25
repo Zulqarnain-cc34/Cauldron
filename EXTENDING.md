@@ -10,6 +10,7 @@ This is a **library you build on**. Every extension type has one registration AP
 | Add a **material** (runtime/mod) | `registerMaterialPack()` | `cauldron/extend.js` |
 | Add a **reaction** | `registerReaction()` | `cauldron/extend.js` or `ctx.registerReaction` |
 | Add a **sim rule** (forces, agents…) | `registerRule(phase, rule)` | `cauldron/app.js` or `ctx.registerRule` |
+| Register **rule def** | `registerRuleDef` / `ctx.registerRuleDef` | Materials → scanner; others with `run` → phased registry |
 | Add a **plugin feature** | `registerPlugin()` + `setup(ctx)` | `cauldron/plugin.js` |
 | Add a **brush tool** | `registerBrushTool()` | `ctx.registerBrushTool` |
 | Add a **UI toggle** | `registerToggle()` | `ctx.registerToggle` |

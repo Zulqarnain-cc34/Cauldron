@@ -7,7 +7,10 @@ import {
   getTestSuites,
   resolveActiveSpecies,
 } from '../sim/test-registry.js';
-import { applyReactions } from './reactions-module.js';
+import {
+  attachRuleRegistry,
+  wireAllStoredRuleDefs,
+} from '../sim/register-rule-def.js';
 
 export const PHASES = [
   'emitters',
@@ -44,7 +47,7 @@ function runMaterialsPhase(world, only) {
 }
 
 function buildRegistry() {
-  const registry = {
+  return {
     emitters: [],
     materials: [
       {
@@ -55,19 +58,12 @@ function buildRegistry() {
         },
       },
     ],
-    reactions: [
-      {
-        id: 'reactions',
-        enabled: (w) => w.ruleEnabled.reactions,
-        run: applyReactions,
-      },
-    ],
+    reactions: [],
     life: [],
     forces: [],
     agents: [],
     brush: [],
   };
-  return registry;
 }
 
 let registry = buildRegistry();
@@ -100,3 +96,6 @@ export function runRules(world, options = {}) {
 }
 
 export { getRuleModules, getMaterialModules, getAllBehaviors, getTestSuites };
+
+attachRuleRegistry(registerRule);
+wireAllStoredRuleDefs();

@@ -8,11 +8,18 @@
 /** @type {ReactionDef[]} */
 const reactions = [];
 
+/** @type {Set<string>} */
+const reactionIds = new Set();
+
 /**
  * Register an adjacency reaction (a + b → result at cell `at`).
  * @param {ReactionDef} rxn
  */
 export function registerReaction(rxn) {
+  if (rxn.id) {
+    if (reactionIds.has(rxn.id)) return;
+    reactionIds.add(rxn.id);
+  }
   reactions.push({ at: 'b', clearA: false, priority: 0, ...rxn });
   reactions.sort((a, b) => (b.priority ?? 0) - (a.priority ?? 0));
 }

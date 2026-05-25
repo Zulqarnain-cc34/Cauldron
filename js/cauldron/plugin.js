@@ -32,7 +32,6 @@ export {
   getRegisteredPlugins,
 } from '../plugins/host.js';
 export { registerReaction } from '../sim/reaction-store.js';
-export { registerMaterialPack } from '../sim/material-pack.js';
 
 /** @typedef {import('../plugins/host.js').CauldronPlugin} Plugin */
 /** @typedef {import('../plugins/host.js').PluginSetupContext} PluginContext */

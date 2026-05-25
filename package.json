@@ -1,11 +1,20 @@
 {
   "name": "cauldron",
-  "private": true,
+  "version": "0.1.0",
+  "description": "Layered falling-sand simulation library with plugin SDK",
   "type": "module",
+  "exports": {
+    ".": "./js/cauldron/index.js",
+    "./plugin": "./js/cauldron/plugin.js",
+    "./extend": "./js/cauldron/extend.js",
+    "./app": "./js/cauldron/app.js",
+    "./tooling": "./js/cauldron/tooling.js",
+    "./bootstrap": "./js/cauldron/bootstrap.js"
+  },
   "scripts": {
     "start": "npx --yes serve . -p 3456",
     "dev": "npm start",
-    "test": "node --test tests/run-node.js",
+    "test": "node --test tests/run-node.js tests/extension-api.test.js && npm run check:layers",
     "test:visual": "npm start",
     "check:layers": "node scripts/check-layers.mjs"
   }

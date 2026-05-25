@@ -1,12 +1,17 @@
-import { Species, getBurnableSpecies, getBlastImmuneSpecies } from '../../js/cauldron/plugin.js';
+import { Species, materialHasTag, Tags } from '../../js/cauldron/plugin.js';
 
 /** Pineapple grenade — fragmentation pattern (segments radiate outward). */
 export const FRAG_COUNT = 14;
 export const FRAG_SPEED = 2.2;
 export const FRAG_LIFE = 8;
 
-const BURNABLE = new Set(getBurnableSpecies());
-const IMMUNE = new Set([Species.WALL, Species.STONE, ...getBlastImmuneSpecies()]);
+function isBurnable(species) {
+  return materialHasTag(species, Tags.BURNABLE) || species === Species.FIRE;
+}
+
+function isBlastImmune(species) {
+  return species === Species.WALL || species === Species.STONE || materialHasTag(species, Tags.STATIC);
+}
 
 /**
  * @param {import('../../js/cauldron/index.js').World} world
@@ -29,7 +34,7 @@ export function applyGrenadeBlast(world, cx, cy, opts = {}) {
       if (!world.inBounds(x, y)) continue;
 
       const cell = world.get(x, y);
-      if (IMMUNE.has(cell.species)) continue;
+      if (isBlastImmune(cell.species)) continue;
 
       const t = 1 - dist / radius;
       const heat = Math.floor((60 + 200 * t) * power);
@@ -44,7 +49,7 @@ export function applyGrenadeBlast(world, cx, cy, opts = {}) {
         continue;
       }
 
-      if (BURNABLE.has(cell.species) || cell.species === Species.FIRE) {
+      if (isBurnable(cell.species)) {
         world.set(x, y, {
           species: Species.FIRE,
           flags: 0,
@@ -64,7 +69,7 @@ export function applyGrenadeBlast(world, cx, cy, opts = {}) {
         continue;
       }
 
-      if (t > 0.2 && !IMMUNE.has(cell.species) && world.randInt(100) < 22 * t * power) {
+      if (t > 0.2 && !isBlastImmune(cell.species) && world.randInt(100) < 22 * t * power) {
         pushOutward(world, x, y, cx, cy);
       }
     }
@@ -108,7 +113,7 @@ function pushOutward(world, x, y, cx, cy) {
   if (target.species !== Species.EMPTY) return;
 
   const cell = world.get(x, y);
-  if (cell.species === Species.EMPTY || IMMUNE.has(cell.species)) return;
+  if (cell.species === Species.EMPTY || isBlastImmune(cell.species)) return;
 
   world.set(tx, ty, cell);
   world.set(x, y, world.emptyCell());
@@ -228,7 +233,7 @@ function tickFragments(world) {
 
     if (world.inBounds(gx, gy)) {
       const cell = world.get(gx, gy);
-      if (!IMMUNE.has(cell.species)) {
+      if (!isBlastImmune(cell.species)) {
         if (cell.species === Species.EMPTY) {
           world.set(gx, gy, {
             species: Species.STONE,
@@ -236,7 +241,7 @@ function tickFragments(world) {
             ra: 180 + world.randInt(40),
             rb: 0,
           });
-        } else if (BURNABLE.has(cell.species) || cell.species === Species.SAND) {
+        } else if (isBurnable(cell.species) || cell.species === Species.SAND) {
           world.set(gx, gy, {
             species: Species.FIRE,
             flags: 0,

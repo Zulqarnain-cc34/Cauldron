@@ -1,8 +1,5 @@
 /**
  * Cauldron extension API — register materials, reactions, rules at runtime.
- *
- * Library authors and feature plugins use this to extend Cauldron without
- * editing core files. Plugin `setup(ctx)` mirrors these methods on context.
  */
 export {
   allocateSpecies,
@@ -25,15 +22,4 @@ export { registerBrushTool, getExtensionBrushTools } from '../sim/brush-registry
 export { registerExtensionToggle } from '../sim/toggle-registry.js';
 export { invalidateRuleCache } from '../sim/test-registry.js';
 export { registerRule, PHASES } from '../rules/registry.js';
-
-import { registerRuleDef as pushRuleDef } from '../sim/rule-store.js';
-import { invalidateRuleCache as bustCache } from '../sim/test-registry.js';
-
-/**
- * Register a rule def at runtime and refresh compiled modules.
- * @param {object} def
- */
-export function registerRuntimeRuleDef(def) {
-  pushRuleDef(def);
-  bustCache();
-}
+export { registerRuntimeRuleDef } from '../sim/register-rule-def.js';

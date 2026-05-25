@@ -4,7 +4,7 @@ import { onWorldReset } from '../sim/lifecycle.js';
 import { registerMaterialPack } from '../sim/material-pack.js';
 import { registerReaction } from '../sim/reaction-store.js';
 import { registerBrushTool } from '../sim/brush-registry.js';
-import { registerRuntimeRuleDef } from '../cauldron/extend.js';
+import { registerRuntimeRuleDef } from '../sim/register-rule-def.js';
 
 export const CAULDRON_API_VERSION = 1;
 

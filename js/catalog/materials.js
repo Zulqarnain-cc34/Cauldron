@@ -1,5 +1,6 @@
 import { Species } from './species.js';
 import { Mobility } from './physics.js';
+import { rebuildFromMaterials, resolveCharToSpecies, resolveSpeciesToChar } from './ascii-map.js';
 
 /**
  * Full material catalog — Sandspiel-aligned element set.
@@ -212,12 +213,16 @@ export function isDenser(a, b) {
   return getMaterial(a).density > getMaterial(b).density;
 }
 
+export { resolveCharToSpecies, resolveSpeciesToChar } from './ascii-map.js';
+export { rebuildFromMaterials as rebuildAsciiMaps } from './ascii-map.js';
+
 export function registerMaterial(def) {
   if (MATERIALS[def.id]) {
     throw new Error(`Material id ${def.id} already registered`);
   }
   MATERIALS[def.id] = def;
   PALETTE[def.id] = def.color;
+  rebuildFromMaterials(MATERIALS);
 }
 
 /** All paintable brush species (excluding empty/wall optional). */
@@ -226,3 +231,5 @@ export function getBrushMaterials() {
     (m) => m.id !== Species.EMPTY && m.ascii
   );
 }
+
+rebuildFromMaterials(MATERIALS);

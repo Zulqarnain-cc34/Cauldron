@@ -23,13 +23,27 @@ No build step. Static files + ES modules.
 
 ```bash
 npm start          # sandbox server (port 3456)
-npm test           # headless behavior tests
+npm test           # 70 behavior + extension tests + layer check
+npm run check:layers  # import boundary enforcement
 npm run test:visual  # same as start — use /tests/ in browser
 ```
 
+## Extend the library
+
+See **[EXTENDING.md](EXTENDING.md)** — materials, reactions, rules, plugins, brushes.
+
+SDK entry points (`package.json` exports):
+
+| Import | Use |
+|--------|-----|
+| `cauldron/plugin.js` | Plugins |
+| `cauldron/extend.js` | Material packs, reactions, runtime rules |
+| `cauldron/app.js` | Host apps |
+| `cauldron/bootstrap.js` | Startup |
+
 ## Architecture (layers)
 
-See [ARCHITECTURE.md](ARCHITECTURE.md). **Plugins import only `js/cauldron/index.js`** — the public SDK boundary.
+See [ARCHITECTURE.md](ARCHITECTURE.md). **Plugins import `js/cauldron/plugin.js`** — the public SDK boundary.
 
 ```
 L0 Kernel → L1 Catalog → L2 Engine → L3 Runtime → L4 SDK (cauldron) → L6 Plugins

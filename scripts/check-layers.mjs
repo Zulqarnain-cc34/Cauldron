@@ -53,20 +53,25 @@ const violations = [];
 
 for (const file of walk(ROOT)) {
   const rel = relative(ROOT, file).replace(/\\/g, '/');
+  if (rel.startsWith('node_modules/')) continue;
 
   for (const spec of importsIn(file)) {
-    const target = spec.startsWith('.') ? relative(ROOT, resolvesTo(file, spec)).replace(/\\/g, '/') : spec;
+    if (!spec.startsWith('.')) continue;
+    const target = relative(ROOT, resolvesTo(file, spec)).replace(/\\/g, '/');
 
-    // L6 Plugins — cauldron SDK only
-    if (rel.startsWith('plugins/') && !rel.includes('_template')) {
-      if (spec.startsWith('.') && !target.startsWith('js/cauldron/') && !target.startsWith('plugins/')) {
-        violations.push(`${rel}: plugin must not import "${spec}" → ${target}`);
+    // L6 Plugins — cauldron SDK only (all plugin files, not just top-level)
+    if (rel.startsWith('plugins/') && rel.endsWith('.js') && !rel.includes('node_modules')) {
+      const allowed =
+        target.startsWith('js/cauldron/') ||
+        (target.startsWith('plugins/') && target !== rel);
+      if (!allowed) {
+        violations.push(`${rel}: plugin must import cauldron SDK only, not "${spec}" → ${target}`);
       }
     }
 
-    // L0 Kernel — no plugin host
+    // L0 Kernel — no plugins or sim lifecycle from plugins host
     if (rel === 'js/world.js') {
-      if (target.includes('plugins/') || target.includes('plugins/host')) {
+      if (target.includes('plugins/')) {
         violations.push(`${rel}: kernel must not import plugins (${spec})`);
       }
     }
@@ -75,6 +80,13 @@ for (const file of walk(ROOT)) {
     if (rel === 'js/sim/test-registry.js') {
       if (target.includes('plugins/host')) {
         violations.push(`${rel}: runtime registry must not import plugin host (${spec})`);
+      }
+    }
+
+    // L5 App UI — prefer cauldron/app over direct L3 sim imports
+    if (rel.startsWith('js/ui/')) {
+      if (target.startsWith('js/sim/test-registry') || target.startsWith('js/rules/registry')) {
+        violations.push(`${rel}: UI should import cauldron/app.js, not ${target}`);
       }
     }
   }

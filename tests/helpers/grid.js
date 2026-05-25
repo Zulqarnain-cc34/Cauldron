@@ -1,18 +1,5 @@
 import { World } from '../../js/world.js';
-import { MATERIALS } from '../../js/catalog/materials.js';
-
-/** ASCII char → species id (built from MaterialCatalog). */
-export const CHAR_TO_SPECIES = Object.fromEntries(
-  Object.values(MATERIALS)
-    .filter((m) => m.ascii)
-    .map((m) => [m.ascii, m.id])
-);
-
-CHAR_TO_SPECIES[' '] = CHAR_TO_SPECIES['.'];
-
-export const SPECIES_TO_CHAR = Object.fromEntries(
-  Object.entries(CHAR_TO_SPECIES).map(([ch, sp]) => [sp, ch === ' ' ? '.' : ch])
-);
+import { resolveCharToSpecies, resolveSpeciesToChar } from '../../js/catalog/ascii-map.js';
 
 export function worldFromAscii(rows, seed = 1) {
   const height = rows.length;
@@ -27,7 +14,7 @@ export function worldFromAscii(rows, seed = 1) {
     const row = rows[y].padEnd(width, '.');
     for (let x = 0; x < width; x++) {
       const ch = row[x];
-      const species = CHAR_TO_SPECIES[ch];
+      const species = resolveCharToSpecies(ch);
       if (species === undefined) {
         throw new Error(`Unknown char "${ch}" at (${x}, ${y})`);
       }
@@ -45,7 +32,7 @@ export function asciiFromWorld(world) {
     let line = '';
     for (let x = 0; x < world.width; x++) {
       const sp = world.get(x, y).species;
-      line += SPECIES_TO_CHAR[sp] ?? '?';
+      line += resolveSpeciesToChar(sp);
     }
     rows.push(line);
   }
