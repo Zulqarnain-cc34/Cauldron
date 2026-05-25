@@ -25,7 +25,8 @@
     "check:snapshots": "node scripts/behavior-snapshot.mjs",
     "snapshot:update": "node scripts/behavior-snapshot.mjs --write",
     "export:verification": "node scripts/export-verification.mjs",
-    "copy:llm": "node scripts/copy-llm-review.mjs",
+    "export:verification:quick": "node scripts/export-verification.mjs --quick",
+    "copy:llm": "bash scripts/copy-llm.sh",
     "setup:hooks": "bash scripts/install-hooks.sh"
   }
 }

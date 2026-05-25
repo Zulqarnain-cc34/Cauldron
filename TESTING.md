@@ -105,13 +105,14 @@ Generate a full audit JSON to paste into any LLM for a second opinion:
 npm run export:verification
 ```
 
-Or copy straight to clipboard (regenerates + copies in one step):
+Or copy straight to clipboard:
 
 ```bash
-npm run copy:llm
+npm run copy:llm              # ~0.3s — copies pre-built bundle (no test runs)
+bash scripts/copy-llm.sh      # ~0.02s — same, skips npm startup
+npm run copy:llm -- --fresh   # ~1s — re-run behaviors, rebuild bundle
+npm run copy:llm -- --full    # ~15s — full gates + copy
 ```
-
-Paste into any LLM. Use `--no-regenerate` to copy the last export without re-running tests.
 
 Creates:
 

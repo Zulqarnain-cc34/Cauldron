@@ -26,7 +26,7 @@ const payload = {
 if (write) {
   mkdirSync(dirname(SNAPSHOT_PATH), { recursive: true });
   writeFileSync(SNAPSHOT_PATH, `${JSON.stringify(payload, null, 2)}\n`);
-  const failed = ids.filter((id) => !current[id].pass);
+  const failed = ids.filter((id) => (current[id].verdict ?? (current[id].pass ? 'PASS' : 'FAIL')) !== 'PASS');
   console.log(`snapshot:update — wrote ${ids.length} behaviors → tests/snapshots/behaviors.json`);
   if (failed.length) {
     console.error(`  ✗ ${failed.length} behavior(s) failing — fix before release:`);
@@ -56,8 +56,9 @@ for (const id of ids) {
   }
   const a = saved.behaviors[id];
   const b = current[id];
-  if (!b.pass) {
-    errors.push(`${id}: currently failing — ${b.inspectError ?? b.error ?? 'grid mismatch'}`);
+  const bPass = b.verdict === 'PASS' || b.pass === true;
+  if (!bPass) {
+    errors.push(`${id}: currently failing — ${b.failure ?? b.inspectError ?? b.error ?? 'grid mismatch'}`);
     continue;
   }
   if (JSON.stringify(pick(a)) !== JSON.stringify(pick(b))) {
@@ -79,9 +80,8 @@ console.log(`check:snapshots OK — ${ids.length} behavior outcomes match golden
 
 function pick(o) {
   return {
-    pass: o.pass,
-    before: o.before,
-    after: o.after,
-    rb: o.rb,
+    before: o.startGrid ?? o.before,
+    after: o.actualGrid ?? o.after,
+    rb: o.rbState ?? o.rb ?? '',
   };
 }

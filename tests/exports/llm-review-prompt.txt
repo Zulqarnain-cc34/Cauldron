@@ -12,13 +12,6 @@ Your job:
 Do NOT re-run code. Judge only from this JSON. Be concise.
 
 ---
-Paste the JSON below this line (from verification-report.json) or attach the file.
+SUMMARY: ALL_PASS — 86/86 behaviors PASS
+Mode: quick (behaviors only)
 ---
-
-SUMMARY FROM EXPORT:
-- Overall: ALL_PASS
-- Behaviors: 86/86 PASS
-- Headless: null pass, null fail
-- Quality gates: all pass
-
-Then review each behavior in the "behaviors" array.

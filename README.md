@@ -28,7 +28,9 @@ npm test               # same checks, plain output
 npm run test:watch     # background auto-rerun while coding
 npm run snapshot:update  # after intentional sim changes
 npm run export:verification  # JSON audit for LLM second opinion
-npm run copy:llm             # same + copies prompt+JSON to clipboard
+npm run copy:llm             # ~0.3s clipboard (pre-built bundle)
+bash scripts/copy-llm.sh     # ~0.02s — fastest, no npm
+npm run copy:llm -- --fresh  # ~1s — refresh behaviors then copy
 npm run setup:hooks    # optional git pre-commit + pre-push gates
 ```
 
