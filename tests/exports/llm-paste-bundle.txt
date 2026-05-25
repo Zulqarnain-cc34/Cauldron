@@ -15,9 +15,9 @@ Do NOT re-run code. Judge only from this JSON. Be concise.
 AUDIT SUMMARY
 ---
 Overall: ALL_PASS
-Behaviors: 86/86 PASS
+Behaviors: 89/89 PASS
 Export mode: quick
-Generated: 2026-05-25T18:19:23.422Z
+Generated: 2026-05-25T18:25:43.341Z
 
 ---
 Paste review task: Read the JSON below. Flag suspicious PASS rows. Summarize OK vs suspicious behavior ids.
@@ -27,7 +27,7 @@ Paste review task: Read the JSON below. Flag suspicious PASS rows. Summarize OK 
   "documentType": "cauldron-verification-export",
   "version": 1,
   "exportMode": "quick",
-  "generatedAt": "2026-05-25T18:19:23.422Z",
+  "generatedAt": "2026-05-25T18:25:43.341Z",
   "project": {
     "name": "cauldron",
     "description": "Layered falling-sand simulation library"
@@ -36,10 +36,12 @@ Paste review task: Read the JSON below. Flag suspicious PASS rows. Summarize OK 
   "summary": {
     "overallVerdict": "ALL_PASS",
     "behaviorTests": {
-      "total": 86,
-      "pass": 86,
+      "total": 89,
+      "pass": 89,
       "fail": 0
     },
+    "expectedBehaviorCount": 89,
+    "includesPluginTests": true,
     "headlessTests": {
       "pass": null,
       "fail": null,
@@ -2857,7 +2859,112 @@ Paste review task: Read the JSON below. Flag suspicious PASS rows. Summarize OK 
       "rbState": "0,0:0|1,0:0",
       "verdict": "PASS",
       "failure": null
+    },
+    {
+      "id": "grenade-ignites-organic",
+      "suite": "grenade",
+      "name": "Blast ignites organic at center",
+      "description": "Radial blast converts plant matter to fire.",
+      "rulesEnabled": [
+        "grenade-blast"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".....",
+        ".....",
+        "..O..",
+        ".....",
+        "....."
+      ],
+      "expectedGrid": [
+        ".....",
+        ".....",
+        "..F..",
+        ".....",
+        "....."
+      ],
+      "actualGrid": [
+        ".....",
+        ".....",
+        "..F..",
+        ".....",
+        "....."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "2,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "grenade-spares-stone",
+      "suite": "grenade",
+      "name": "Blast does not destroy stone",
+      "description": "Stone cells survive the detonation.",
+      "rulesEnabled": [
+        "grenade-blast"
+      ],
+      "steps": 1,
+      "startGrid": [
+        ".....",
+        ".....",
+        "..T..",
+        ".....",
+        "....."
+      ],
+      "expectedGrid": [
+        ".....",
+        ".....",
+        "..T..",
+        ".....",
+        "....."
+      ],
+      "actualGrid": [
+        ".....",
+        ".....",
+        "..T..",
+        ".....",
+        "....."
+      ],
+      "gridChanged": false,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "2,2:0",
+      "verdict": "PASS",
+      "failure": null
+    },
+    {
+      "id": "grenade-direct-apply",
+      "suite": "grenade",
+      "name": "Direct blast clears center to fire",
+      "description": "applyGrenadeBlast on sand spawns fire at the impact cell.",
+      "rulesEnabled": [],
+      "steps": 0,
+      "startGrid": [
+        "...",
+        ".S.",
+        "..."
+      ],
+      "expectedGrid": [
+        "...",
+        ".F.",
+        "..."
+      ],
+      "actualGrid": [
+        "...",
+        ".F.",
+        "..."
+      ],
+      "gridChanged": true,
+      "gridMatchesExpected": true,
+      "hasInspect": false,
+      "inspectPassed": false,
+      "rbState": "1,1:0",
+      "verdict": "PASS",
+      "failure": null
     }
   ]
 }
-

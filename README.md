@@ -34,7 +34,7 @@ npm run copy:llm -- --fresh  # ~1s — refresh behaviors then copy
 npm run setup:hooks    # optional git pre-commit + pre-push gates
 ```
 
-**You never review tests one by one.** `npm run release` runs headless tests, quality gates, catalog coverage, and golden snapshots for all 86 behaviors. See [TESTING.md](TESTING.md).
+**You never review tests one by one.** `npm run release` runs headless tests, quality gates, catalog coverage, and golden snapshots for all **89 behaviors** (86 core + 3 grenade plugin). See [TESTING.md](TESTING.md).
 
 ## Extend the library
 

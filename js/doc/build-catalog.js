@@ -225,6 +225,11 @@ export function getAllTestSuites() {
   return [...getTestSuites(), ...getPluginTestSuites()];
 }
 
+/** All behavior specs — core rules + plugins (same set as npm test). */
+export function getAllBehaviors() {
+  return getAllTestSuites().flatMap((suite) => suite.tests);
+}
+
 /** @returns {Map<string, object>} */
 export function buildTestIndex() {
   const map = new Map();

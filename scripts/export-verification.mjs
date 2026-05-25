@@ -9,7 +9,7 @@ import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { getRuleModules } from '../js/cauldron/tooling.js';
+import { getRuleModules, getAllTestSuites } from '../js/cauldron/tooling.js';
 import { getRegisteredPlugins } from '../js/plugins/host.js';
 import { MATERIALS } from '../js/catalog/materials.js';
 import { collectBehaviorSnapshots, behaviorCount } from './lib/behavior-outcomes.mjs';
@@ -51,6 +51,14 @@ const snapshots = await collectBehaviorSnapshots();
 const behaviorRows = Object.values(snapshots);
 const passCount = behaviorRows.filter((b) => b.verdict === 'PASS').length;
 const failCount = behaviorRows.length - passCount;
+
+const expectedTotal = getAllTestSuites().reduce((n, s) => n + s.tests.length, 0);
+if (behaviorRows.length !== expectedTotal) {
+  console.error(
+    `export: behavior count mismatch — ran ${behaviorRows.length}, expected ${expectedTotal} (core + plugins)`
+  );
+  process.exit(1);
+}
 
 const rules = getRuleModules().map((mod) => ({
   id: mod.id,
@@ -120,6 +128,8 @@ const report = {
   summary: {
     overallVerdict: allGatesOk ? 'ALL_PASS' : 'ISSUES_FOUND',
     behaviorTests: { total: behaviorRows.length, pass: passCount, fail: failCount },
+    expectedBehaviorCount: expectedTotal,
+    includesPluginTests: true,
     headlessTests: quick
       ? { pass: null, fail: null, note: 'not run in quick mode — use npm test or export:verification' }
       : { pass: headlessPass, fail: headlessFail },

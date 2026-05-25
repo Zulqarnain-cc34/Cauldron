@@ -15,7 +15,7 @@ If it prints `READY FOR RELEASE`, ship it. CI runs the same gate on every push.
 | **92+ headless tests** | Wrong grid output, broken extension API |
 | **check:behaviors** | No-op tests, weak ignite specs, tests that pass with wrong expect |
 | **check:coverage** | Materials/reactions with zero tests |
-| **Golden snapshots** | **Any behavior outcome drift** — regression across all 86 behaviors at once |
+| **Golden snapshots** | **Any behavior outcome drift** — regression across all 89 behaviors at once |
 | **check:layers** | Plugin import violations |
 
 Golden snapshots live in `tests/snapshots/behaviors.json`. Every behavior's `before` / `after` grid and burn timers are recorded. If you break sand falling, fungus ignite, or anything else, **CI fails and names the behavior id** — you don't open each test.
@@ -118,11 +118,11 @@ Creates:
 
 | File | Purpose |
 |------|---------|
-| `tests/exports/verification-report.json` | All rules, all 86 behaviors, start/expected/actual grids, pass/fail, quality gates |
+| `tests/exports/verification-report.json` | All rules, all 89 behaviors, start/expected/actual grids, pass/fail, quality gates |
 | `tests/exports/llm-review-prompt.txt` | Instructions to paste above the JSON |
 
 The JSON includes `reviewerInstructions` telling the LLM what to validate. Regenerate after code changes.
 
 ## CI
 
-`.github/workflows/ci.yml` runs `npm run release` on every push/PR. Check GitHub **Actions** — green means all 86 behavior outcomes still match the golden file.
+`.github/workflows/ci.yml` runs `npm run release` on every push/PR. Check GitHub **Actions** — green means all 89 behavior outcomes still match the golden file.

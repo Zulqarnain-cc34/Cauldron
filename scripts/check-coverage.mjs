@@ -4,6 +4,7 @@
  */
 import { ensureTestBootstrap } from './lib/behavior-outcomes.mjs';
 import { getRuleModules } from '../js/cauldron/tooling.js';
+import { getRegisteredPlugins } from '../js/plugins/host.js';
 
 await ensureTestBootstrap();
 
@@ -32,6 +33,13 @@ for (const mod of getRuleModules()) {
   }
 }
 
+for (const plugin of getRegisteredPlugins()) {
+  const count = plugin.behaviors?.length ?? 0;
+  if (count === 0) {
+    warnings.push(`plugin/${plugin.id}: no behaviors[] — consider adding specs`);
+  }
+}
+
 if (warnings.length) {
   console.warn(`\ncheck:coverage — ${warnings.length} warning(s):`);
   for (const w of warnings) console.warn(`  ⚠ ${w}`);
@@ -43,5 +51,8 @@ if (errors.length) {
   process.exit(1);
 }
 
-const total = getRuleModules().reduce((n, m) => n + (m.behaviors?.length ?? 0), 0);
-console.log(`check:coverage OK — ${getRuleModules().length} rules, ${total} behaviors`);
+const ruleTotal = getRuleModules().reduce((n, m) => n + (m.behaviors?.length ?? 0), 0);
+const pluginTotal = getRegisteredPlugins().reduce((n, p) => n + (p.behaviors?.length ?? 0), 0);
+console.log(
+  `check:coverage OK — ${getRuleModules().length} rules (${ruleTotal} behaviors), ${getRegisteredPlugins().length} plugins (${pluginTotal} behaviors)`
+);
