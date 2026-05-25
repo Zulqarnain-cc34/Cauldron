@@ -44,6 +44,44 @@ body {
   image-rendering: crisp-edges;
 }
 
+#map-tabs.map-tabs {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: 11;
+  display: flex;
+  gap: 0.15rem;
+  pointer-events: auto;
+  background: rgba(13, 13, 18, 0.92);
+  border: 1px solid #2a2a38;
+  border-radius: 8px;
+  padding: 0.25rem;
+}
+
+.map-tab {
+  background: #1a1a24;
+  color: #e8e8f0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  padding: 0.4rem 0.85rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.map-tab:hover {
+  background: #252532;
+  border-color: #3a3a4a;
+}
+
+.map-tab.active {
+  background: #1e2848;
+  border-color: #6a8cff;
+  color: #fff;
+}
+
 #cauldron-ui {
   position: fixed;
   inset: 0;
@@ -389,38 +427,23 @@ body {
   transition: border-color 0.15s, transform 0.1s, background 0.15s;
 }
 
-.container-toggle-backpack {
-  width: 7.5rem;
-  height: 7.5rem;
-  padding: 0.65rem;
-}
-
+.container-toggle-backpack,
 .container-toggle-jar {
-  width: 8.5rem;
-  height: 8.5rem;
-  padding: 0.75rem;
+  width: 4.5rem;
+  height: 4.5rem;
+  padding: 0.4rem;
 }
 
 .container-toggle-icon,
 .backpack-toggle-icon {
   width: 100%;
   height: 100%;
-  max-width: 5.75rem;
-  max-height: 5.75rem;
+  max-width: 3.5rem;
+  max-height: 3.5rem;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
   object-fit: contain;
-}
-
-.container-toggle-backpack .container-toggle-icon {
-  max-width: 5.85rem;
-  max-height: 5.85rem;
-}
-
-.container-toggle-jar .container-toggle-icon {
-  max-width: 6.5rem;
-  max-height: 6.5rem;
 }
 
 .container-toggle.active,
@@ -460,7 +483,7 @@ body {
 
 .container-modal,
 .backpack-modal {
-  width: min(calc(var(--inv-cols, 9) * 5.5rem + 3rem), 96vw);
+  width: min(calc(var(--inv-cols, 9) * 4.125rem + 2.25rem), 96vw);
   background: rgba(18, 18, 26, 0.98);
   border: 2px solid #3a3a4a;
   border-radius: 10px;
@@ -520,15 +543,15 @@ body {
 
 .inventory-grid {
   display: grid;
-  grid-template-columns: repeat(var(--inv-cols, 9), 5rem);
-  gap: 0.7rem;
+  grid-template-columns: repeat(var(--inv-cols, 9), 3.75rem);
+  gap: 0.53rem;
   justify-content: center;
 }
 
 .inventory-slot {
   position: relative;
-  width: 5rem;
-  height: 5rem;
+  width: 3.75rem;
+  height: 3.75rem;
   padding: 0;
   background: #1a1a24;
   border: 2px solid #4a4a58;
@@ -553,7 +576,7 @@ body {
   justify-content: center;
   width: 100%;
   height: 100%;
-  font-size: 0.95rem;
+  font-size: 0.71rem;
   font-weight: 600;
   color: #e8e8f0;
   text-align: center;
@@ -565,8 +588,8 @@ body {
 }
 
 .inventory-slot-icon {
-  width: 3.3rem;
-  height: 3.3rem;
+  width: 2.48rem;
+  height: 2.48rem;
   object-fit: contain;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
@@ -574,8 +597,8 @@ body {
 }
 
 .inventory-slot-swatch {
-  width: 2.7rem;
-  height: 2.7rem;
+  width: 2.03rem;
+  height: 2.03rem;
   border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
@@ -583,9 +606,9 @@ body {
 
 .inventory-slot-count {
   position: absolute;
-  right: 0.25rem;
-  bottom: 0.15rem;
-  font-size: 1rem;
+  right: 0.2rem;
+  bottom: 0.12rem;
+  font-size: 0.75rem;
   font-weight: 700;
   color: #fff;
   text-shadow: 0 0 3px #000, 0 1px 2px #000;

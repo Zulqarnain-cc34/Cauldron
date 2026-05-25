@@ -1,5 +1,6 @@
-import { Species } from '../../catalog/species.js';
+import { Species } from '../../../catalog/species.js';
 import { addStack } from '../../inventory/slot-inventory.js';
+import { spawnGemPickups } from '../../gems/pickups.js';
 
 /** Stone chamber with water pocket — separate session defaults for Gem Digger prep. */
 export function bootstrapWorkshop(world) {
@@ -52,6 +53,11 @@ export function bootstrapWorkshop(world) {
       rb: 0,
     });
   }
+
+  spawnGemPickups(world, [
+    { x: midX - 5, y: floorY - 20 },
+    { x: midX + 12, y: floorY - 32 },
+  ]);
 }
 
 /** @type {import('../registry.js').MapDefinition} */

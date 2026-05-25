@@ -5,3 +5,4 @@
 
 export * from './inventory/index.js';
 export * from './maps/index.js';
+export * from './gems/index.js';

@@ -42,3 +42,14 @@ export {
   sandboxMap,
   workshopMap,
 } from '../game/maps/index.js';
+
+export {
+  spawnGemPickup,
+  spawnGemPickups,
+  tryCollectGem,
+  tickGemPickups,
+  renderGemPickups,
+  setupGemCollectInput,
+  installGemSystem,
+  clearGemPickups,
+} from '../game/gems/index.js';

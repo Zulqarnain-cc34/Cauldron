@@ -19,14 +19,16 @@ export function mountMapTabs(manager, hostEl) {
     hostEl.innerHTML = '';
     tabButtons.clear();
 
-    for (const def of getAllMapDefinitions()) {
+    const defs = getAllMapDefinitions();
+    defs.forEach((def, index) => {
       const tab = document.createElement('button');
       tab.type = 'button';
       tab.className = 'map-tab';
       tab.dataset.mapId = def.id;
       tab.setAttribute('role', 'tab');
       tab.setAttribute('aria-selected', 'false');
-      tab.title = def.description ?? def.label;
+      const shortcut = index < 9 ? ` (${index + 1})` : '';
+      tab.title = `${def.description ?? def.label}${shortcut}`;
       tab.textContent = def.label;
 
       tab.addEventListener('click', () => {
@@ -36,7 +38,7 @@ export function mountMapTabs(manager, hostEl) {
 
       hostEl.appendChild(tab);
       tabButtons.set(def.id, tab);
-    }
+    });
 
     syncActiveTab();
   }
@@ -50,7 +52,28 @@ export function mountMapTabs(manager, hostEl) {
     }
   }
 
+  function bindTabKeyboard() {
+    window.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+      const target = e.target;
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+      const idx = Number(e.key) - 1;
+      if (idx < 0 || idx >= getAllMapDefinitions().length) return;
+      const def = getAllMapDefinitions()[idx];
+      if (manager.getActiveMapId() === def.id) return;
+      e.preventDefault();
+      manager.switchTo(def.id);
+    });
+  }
+
   renderTabs();
+  bindTabKeyboard();
 
   const priorOnSwitch = manager.onSwitch;
   manager.onSwitch = (ctx) => {

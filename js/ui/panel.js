@@ -95,6 +95,14 @@ function mountBrushDropdown(world, brushEl) {
   picker.append(trigger, menu);
   brushEl.appendChild(picker);
   setSelection(activeTool);
+
+  return {
+    syncFromWorld() {
+      const tool =
+        brushTools.find((t) => t.species === world.brush.species) ?? brushTools[0];
+      setSelection(tool);
+    },
+  };
 }
 
 export function mountPanel(world, callbacks) {
@@ -116,7 +124,7 @@ export function mountPanel(world, callbacks) {
   `;
 
   const brushEl = root.querySelector('#brush-tools');
-  mountBrushDropdown(world, brushEl);
+  const brushPicker = mountBrushDropdown(world, brushEl);
 
   const rulesEl = root.querySelector('#rule-toggles');
   const rulePicker = mountRulePicker(world, rulesEl, { rules: getToggleableRules() });
@@ -159,6 +167,10 @@ export function mountPanel(world, callbacks) {
       if (btn) btn.textContent = paused ? 'Play' : 'Pause';
     },
     syncRules: rulePicker?.refresh,
+    syncBrush: brushPicker?.syncFromWorld,
+    syncBrushRadius() {
+      radiusInput.value = String(world.brush.radius);
+    },
   };
 }
 

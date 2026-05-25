@@ -1,7 +1,7 @@
 import { Species } from '../../catalog/species.js';
 import { getMaterial } from '../../catalog/materials.js';
 
-/** @typedef {'material' | 'tool'} ItemKind */
+/** @typedef {'material' | 'tool' | 'gem'} ItemKind */
 
 /**
  * @typedef {object} ItemDef
@@ -42,6 +42,13 @@ export const ITEM_CATALOG = {
     kind: 'tool',
     stackSize: 16,
     icon: '/assets/grenade.png',
+  },
+  diamond: {
+    id: 'diamond',
+    label: 'Diamond',
+    kind: 'gem',
+    stackSize: 99,
+    icon: '/assets/diamond.png',
   },
 };
 

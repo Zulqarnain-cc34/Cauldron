@@ -1,3 +1,4 @@
+import { clearGemPickups, cloneGemPickups, setGemPickups } from '../gems/pickups.js';
 import { createBackpackInventory } from '../inventory/backpack-inventory.js';
 import { createJarInventory } from '../inventory/jar-inventory.js';
 
@@ -16,6 +17,7 @@ import { createJarInventory } from '../inventory/jar-inventory.js';
  * @property {Record<string, unknown>} plugin
  * @property {import('../inventory/slot-inventory.js').SlotInventory} backpack
  * @property {import('../inventory/slot-inventory.js').SlotInventory} jar
+ * @property {import('../gems/pickups.js').GemPickup[]} gemPickups
  * @property {Record<string, unknown>} [custom]
  */
 
@@ -50,6 +52,7 @@ export function captureMapSession(world, meta) {
     jar: world.jar
       ? cloneSlotInventory(world.jar)
       : cloneSlotInventory({ cols: 4, rows: 2, slots: [] }),
+    gemPickups: cloneGemPickups(world),
     custom: meta.custom ? structuredClone(meta.custom) : {},
   };
 }
@@ -77,6 +80,7 @@ export function applyMapSession(world, session) {
   world.plugin = structuredClone(session.plugin ?? {});
   world.backpack = cloneSlotInventory(session.backpack);
   world.jar = cloneSlotInventory(session.jar);
+  setGemPickups(world, session.gemPickups ?? []);
 }
 
 /**
@@ -101,6 +105,7 @@ export function createFreshMapSession(world, def) {
 
   world.backpack = createBackpackInventory();
   world.jar = createJarInventory();
+  clearGemPickups(world);
 
   def.bootstrap(world);
 

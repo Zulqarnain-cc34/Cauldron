@@ -1,4 +1,6 @@
-import { Species } from '../../catalog/species.js';
+import { Species } from '../../../catalog/species.js';
+
+import { spawnGemPickups } from '../../gems/pickups.js';
 
 /** Classic sand-on-floor demo. */
 export function bootstrapSandbox(world) {
@@ -20,6 +22,12 @@ export function bootstrapSandbox(world) {
       rb: 0,
     });
   }
+
+  spawnGemPickups(world, [
+    { x: 120, y: 40 },
+    { x: 145, y: 55 },
+    { x: 165, y: 35 },
+  ]);
 }
 
 /** @type {import('../registry.js').MapDefinition} */

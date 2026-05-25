@@ -17,6 +17,7 @@ import {
   registerMapDefinitions,
   createMapManager,
   BUILTIN_MAPS,
+  installGemSystem,
 } from './js/cauldron/game.js';
 
 let world;
@@ -24,6 +25,7 @@ let ui;
 let mapManager;
 let backpackUi;
 let jarUi;
+let gems;
 
 function syncSessionUi() {
   backpackUi?.refresh();
@@ -31,6 +33,8 @@ function syncSessionUi() {
   ui?.setTick(world.tick);
   ui?.setPaused(world.paused);
   ui?.syncRules?.();
+  ui?.syncBrush?.();
+  ui?.syncBrushRadius?.();
 }
 
 new window.p5((p) => {
@@ -44,6 +48,12 @@ new window.p5((p) => {
 
     setupInput(world, canvas.elt);
     await bootstrapSandbox({ world, canvas: canvas.elt });
+
+    gems = installGemSystem(p, world, canvas.elt, {
+      onCollected() {
+        syncSessionUi();
+      },
+    });
 
     mapManager = createMapManager({
       world,
@@ -86,9 +96,11 @@ new window.p5((p) => {
   p.draw = () => {
     if (!world.paused) {
       runRules(world);
+      gems?.tick();
     }
     renderWorld(p, world);
     renderPlugins(p, world);
+    gems?.render();
     ui?.setTick(world.tick);
   };
 });

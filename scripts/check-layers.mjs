@@ -105,9 +105,6 @@ for (const file of walk(ROOT)) {
       if (target.startsWith('js/catalog/')) {
         violations.push(`${rel}: UI should import cauldron/app.js, not ${target}`);
       }
-      if (target.startsWith('js/sim/') && !target.startsWith('js/sim/')) {
-        /* unreachable */
-      }
       if (target.startsWith('js/sim/')) {
         violations.push(`${rel}: UI should import cauldron/app.js or cauldron/game.js, not ${target}`);
       }

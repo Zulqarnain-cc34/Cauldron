@@ -7,6 +7,7 @@ import {
 } from './session.js';
 import { createBackpackInventory } from '../inventory/backpack-inventory.js';
 import { createJarInventory } from '../inventory/jar-inventory.js';
+import { clearGemPickups } from '../gems/pickups.js';
 
 /**
  * @typedef {object} MapManagerOptions
@@ -115,6 +116,7 @@ export class MapManager {
 
     this.world.reset();
     this.world.seed = def.seed ?? this.world.seed;
+    clearGemPickups(this.world);
 
     if (def.defaultRules) {
       for (const [key, enabled] of Object.entries(def.defaultRules)) {
