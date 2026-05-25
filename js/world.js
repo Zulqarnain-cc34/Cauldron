@@ -1,4 +1,5 @@
 import { Species, Flags } from './materials.js';
+import { defaultRuleEnabled } from './catalog/rule-defaults.js';
 
 const STRIDE = 4;
 
@@ -28,17 +29,7 @@ export class World {
       radius: 2,
       queue: [],
     };
-    this.ruleEnabled = {
-      sand: true,
-      water: true,
-      fire: true,
-      organic: true,
-      stone: true,
-      reactions: true,
-      life: false,
-      boids: false,
-      flow: false,
-    };
+    this.ruleEnabled = defaultRuleEnabled();
   }
 
   idx(x, y) {

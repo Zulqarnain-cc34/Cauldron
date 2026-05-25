@@ -1,4 +1,5 @@
-import { Species } from './materials.js';
+import { Species } from './catalog/species.js';
+import { getBrushMaterials } from './catalog/materials.js';
 import { CELL_PX } from './world.js';
 import { registerRule } from './rules/registry.js';
 
@@ -69,12 +70,16 @@ export function setupInput(world, canvas) {
   canvas.addEventListener('contextmenu', (e) => e.preventDefault());
 }
 
+/** Sandspiel-aligned brush list (sorted by label). */
 export const BRUSH_TOOLS = [
-  { id: 'sand', species: Species.SAND, label: 'Sand' },
-  { id: 'water', species: Species.WATER, label: 'Water' },
-  { id: 'stone', species: Species.STONE, label: 'Stone' },
+  ...getBrushMaterials()
+    .filter((m) => m.id !== Species.WALL)
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .map((m) => ({
+      id: m.name,
+      species: m.id,
+      label: m.name.charAt(0).toUpperCase() + m.name.slice(1),
+    })),
   { id: 'wall', species: Species.WALL, label: 'Wall' },
-  { id: 'fire', species: Species.FIRE, label: 'Fire' },
-  { id: 'organic', species: Species.ORGANIC, label: 'Organic' },
   { id: 'erase', species: Species.EMPTY, label: 'Eraser' },
 ];

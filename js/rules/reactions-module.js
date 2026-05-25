@@ -3,6 +3,10 @@ import { Species } from '../catalog/species.js';
 const REACTIONS = [
   { a: Species.WATER, b: Species.FIRE, result: Species.STEAM, clearA: true, at: 'b' },
   { a: Species.FIRE, b: Species.ORGANIC, result: Species.FIRE, at: 'b' },
+  { a: Species.FIRE, b: Species.WOOD, result: Species.FIRE, at: 'b' },
+  { a: Species.FIRE, b: Species.FUNGUS, result: Species.FIRE, at: 'b' },
+  { a: Species.FIRE, b: Species.OIL, result: Species.FIRE, at: 'b' },
+  { a: Species.LAVA, b: Species.WATER, result: Species.STONE, clearA: false, at: 'a' },
 ];
 
 export function applyReactions(world) {

@@ -5,6 +5,16 @@ import { steamRuleDef } from '../rules/materials/steam.js';
 import { fireRuleDef } from '../rules/materials/fire.js';
 import { organicRuleDef } from '../rules/materials/organic.js';
 import { stoneRuleDef } from '../rules/materials/stone.js';
+import { dustRuleDef } from '../rules/materials/dust.js';
+import { oilRuleDef } from '../rules/materials/oil.js';
+import { gasRuleDef } from '../rules/materials/gas.js';
+import { iceRuleDef } from '../rules/materials/ice.js';
+import { lavaRuleDef } from '../rules/materials/lava.js';
+import { woodRuleDef } from '../rules/materials/wood.js';
+import { acidRuleDef } from '../rules/materials/acid.js';
+import { seedRuleDef } from '../rules/materials/seed.js';
+import { fungusRuleDef } from '../rules/materials/fungus.js';
+import { rocketRuleDef } from '../rules/materials/rocket.js';
 import { reactionRuleDef } from '../rules/reactions-module.js';
 
 const RULE_DEFS = [
@@ -14,6 +24,16 @@ const RULE_DEFS = [
   fireRuleDef,
   organicRuleDef,
   stoneRuleDef,
+  dustRuleDef,
+  oilRuleDef,
+  gasRuleDef,
+  iceRuleDef,
+  lavaRuleDef,
+  woodRuleDef,
+  acidRuleDef,
+  seedRuleDef,
+  fungusRuleDef,
+  rocketRuleDef,
   reactionRuleDef,
 ];
 
@@ -70,12 +90,6 @@ export function buildUpdaters() {
   return updaters;
 }
 
-/**
- * Which species to simulate this tick — respects rule toggles and test `only` scope.
- * @param {import('../world.js').World} world
- * @param {Set<string>|null} onlyRuleIds
- * @returns {{ down: Set<number>, up: Set<number> }}
- */
 export function resolveActiveSpecies(world, onlyRuleIds) {
   const down = new Set();
   const up = new Set();

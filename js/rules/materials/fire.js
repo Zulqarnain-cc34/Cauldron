@@ -17,7 +17,7 @@ function updateFire(cell, api) {
     return;
   }
 
-  if (target.species === Species.ORGANIC) {
+  if (target.species === Species.ORGANIC || target.species === Species.DUST || target.species === Species.GAS) {
     api.set(dx, dy, {
       species: Species.FIRE,
       flags: 0,

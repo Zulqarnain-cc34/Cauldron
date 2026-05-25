@@ -1,6 +1,7 @@
 import { Species } from '../catalog/species.js';
 import { getMaterial } from '../catalog/materials.js';
 import { BRUSH_TOOLS } from '../input.js';
+import { getMaterialModules } from '../sim/test-registry.js';
 
 function materialColor(species) {
   const [r, g, b] = getMaterial(species).color;
@@ -117,23 +118,38 @@ export function mountPanel(world, callbacks) {
   mountBrushDropdown(world, brushEl);
 
   const rulesEl = root.querySelector('#rule-toggles');
-  const ruleDefs = [
-    { key: 'sand', label: 'Sand' },
-    { key: 'water', label: 'Water / Steam' },
-    { key: 'fire', label: 'Fire' },
-    { key: 'organic', label: 'Organic' },
-    { key: 'stone', label: 'Stone' },
-    { key: 'reactions', label: 'Reactions' },
-    { key: 'life', label: 'Life (soon)' },
-    { key: 'boids', label: 'Boids (soon)' },
-  ];
+  rulesEl.classList.add('rule-toggles-scroll');
 
-  for (const { key, label } of ruleDefs) {
+  const materialRules = getMaterialModules().map((m) => ({
+    key: m.enabledKey ?? m.id,
+    label: m.label ?? m.id,
+  }));
+  const seen = new Set();
+  for (const { key, label } of materialRules) {
+    if (seen.has(key)) continue;
+    seen.add(key);
+    const labelEl = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = world.ruleEnabled[key] ?? true;
+    cb.addEventListener('change', () => {
+      world.ruleEnabled[key] = cb.checked;
+    });
+    labelEl.appendChild(cb);
+    labelEl.appendChild(document.createTextNode(` ${label}`));
+    rulesEl.appendChild(labelEl);
+  }
+
+  for (const { key, label, disabled } of [
+    { key: 'reactions', label: 'Reactions' },
+    { key: 'life', label: 'Life (soon)', disabled: true },
+    { key: 'boids', label: 'Boids (soon)', disabled: true },
+  ]) {
     const labelEl = document.createElement('label');
     const cb = document.createElement('input');
     cb.type = 'checkbox';
     cb.checked = world.ruleEnabled[key] ?? false;
-    cb.disabled = key === 'life' || key === 'boids';
+    cb.disabled = disabled ?? false;
     cb.addEventListener('change', () => {
       world.ruleEnabled[key] = cb.checked;
     });
