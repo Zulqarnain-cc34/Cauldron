@@ -13,6 +13,7 @@ import { mountPanel, bindKeyboard } from './js/ui/panel.js';
 import { mountBackpack } from './js/ui/backpack.js';
 import { mountJar } from './js/ui/jar.js';
 import { mountMapTabs } from './js/ui/map-tabs.js';
+import { mountMapHud } from './js/ui/map-hud.js';
 import {
   registerMapDefinitions,
   createMapManager,
@@ -25,11 +26,13 @@ let ui;
 let mapManager;
 let backpackUi;
 let jarUi;
+let mapHud;
 let gems;
 
 function syncSessionUi() {
   backpackUi?.refresh();
   jarUi?.refresh();
+  mapHud?.refresh();
   ui?.setTick(world.tick);
   ui?.setPaused(world.paused);
   ui?.syncRules?.();
@@ -80,6 +83,14 @@ new window.p5((p) => {
     });
     ui.setPaused(false);
 
+    mapManager.init('sandbox');
+
+    mapHud = mountMapHud({
+      world,
+      mapManager,
+      hostEl: document.getElementById('map-hud'),
+    });
+
     bindKeyboard(world, {
       onPauseChange(paused) {
         ui?.setPaused(paused);
@@ -89,8 +100,6 @@ new window.p5((p) => {
         syncSessionUi();
       },
     });
-
-    mapManager.init('sandbox');
   };
 
   p.draw = () => {

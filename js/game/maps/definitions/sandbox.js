@@ -34,9 +34,10 @@ export function bootstrapSandbox(world) {
 export const sandboxMap = {
   id: 'sandbox',
   label: 'Sandbox',
-  description: 'Open sand box — default Cauldron playground.',
+  description: 'Find 3 diamonds buried in the sand pile.',
   seed: 42,
   bootstrap: bootstrapSandbox,
+  goals: { gems: { diamond: 3 } },
   defaultRules: {
     grenade: true,
   },

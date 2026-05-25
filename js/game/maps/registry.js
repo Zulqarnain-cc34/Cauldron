@@ -22,6 +22,7 @@
  * @property {{ species?: number, radius?: number }} [defaultBrush]
  * @property {Record<string, boolean>} [defaultRules] per-map rule toggles
  * @property {boolean} [resetClearsInventory] clear backpack/jar on Reset (default false)
+ * @property {{ gems?: Record<string, number> }} [goals] collect targets per gem item id
  * @property {MapHooks} [hooks] optional custom session data
  */
 

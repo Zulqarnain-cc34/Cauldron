@@ -27,4 +27,10 @@ export {
 
 export { MapManager, createMapManager } from './manager.js';
 
+export {
+  computeMapGoalProgress,
+  countGemsInWorld,
+  countGemsInInventory,
+} from './goals.js';
+
 export { BUILTIN_MAPS, sandboxMap, workshopMap } from './definitions/index.js';

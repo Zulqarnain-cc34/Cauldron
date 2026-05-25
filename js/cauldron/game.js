@@ -44,6 +44,12 @@ export {
 } from '../game/maps/index.js';
 
 export {
+  computeMapGoalProgress,
+  countGemsInWorld,
+  countGemsInInventory,
+} from '../game/maps/goals.js';
+
+export {
   spawnGemPickup,
   spawnGemPickups,
   tryCollectGem,

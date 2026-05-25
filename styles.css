@@ -114,6 +114,80 @@ body {
   letter-spacing: 0.04em;
 }
 
+.map-hud-host {
+  display: flex;
+  align-items: center;
+  max-width: 22rem;
+}
+
+.map-hud {
+  display: flex;
+  align-items: center;
+}
+
+.map-hud-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.15rem 0.65rem;
+  border-left: 1px solid #2a2a38;
+  border-right: 1px solid #2a2a38;
+}
+
+.map-hud-name {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #f0f0f8;
+  letter-spacing: 0.02em;
+}
+
+.map-hud-desc {
+  font-size: 0.72rem;
+  color: #9898b0;
+  line-height: 1.25;
+  max-width: 20rem;
+}
+
+.map-hud-goal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.75rem;
+  color: #c8c8dc;
+  margin-top: 0.1rem;
+}
+
+.map-hud-goal strong {
+  color: #6a8cff;
+  font-variant-numeric: tabular-nums;
+}
+
+.map-hud-goal--complete .map-hud-gem-text {
+  color: #7dcea0;
+}
+
+.map-hud-gem-icon {
+  width: 1rem;
+  height: 1rem;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.map-hud-complete {
+  display: inline-block;
+  margin-top: 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #7dcea0;
+  background: rgba(45, 90, 60, 0.35);
+  border: 1px solid rgba(125, 206, 160, 0.45);
+  border-radius: 4px;
+  padding: 0.12rem 0.4rem;
+  align-self: flex-start;
+}
+
 .bar-top a {
   color: #6a8cff;
   font-size: 0.8rem;

@@ -64,9 +64,10 @@ export function bootstrapWorkshop(world) {
 export const workshopMap = {
   id: 'workshop',
   label: 'Workshop',
-  description: 'Stone cave with sand fill and water — separate inventory session.',
+  description: 'Dig through sand and water to collect 2 diamonds.',
   seed: 9001,
   bootstrap: bootstrapWorkshop,
+  goals: { gems: { diamond: 2 } },
   defaultRules: {
     grenade: true,
   },

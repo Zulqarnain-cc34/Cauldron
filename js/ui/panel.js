@@ -112,6 +112,7 @@ export function mountPanel(world, callbacks) {
   root.innerHTML = `
     <header class="bar bar-top">
       <h1>Cauldron</h1>
+      <section class="map-hud-host" id="map-hud" aria-live="polite"></section>
       <a href="/help/index.html">Help</a>
       <a href="/docs/index.html">Docs</a>
       <span class="tick" id="tick-label">tick 0</span>
