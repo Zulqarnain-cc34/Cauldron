@@ -13,7 +13,8 @@ import { getBirdDef } from './catalog.js';
 import { getSkyArena, toroidalVectorTo } from './boundaries.js';
 import { flowVelocity } from './wind.js';
 import { buildBirdSpatialIndex, forEachBirdNearby } from './spatial.js';
-import { computeLocalFlockData, computeVicsekOrder } from './flock.js';
+import { computeVicsekOrder } from './flock.js';
+import { integrationSubsteps } from './birds.js';
 
 /** @typedef {import('./birds.js').Bird} Bird */
 
@@ -72,7 +73,7 @@ export function sampleBirdMetrics(world, birds) {
 
   const arena = getSkyArena(world);
   const def = getBirdDef();
-  const personalSpace = birdSimConfig.flock.personalSpace;
+  const separationRadius = birdSimConfig.flock.separationRadius;
   const minFlock = birdSimConfig.flock.minFlockSize;
   const simSpeed = birdSimConfig.motion.simSpeed;
 
@@ -94,7 +95,7 @@ export function sampleBirdMetrics(world, birds) {
   let interactionCountSum = 0;
 
   const spatial = buildBirdSpatialIndex(birds, arena);
-  const nnRadius = personalSpace * 4;
+  const nnRadius = separationRadius * 1.5;
 
   for (const bird of birds) {
     const sp = Math.hypot(bird.vx, bird.vy);
@@ -109,37 +110,30 @@ export function sampleBirdMetrics(world, birds) {
     const bm = sp || 0.001;
     windCos += (bird.vx * fvx) / (bm * fm) + (bird.vy * fvy) / (bm * fm);
 
-    const { neighbors } = computeLocalFlockData(bird, spatial, arena, def.maxForce);
-    interactionCountSum += neighbors.length;
-
     let nearest = Infinity;
-    for (const other of neighbors) {
-      const [dx, dy] = toroidalVectorTo(bird.x, bird.y, other.x, other.y, arena);
-      const d = Math.hypot(dx, dy);
-      interactionDistSum += d;
-      interactionDistN++;
-    }
+    let flockNeighbors = 0;
 
-    forEachBirdNearby(spatial, bird, arena, nnRadius, (_other, _dx, _dy, d) => {
+    forEachBirdNearby(spatial, bird, arena, nnRadius, (other, dx, dy, d2) => {
+      const d = Math.sqrt(d2);
       if (d < nearest) nearest = d;
-      if (d < personalSpace) violations++;
+      if (d < separationRadius * 0.32) violations++;
+      if (d <= birdSimConfig.flock.perception) {
+        flockNeighbors++;
+        interactionDistSum += d;
+        interactionDistN++;
+      }
     });
+
+    interactionCountSum += flockNeighbors;
 
     if (nearest < Infinity) {
       nnDistSum += nearest;
       nnCount++;
     }
-    if (neighbors.length >= minFlock) participating++;
+    if (flockNeighbors >= minFlock) participating++;
 
-    if (neighbors.length > 0) {
-      let cx = 0;
-      let cy = 0;
-      for (const o of neighbors) {
-        const [tx, ty] = toroidalVectorTo(bird.x, bird.y, o.x, o.y, arena);
-        cx += tx;
-        cy += ty;
-      }
-      cohesionSum += Math.hypot(cx / neighbors.length, cy / neighbors.length);
+    if (flockNeighbors > 0) {
+      cohesionSum += Math.min(nearest, separationRadius * 0.9);
       cohesionN++;
     }
 
@@ -147,7 +141,7 @@ export function sampleBirdMetrics(world, birds) {
     if (prev) {
       const [sx, sy] = toroidalVectorTo(prev.x, prev.y, bird.x, bird.y, arena);
       const step = Math.hypot(sx, sy);
-      const substeps = Math.max(1, Math.ceil(simSpeed / 0.35));
+      const substeps = integrationSubsteps(simSpeed);
       const dt = simSpeed / substeps;
       const maxStep = def.maxSpeed * dt * 2.5;
       const wrapped = step > arena.worldW * 0.32 || step > arena.skyH * 0.32;
@@ -184,7 +178,7 @@ export function sampleBirdMetrics(world, birds) {
       separationViolations,
       cohesionSpread,
       meanNeighborDist,
-      personalSpace,
+      separationRadius,
       perception: birdSimConfig.flock.perception,
       minFlock,
     });
@@ -202,7 +196,7 @@ export function sampleBirdMetrics(world, birds) {
     separationViolations,
     glitchRate,
     stuckRate,
-    personalSpace,
+    separationRadius,
     simSpeed,
     windEnabled: birdSimConfig.wind.enabled,
     separationScore,
@@ -255,7 +249,7 @@ function computeBehaviorScores(p) {
     separationViolations,
     cohesionSpread,
     meanNeighborDist,
-    personalSpace,
+    separationRadius,
     perception,
     minFlock,
   } = p;
@@ -267,7 +261,7 @@ function computeBehaviorScores(p) {
     Math.min(1, polarization * Math.min(1, flockParticipation / 0.45))
   );
 
-  const idealSpread = personalSpace * 3.2;
+  const idealSpread = separationRadius * 1.1;
   const maxSpread = Math.max(idealSpread * 2, perception * 0.55);
   let cohesionScore = 0;
   if (cohesionSpread > 0 && flockParticipation >= minFlock / 8) {
@@ -279,7 +273,7 @@ function computeBehaviorScores(p) {
       cohesionScore = Math.max(0, 0.35 - (cohesionSpread - maxSpread) / maxSpread);
     }
     cohesionScore = Math.max(0, Math.min(1, cohesionScore));
-    if (meanNeighborDist > personalSpace * 5) cohesionScore *= 0.7;
+    if (meanNeighborDist > separationRadius * 1.8) cohesionScore *= 0.7;
   }
 
   const flockEmergence =
@@ -301,7 +295,7 @@ function interpretMetrics(m) {
     separationViolations,
     glitchRate,
     stuckRate,
-    personalSpace,
+    separationRadius,
     simSpeed,
   } = m;
 
@@ -322,7 +316,7 @@ function interpretMetrics(m) {
   if (separationViolations > 0.35) {
     return {
       verdict: 'Crowded',
-      hint: 'Too many birds inside personal space — increase separation weight or personal space.',
+      hint: 'Too many birds overlapping — increase separation weight or separation radius.',
     };
   }
 
@@ -351,7 +345,7 @@ function interpretMetrics(m) {
     };
   }
 
-  if (polarization > 0.6 && flockParticipation > 0.5 && meanNeighborDist < personalSpace * 4) {
+  if (polarization > 0.6 && flockParticipation > 0.5 && meanNeighborDist < separationRadius * 1.4) {
     return {
       verdict: 'Healthy flock',
       hint: 'Alignment + grouping look good. Tweak cohesion spread if flocks feel too tight/loose.',
@@ -376,10 +370,17 @@ function interpretMetrics(m) {
     };
   }
 
-  if (polarization >= 0.75) {
+  if (polarization >= 0.85) {
     return {
       verdict: 'High Vicsek order',
-      hint: `φ=${(polarization * 100).toFixed(0)}% — strong alignment. Wind lowers φ when several flocks face different flow.`,
+      hint: `φ=${(polarization * 100).toFixed(0)}% — target met. Use one flock + metric mode for stable φ; wind splits flocks.`,
+    };
+  }
+
+  if (polarization >= 0.75) {
+    return {
+      verdict: 'Good Vicsek order',
+      hint: `φ=${(polarization * 100).toFixed(0)}% — raise alignment or use preset High order (φ≥85%).`,
     };
   }
 
@@ -390,7 +391,7 @@ function interpretMetrics(m) {
     };
   }
 
-  if (cohesionSpread > personalSpace * 6) {
+  if (cohesionSpread > separationRadius * 2.2) {
     return {
       verdict: 'Loose swarm',
       hint: 'Wide spread around centroids — increase cohesion or lower separation.',

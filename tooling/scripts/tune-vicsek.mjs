@@ -1,5 +1,6 @@
 /**
- * Search flock params for stable Vicsek φ ≥ 0.75 (headless).
+ * Search flock params for stable Vicsek φ ≥ target (headless).
+ * Run: node tooling/scripts/tune-vicsek.mjs
  */
 import { World, GRID_W, GRID_H } from '../../js/world.js';
 import { bootstrapSandbox } from '../../apps/gem-digger/lib/content/maps/sandbox.js';
@@ -13,15 +14,16 @@ import {
 import { birdSimConfig, applyBirdSimPreset } from '../../apps/gem-digger/lib/birds/config.js';
 import { computeVicsekOrder } from '../../apps/gem-digger/lib/birds/flock.js';
 
-const TARGET = 0.75;
-const WARMUP = 500;
-const SAMPLE = 150;
+const TARGET = 0.85;
+const WARMUP = 550;
+const SAMPLE = 180;
 const RUNS = 3;
 
-function simulate(spawnFn, flockPatch, windPatch, motionPatch) {
+function simulate(spawnFn, flockPatch, windPatch, spawnPatch, motionPatch) {
   applyBirdSimPreset('default');
   Object.assign(birdSimConfig.flock, flockPatch);
   if (windPatch) Object.assign(birdSimConfig.wind, windPatch);
+  if (spawnPatch) Object.assign(birdSimConfig.spawn, spawnPatch);
   if (motionPatch) Object.assign(birdSimConfig.motion, motionPatch);
 
   let phiMin = 1;
@@ -53,76 +55,123 @@ function simulate(spawnFn, flockPatch, windPatch, motionPatch) {
   return { phiMean: phiMean / RUNS, phiMin };
 }
 
-function singleFlock(world) {
+function singleFlock(world, n = 40) {
   clearBirds(world);
-  spawnFlock(world, world.width * 0.45, world.height * 0.28, 48);
+  spawnFlock(world, world.width * 0.45, world.height * 0.28, n);
 }
+
+const baseWind = { enabled: false, steerWeight: 0 };
 
 const candidates = [
   {
-    name: 'single-noWind',
-    spawn: singleFlock,
+    name: 'current-default',
+    spawn: spawnDemoFlocks,
+    flock: {},
+    wind: baseWind,
+    spawnPatch: { flockCount: 2, birdsPerFlock: 10 },
+  },
+  {
+    name: 'demo-high-ali',
+    spawn: spawnDemoFlocks,
     flock: {
-      interactionMode: 'topological',
-      topologicalNeighbors: 7,
-      weightAli: 1.1,
-      weightCoh: 0.55,
-      weightSep: 1.6,
+      weightAli: 1.15,
+      weightCoh: 0.52,
+      weightSep: 1.65,
       personalSpace: 6.5,
       separationRadius: 28,
-      cohesionSpeed: 0.5,
-    },
-    wind: { enabled: false, steerWeight: 0 },
-  },
-  {
-    name: 'single-flockFirst',
-    spawn: singleFlock,
-    flock: {
       topologicalNeighbors: 8,
-      weightAli: 1.0,
-      weightCoh: 0.5,
-      weightSep: 1.8,
-      personalSpace: 6,
+      cohesionSpeed: 0.48,
     },
-    wind: { enabled: true, steerWeight: 0.5, speedFactor: 0.35, gustMin: 0.18 },
+    wind: baseWind,
+    spawnPatch: { flockCount: 2, birdsPerFlock: 10 },
   },
   {
-    name: 'demo-noWind-tuned',
-    spawn: spawnDemoFlocks,
-    flock: {
-      weightAli: 1.05,
-      weightCoh: 0.5,
-      weightSep: 1.7,
-      personalSpace: 7,
-      separationRadius: 30,
-      topologicalNeighbors: 8,
-    },
-    wind: { enabled: false, steerWeight: 0 },
-  },
-  {
-    name: 'demo-calmWind-tuned',
-    spawn: spawnDemoFlocks,
-    flock: {
-      weightAli: 0.95,
-      weightCoh: 0.45,
-      weightSep: 1.9,
-      personalSpace: 6.5,
-      topologicalNeighbors: 8,
-    },
-    wind: { enabled: true, steerWeight: 0.55, speedFactor: 0.38, gustMin: 0.2 },
-  },
-  {
-    name: 'demo-metric-tuned',
+    name: 'demo-metric-85',
     spawn: spawnDemoFlocks,
     flock: {
       interactionMode: 'metric',
-      perception: 50,
-      weightAli: 1.0,
+      perception: 48,
+      weightAli: 1.1,
+      weightCoh: 0.5,
+      weightSep: 1.7,
+      personalSpace: 6.5,
+      separationRadius: 28,
+      cohesionSpeed: 0.45,
+    },
+    wind: baseWind,
+    spawnPatch: { flockCount: 2, birdsPerFlock: 10 },
+  },
+  {
+    name: 'demo-topo-balanced',
+    spawn: spawnDemoFlocks,
+    flock: {
+      interactionMode: 'topological',
+      topologicalNeighbors: 7,
+      weightAli: 1.08,
       weightCoh: 0.48,
       weightSep: 1.75,
-      personalSpace: 6.5,
+      personalSpace: 6.8,
+      separationRadius: 29,
+      cohesionSpeed: 0.46,
     },
-    wind: { enabled: false, steerWeight: 0 },
+    wind: baseWind,
+    spawnPatch: { flockCount: 2, birdsPerFlock: 10 },
+  },
+  {
+    name: '1flock-40',
+    spawn: (w) => singleFlock(w, 40),
+    flock: {
+      weightAli: 1.12,
+      weightCoh: 0.5,
+      weightSep: 1.6,
+      personalSpace: 6.5,
+      separationRadius: 28,
+      topologicalNeighbors: 7,
+    },
+    wind: baseWind,
+  },
+  {
+    name: '2flock-14',
+    spawn: spawnDemoFlocks,
+    flock: {
+      weightAli: 1.1,
+      weightCoh: 0.5,
+      weightSep: 1.65,
+      personalSpace: 6.5,
+      topologicalNeighbors: 8,
+    },
+    wind: baseWind,
+    spawnPatch: { flockCount: 2, birdsPerFlock: 14 },
+  },
+  {
+    name: 'demo-ali-coh-sep-sweep-a',
+    spawn: spawnDemoFlocks,
+    flock: {
+      weightAli: 1.2,
+      weightCoh: 0.55,
+      weightSep: 1.55,
+      personalSpace: 6.2,
+      separationRadius: 26,
+      topologicalNeighbors: 7,
+      cohesionSpeed: 0.5,
+    },
+    wind: baseWind,
+    spawnPatch: { flockCount: 2, birdsPerFlock: 10 },
+  },
+  {
+    name: 'demo-ali-coh-sep-sweep-b',
+    spawn: spawnDemoFlocks,
+    flock: {
+      weightAli: 1.05,
+      weightCoh: 0.45,
+      weightSep: 1.85,
+      personalSpace: 7,
+      separationRadius: 30,
+      topologicalNeighbors: 8,
+      cohesionSpeed: 0.42,
+    },
+    wind: baseWind,
+    spawnPatch: { flockCount: 2, birdsPerFlock: 10 },
   },
 ];
 
@@ -130,20 +179,32 @@ console.log(`Vicsek φ target ≥ ${TARGET * 100}% (${RUNS} runs, warmup=${WARMU
 
 const results = [];
 for (const c of candidates) {
-  const r = simulate(c.spawn, c.flock, c.wind);
+  const r = simulate(c.spawn, c.flock, c.wind, c.spawnPatch, c.motionPatch);
   const ok = r.phiMin >= TARGET;
   results.push({ ...c, ...r, ok });
   console.log(
-    `${ok ? '✓' : '✗'} ${c.name.padEnd(22)} mean=${(r.phiMean * 100).toFixed(1)}% min=${(r.phiMin * 100).toFixed(1)}%`
+    `${ok ? '✓' : '✗'} ${c.name.padEnd(24)} mean=${(r.phiMean * 100).toFixed(1)}% min=${(r.phiMin * 100).toFixed(1)}%`
   );
 }
 
-const winners = results.filter((r) => r.ok).sort((a, b) => b.phiMin - a.phiMin);
+results.sort((a, b) => b.phiMin - a.phiMin || b.phiMean - a.phiMean);
+const winners = results.filter((r) => r.ok);
+
+console.log('\n--- Ranked by min φ ---');
+for (const r of results.slice(0, 5)) {
+  console.log(
+    `  ${r.ok ? '✓' : '✗'} ${r.name}: mean=${(r.phiMean * 100).toFixed(1)}% min=${(r.phiMin * 100).toFixed(1)}%`
+  );
+}
+
 if (winners.length) {
   const w = winners[0];
-  console.log(`\nBest stable config: ${w.name}`);
+  console.log(`\nBest (min φ ≥ ${TARGET * 100}%): ${w.name}`);
   console.log('flock:', JSON.stringify(w.flock, null, 2));
-  console.log('wind:', JSON.stringify(w.wind, null, 2));
+  if (w.spawnPatch) console.log('spawn:', JSON.stringify(w.spawnPatch, null, 2));
 } else {
-  console.log('\nNo config met min φ — try single-flock spawn.');
+  console.log(`\nNo candidate met min φ ≥ ${TARGET * 100}%. Best attempt:`);
+  const b = results[0];
+  console.log(`  ${b.name} mean=${(b.phiMean * 100).toFixed(1)}% min=${(b.phiMin * 100).toFixed(1)}%`);
+  console.log('flock:', JSON.stringify(b.flock, null, 2));
 }

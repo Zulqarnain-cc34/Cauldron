@@ -15,11 +15,17 @@ const STRIDE = 5;
  * @property {number} floorY
  */
 
+/** @type {WeakMap<import('../../../../js/world.js').World, SkyArena>} */
+const arenaCache = new WeakMap();
+
 /**
  * @param {import('../../../../js/world.js').World} world
  * @returns {SkyArena}
  */
 export function getSkyArena(world) {
+  const cached = arenaCache.get(world);
+  if (cached) return cached;
+
   const worldW = world.width;
   const worldH = world.height;
   let floorY = worldH - 1;
@@ -43,7 +49,14 @@ export function getSkyArena(world) {
   const skyBottom = Math.max(skyTop, floorY - 1);
   const skyH = Math.max(1, skyBottom - skyTop + 1);
 
-  return { worldW, worldH, skyTop, skyBottom, skyH, floorY };
+  const arena = { worldW, worldH, skyTop, skyBottom, skyH, floorY };
+  arenaCache.set(world, arena);
+  return arena;
+}
+
+/** Call after terrain edits that move the floor or sky bounds. */
+export function invalidateSkyArena(world) {
+  arenaCache.delete(world);
 }
 
 export function wrapCoord(value, size) {

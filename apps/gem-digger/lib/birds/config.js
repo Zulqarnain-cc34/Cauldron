@@ -6,16 +6,22 @@
 
 export const DEFAULT_BIRD_SIM_CONFIG = {
   flock: {
+    /** Metric neighbours — tuned for Vicsek φ ≥ ~85% (single flock, headless sweep). */
     interactionMode: 'topological',
-    topologicalNeighbors: 8,
+    topologicalNeighbors: 7,
     perception: 50,
-    separationRadius: 30,
-    personalSpace: 7,
-    minFlockSize: 3,
-    weightSep: 2.0,
-    weightAli: 0.85,
-    weightCoh: 0.38,
-    cohesionSpeed: 0.4,
+    separationRadius: 28,
+    minFlockSize: 2,
+    weightSep: 3.2,
+    /** Heading match with birds in front — not position pull. */
+    weightAli: 0.32,
+    /** Off by default (position pull causes ring/orbit). Raise in UI if needed. */
+    weightCoh: 0,
+    cohesionSpeed: 0.15,
+    cohesionNeighbors: 4,
+    visionFovDeg: 100,
+    /** Organic motion — breaks robot lock-step. */
+    wanderWeight: 0.1,
   },
   wind: {
     /** When false, birds ignore wind forces (flocking only). Viz streaks still optional. */
@@ -27,12 +33,13 @@ export const DEFAULT_BIRD_SIM_CONFIG = {
     gustMin: 0.2,
   },
   spawn: {
-    flockCount: 2,
-    birdsPerFlock: 10,
+    /** One flock keeps global φ high; multiple flocks move in different directions. */
+    flockCount: 1,
+    birdsPerFlock: 22,
   },
   motion: {
     simSpeed: 1,
-    minSpeedRatio: 0.22,
+    minSpeedRatio: 0.15,
   },
   display: {
     showWindField: false,
@@ -49,130 +56,12 @@ export const birdSimConfig = structuredClone(DEFAULT_BIRD_SIM_CONFIG);
 
 /** Human-readable preset names for the UI. */
 export const BIRD_PRESET_LABELS = {
-  default: 'High order (φ≥75%)',
-  noWind: 'No wind (flock only)',
-  calmWind: 'Calm wind',
-  windyDay: 'Windy day',
-  turbulentWind: 'Turbulent wind',
-  flockFirst: 'Flock first',
-  topologicalFlock: 'Topological flock',
-  metricFlock: 'Metric flock',
+  default: 'Natural flock (vision)',
 };
 
 /** @type {Record<string, Partial<BirdSimConfig>>} */
 export const BIRD_SIM_PRESETS = {
   default: {},
-
-  /** Light breeze — wind visible; global φ often lower than default. */
-  calmWind: {
-    wind: {
-      enabled: true,
-      noiseScale: 0.007,
-      timeScale: 0.006,
-      speedFactor: 0.38,
-      steerWeight: 0.5,
-      gustMin: 0.2,
-    },
-    flock: {
-      weightAli: 1.0,
-      weightCoh: 0.48,
-      weightSep: 1.75,
-      personalSpace: 6.5,
-      topologicalNeighbors: 8,
-    },
-    display: { windParticleCount: 80, windOpacity: 18, windDriftSpeed: 0.45 },
-  },
-
-  /** Medium gusts — wind and flock share control. */
-  windyDay: {
-    wind: {
-      noiseScale: 0.012,
-      timeScale: 0.011,
-      speedFactor: 0.62,
-      steerWeight: 1.1,
-      gustMin: 0.38,
-    },
-    flock: {
-      weightAli: 0.6,
-      weightCoh: 0.3,
-      weightSep: 2.4,
-    },
-    display: { windParticleCount: 130, windOpacity: 26, windDriftSpeed: 0.75 },
-  },
-
-  /** Strong turbulent flow — motion dominated by wind. */
-  turbulentWind: {
-    wind: {
-      noiseScale: 0.02,
-      timeScale: 0.018,
-      speedFactor: 0.88,
-      steerWeight: 1.75,
-      gustMin: 0.55,
-    },
-    flock: {
-      weightAli: 0.45,
-      weightCoh: 0.15,
-      weightSep: 3.0,
-    },
-    display: { windParticleCount: 180, windOpacity: 36, windDriftSpeed: 1.05 },
-  },
-
-  /** Same tuning as default — wind forces off, streaks optional. */
-  noWind: {
-    wind: { enabled: false, steerWeight: 0 },
-    display: { showWindField: false, windParticleCount: 0 },
-  },
-
-  /** Metric neighbours — very high φ in benchmarks; slightly different motion. */
-  metricHighOrder: {
-    flock: {
-      interactionMode: 'metric',
-      perception: 50,
-      weightAli: 1.0,
-      weightCoh: 0.48,
-      weightSep: 1.75,
-      personalSpace: 6.5,
-    },
-    wind: { enabled: false, steerWeight: 0 },
-    display: { showWindField: false },
-  },
-
-  flockFirst: {
-    wind: {
-      noiseScale: 0.008,
-      timeScale: 0.007,
-      speedFactor: 0.38,
-      steerWeight: 0.65,
-      gustMin: 0.2,
-    },
-    flock: {
-      interactionMode: 'topological',
-      topologicalNeighbors: 8,
-      weightAli: 0.78,
-      weightCoh: 0.4,
-      weightSep: 2.3,
-      personalSpace: 5.5,
-    },
-    display: { windParticleCount: 70, windOpacity: 16, windDriftSpeed: 0.4 },
-  },
-
-  topologicalFlock: {
-    flock: {
-      interactionMode: 'topological',
-      topologicalNeighbors: 7,
-      weightAli: 0.7,
-      weightCoh: 0.35,
-    },
-  },
-
-  metricFlock: {
-    flock: {
-      interactionMode: 'metric',
-      perception: 40,
-      weightAli: 0.62,
-      weightCoh: 0.34,
-    },
-  },
 };
 
 /**

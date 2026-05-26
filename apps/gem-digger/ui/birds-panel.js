@@ -155,11 +155,11 @@ export function mountBirdsPanel(world, opts = {}) {
     sliderRow('Cohesion', 'flock.weightCoh', 0, 2, 0.05),
     sliderRow('Separation', 'flock.weightSep', 0, 6, 0.05),
     sliderRow('Alignment', 'flock.weightAli', 0, 2, 0.05),
-    sliderRow('Personal space', 'flock.personalSpace', 2, 12, 0.25),
     sliderRow('Perception', 'flock.perception', 12, 80, 1, (v) => String(Math.round(v))),
     sliderRow('Sep. radius', 'flock.separationRadius', 8, 40, 1, (v) => String(Math.round(v))),
-    sliderRow('Min flock', 'flock.minFlockSize', 2, 8, 1, (v) => String(Math.round(v))),
-    sliderRow('Cohesion speed', 'flock.cohesionSpeed', 0.1, 1.2, 0.05)
+    sliderRow('Cohesion speed', 'flock.cohesionSpeed', 0, 1.2, 0.05),
+    sliderRow('Vision FOV°', 'flock.visionFovDeg', 0, 180, 5, (v) => String(Math.round(v))),
+    sliderRow('Wander', 'flock.wanderWeight', 0, 0.35, 0.01)
   );
 
   const windEl = root.querySelector('[data-section="wind"]');
@@ -274,7 +274,7 @@ export function mountBirdsPanel(world, opts = {}) {
       ${metricBar('Separation', m.separationScore, 0.6, 1)}
       ${metricBar('Alignment', m.alignmentScore, 0.5, 1)}
       ${metricBar('Cohesion', m.cohesionScore, 0.45, 1)}
-      ${metricBar('Vicsek order φ', m.polarization, 0.55, 0.95)}
+      ${metricBar('Vicsek order φ', m.polarization, 0.85, 0.98)}
       ${signedBar('Wind alignment', m.windAlignment)}
       <div class="birds-metric-row">
         <span class="birds-metric-label">Mean interact. dist</span>
@@ -333,11 +333,12 @@ export function mountBirdsPanel(world, opts = {}) {
         Cohesion: ['flock', 'weightCoh'],
         Separation: ['flock', 'weightSep'],
         Alignment: ['flock', 'weightAli'],
-        'Personal space': ['flock', 'personalSpace'],
         Perception: ['flock', 'perception'],
         'Sep. radius': ['flock', 'separationRadius'],
         'Min flock': ['flock', 'minFlockSize'],
         'Cohesion speed': ['flock', 'cohesionSpeed'],
+        'Vision FOV°': ['flock', 'visionFovDeg'],
+        Wander: ['flock', 'wanderWeight'],
         'Wind strength': ['wind', 'steerWeight'],
         'Flow speed': ['wind', 'speedFactor'],
         'Noise scale': ['wind', 'noiseScale'],
