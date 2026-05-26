@@ -5,12 +5,14 @@
 
 /** @typedef {import('./inventory/slot-inventory.js').SlotInventory} SlotInventory */
 /** @typedef {import('./gems/pickups.js').GemPickup} GemPickup */
+/** @typedef {import('./birds/birds.js').Bird} Bird */
 
 /**
  * @typedef {object} GemDiggerWorldState
  * @property {SlotInventory | null} backpack
  * @property {SlotInventory | null} jar
  * @property {GemPickup[]} gemPickups
+ * @property {Bird[]} birds
  */
 
 const STATE = Symbol('gemDiggerWorldState');
@@ -25,8 +27,10 @@ export function getGameState(world) {
       backpack: null,
       jar: null,
       gemPickups: [],
+      birds: [],
     };
   }
+  if (!state.birds) state.birds = [];
   return world[STATE];
 }
 
@@ -36,4 +40,5 @@ export function clearGameState(world) {
   state.backpack = null;
   state.jar = null;
   state.gemPickups = [];
+  state.birds = [];
 }

@@ -1,4 +1,5 @@
 import { clearGemPickups, cloneGemPickups, setGemPickups } from '../gems/pickups.js';
+import { clearBirds, cloneBirds, setBirds } from '../birds/birds.js';
 import { runMapWorldGenerator } from '../worldgen-bridge.js';
 import { createBackpackInventory } from '../inventory/backpack-inventory.js';
 import { createJarInventory } from '../inventory/jar-inventory.js';
@@ -20,6 +21,7 @@ import { getGameState } from '../game-state.js';
  * @property {import('../inventory/slot-inventory.js').SlotInventory} backpack
  * @property {import('../inventory/slot-inventory.js').SlotInventory} jar
  * @property {import('../gems/pickups.js').GemPickup[]} gemPickups
+ * @property {import('../birds/birds.js').Bird[]} birds
  * @property {Record<string, unknown>} [custom]
  */
 
@@ -56,6 +58,7 @@ export function captureMapSession(world, meta) {
       ? cloneSlotInventory(state.jar)
       : cloneSlotInventory({ cols: 4, rows: 2, slots: [] }),
     gemPickups: cloneGemPickups(world),
+    birds: cloneBirds(state.birds ?? []),
     custom: meta.custom ? structuredClone(meta.custom) : {},
   };
 }
@@ -86,6 +89,7 @@ export function applyMapSession(world, session) {
   state.backpack = cloneSlotInventory(session.backpack);
   state.jar = cloneSlotInventory(session.jar);
   setGemPickups(world, session.gemPickups ?? []);
+  setBirds(world, session.birds ?? []);
 }
 
 /**
@@ -112,6 +116,7 @@ export function createFreshMapSession(world, def) {
   state.backpack = createBackpackInventory();
   state.jar = createJarInventory();
   clearGemPickups(world);
+  clearBirds(world);
 
   if (def.worldGenerator) {
     runMapWorldGenerator(world, def.worldGenerator, def.worldGeneratorOptions ?? {});

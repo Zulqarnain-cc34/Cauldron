@@ -1,4 +1,5 @@
 import { Species } from '../../../../../js/catalog/species.js';
+import { spawnDemoFlocks } from '../../birds/birds.js';
 import { spawnGemPickups } from '../../gems/pickups.js';
 
 /** Intro level — shaped sand mound, all three gem types, easy dig. */
@@ -62,4 +63,9 @@ export const sandboxMap = {
   bootstrap: bootstrapSandbox,
   goals: { gems: { diamond: 2, topaz: 1, ruby: 1 } },
   defaultRules: { grenade: true },
+  hooks: {
+    afterBootstrap(world) {
+      spawnDemoFlocks(world);
+    },
+  },
 };

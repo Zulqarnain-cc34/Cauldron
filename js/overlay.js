@@ -94,5 +94,29 @@ export function createOverlay(canvas) {
       ctx.ellipse(cx, cy, w / 2, h / 2, 0, 0, Math.PI * 2);
       ctx.fill();
     },
+
+    /**
+     * Filled triangle pointing along +X, rotated by angle (radians) around center.
+     * @param {number} cx
+     * @param {number} cy
+     * @param {number} size edge length scale
+     * @param {number} angle
+     * @param {Rgba} rgba
+     */
+    fillTriangle(cx, cy, size, angle, rgba) {
+      ctx.fillStyle = `rgba(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3] / 255})`;
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(angle);
+      const h = size * 0.9;
+      const w = size * 0.55;
+      ctx.beginPath();
+      ctx.moveTo(h * 0.5, 0);
+      ctx.lineTo(-h * 0.45, w);
+      ctx.lineTo(-h * 0.45, -w);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    },
   };
 }

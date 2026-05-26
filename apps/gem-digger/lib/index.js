@@ -6,6 +6,7 @@
 export * from './inventory/index.js';
 export * from './maps/index.js';
 export * from './gems/index.js';
+export * from './birds/index.js';
 export { runMapWorldGenerator } from './worldgen-bridge.js';
 
 export { BUILTIN_MAPS, sandboxMap, shaftMap, workshopMap } from './content/index.js';

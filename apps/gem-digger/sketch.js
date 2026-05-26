@@ -21,6 +21,7 @@ import {
   registerMapDefinition,
   createMapManager,
   installGemSystem,
+  installBirdSystem,
   BUILTIN_MAPS,
   blankMap,
 } from './lib/index.js';
@@ -32,6 +33,7 @@ let backpackUi;
 let jarUi;
 let mapHud;
 let gems;
+let birds;
 let host;
 
 function syncSessionUi() {
@@ -60,12 +62,6 @@ async function init() {
   setupInput(world, host.viewport);
   await bootstrapSandbox({ world, canvas: host.viewport });
 
-  gems = installGemSystem(host.overlay, world, host.viewport, {
-    onCollected() {
-      syncSessionUi();
-    },
-  });
-
   mapManager = createMapManager({
     world,
     initialMapId: 'sandbox',
@@ -93,6 +89,14 @@ async function init() {
 
   mapManager.init('sandbox');
 
+  gems = installGemSystem(host.overlay, world, host.viewport, {
+    onCollected() {
+      syncSessionUi();
+    },
+  });
+
+  birds = installBirdSystem(host.overlay, world, { spawnDemo: false });
+
   mapHud = mountMapHud({
     world,
     mapManager,
@@ -113,9 +117,11 @@ async function init() {
     if (!world.paused) {
       runRules(world);
       gems?.tick();
+      birds?.tick();
     }
     host.renderFrame(() => {
       gems?.render();
+      birds?.render();
     });
     ui?.setTick(world.tick);
   });

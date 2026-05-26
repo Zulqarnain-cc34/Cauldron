@@ -9,6 +9,7 @@ import { createBackpackInventory } from '../inventory/backpack-inventory.js';
 import { createJarInventory } from '../inventory/jar-inventory.js';
 import { getGameState } from '../game-state.js';
 import { clearGemPickups } from '../gems/pickups.js';
+import { clearBirds } from '../birds/birds.js';
 import { runMapWorldGenerator } from '../worldgen-bridge.js';
 
 /**
@@ -236,6 +237,7 @@ export class MapManager {
       this.world.seed = def.seed ?? this.world.seed;
     }
     clearGemPickups(this.world);
+    clearBirds(this.world);
 
     if (def.defaultRules) {
       for (const [key, enabled] of Object.entries(def.defaultRules)) {
