@@ -2,8 +2,8 @@
  * Map session engine — tabbed maps with isolated inventories and settings.
  *
  * @example
- * import { registerMapDefinitions, createMapManager } from './js/cauldron/game.js';
- * import { BUILTIN_MAPS } from './js/game/content/index.js';
+ * import { registerMapDefinitions, createMapManager } from '../lib/index.js';
+ * import { BUILTIN_MAPS } from '../lib/content/index.js';
  * registerMapDefinitions(BUILTIN_MAPS);
  * const maps = createMapManager({ world, onSwitch: syncUi });
  * mountMapTabs(maps, document.getElementById('map-tabs'));

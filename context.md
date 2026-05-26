@@ -3,6 +3,9 @@
 **Last Updated:** 2026-05-25  
 **Version:** 0.1.0 (milestone: Gem Digger foundations — maps, inventory, gems, map HUD)
 
+> **Canonical layout:** See [`ARCHITECTURE.md`](ARCHITECTURE.md) for library vs game decoupling.  
+> Game kit lives in **`apps/gem-digger/lib/`** (not `js/game/`). There is no `cauldron/game` export.
+
 ---
 
 ## 1. PROJECT OVERVIEW

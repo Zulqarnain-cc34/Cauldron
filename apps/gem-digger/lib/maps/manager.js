@@ -7,6 +7,7 @@ import {
 } from './session.js';
 import { createBackpackInventory } from '../inventory/backpack-inventory.js';
 import { createJarInventory } from '../inventory/jar-inventory.js';
+import { getGameState } from '../game-state.js';
 import { clearGemPickups } from '../gems/pickups.js';
 import { runMapWorldGenerator } from '../worldgen-bridge.js';
 
@@ -220,11 +221,12 @@ export class MapManager {
     const def = this.getActiveDefinition();
     if (!tab || !def || !this.activeTabId) return;
 
-    const keepBackpack = !def.resetClearsInventory && this.world.backpack
-      ? cloneSlotInventory(this.world.backpack)
+    const state = getGameState(this.world);
+    const keepBackpack = !def.resetClearsInventory && state.backpack
+      ? cloneSlotInventory(state.backpack)
       : null;
-    const keepJar = !def.resetClearsInventory && this.world.jar
-      ? cloneSlotInventory(this.world.jar)
+    const keepJar = !def.resetClearsInventory && state.jar
+      ? cloneSlotInventory(state.jar)
       : null;
 
     this.world.reset();
@@ -241,8 +243,8 @@ export class MapManager {
       }
     }
 
-    this.world.backpack = keepBackpack ?? createBackpackInventory();
-    this.world.jar = keepJar ?? createJarInventory();
+    state.backpack = keepBackpack ?? createBackpackInventory();
+    state.jar = keepJar ?? createJarInventory();
 
     if (def.worldGenerator) {
       runMapWorldGenerator(this.world, def.worldGenerator, def.worldGeneratorOptions ?? {});

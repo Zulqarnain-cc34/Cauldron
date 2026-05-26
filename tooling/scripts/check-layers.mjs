@@ -87,9 +87,9 @@ for (const file of walk(ROOT)) {
       }
     }
 
-    if (rel.startsWith('js/worldgen/')) {
+    if (rel.startsWith('js/') && !rel.startsWith('js/cauldron/tooling')) {
       if (target.startsWith('apps/')) {
-        violations.push(`${rel}: worldgen must not import game apps (${spec}) → ${target}`);
+        violations.push(`${rel}: library must not import game apps (${spec}) → ${target}`);
       }
     }
 

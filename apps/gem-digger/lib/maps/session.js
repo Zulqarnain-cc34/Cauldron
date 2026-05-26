@@ -2,6 +2,7 @@ import { clearGemPickups, cloneGemPickups, setGemPickups } from '../gems/pickups
 import { runMapWorldGenerator } from '../worldgen-bridge.js';
 import { createBackpackInventory } from '../inventory/backpack-inventory.js';
 import { createJarInventory } from '../inventory/jar-inventory.js';
+import { getGameState } from '../game-state.js';
 
 /**
  * Serializable snapshot of one map tab — grid, sim, inventories, settings.
@@ -31,8 +32,9 @@ export function cloneSlotInventory(inv) {
   };
 }
 
-/** @param {import('../../world.js').World} world @param {{ mapId: string, label: string, custom?: Record<string, unknown> }} meta */
+/** @param {import('../../../js/world.js').World} world @param {{ mapId: string, label: string, custom?: Record<string, unknown> }} meta */
 export function captureMapSession(world, meta) {
+  const state = getGameState(world);
   return {
     mapId: meta.mapId,
     label: meta.label,
@@ -47,11 +49,11 @@ export function captureMapSession(world, meta) {
     },
     ruleEnabled: { ...world.ruleEnabled },
     plugin: structuredClone(world.plugin ?? {}),
-    backpack: world.backpack
-      ? cloneSlotInventory(world.backpack)
+    backpack: state.backpack
+      ? cloneSlotInventory(state.backpack)
       : cloneSlotInventory({ cols: 9, rows: 3, slots: [] }),
-    jar: world.jar
-      ? cloneSlotInventory(world.jar)
+    jar: state.jar
+      ? cloneSlotInventory(state.jar)
       : cloneSlotInventory({ cols: 4, rows: 2, slots: [] }),
     gemPickups: cloneGemPickups(world),
     custom: meta.custom ? structuredClone(meta.custom) : {},
@@ -59,7 +61,7 @@ export function captureMapSession(world, meta) {
 }
 
 /**
- * @param {import('../../world.js').World} world
+ * @param {import('../../../js/world.js').World} world
  * @param {MapSession} session
  */
 export function applyMapSession(world, session) {
@@ -68,6 +70,8 @@ export function applyMapSession(world, session) {
       `Map session grid size mismatch (${session.cells.length} vs ${world.cells.length})`
     );
   }
+
+  const state = getGameState(world);
 
   world.cells.set(session.cells);
   world.tick = session.tick;
@@ -79,13 +83,13 @@ export function applyMapSession(world, session) {
   world.brush.queue.length = 0;
   world.ruleEnabled = { ...session.ruleEnabled };
   world.plugin = structuredClone(session.plugin ?? {});
-  world.backpack = cloneSlotInventory(session.backpack);
-  world.jar = cloneSlotInventory(session.jar);
+  state.backpack = cloneSlotInventory(session.backpack);
+  state.jar = cloneSlotInventory(session.jar);
   setGemPickups(world, session.gemPickups ?? []);
 }
 
 /**
- * @param {import('../../world.js').World} world
+ * @param {import('../../../js/world.js').World} world
  * @param {import('./registry.js').MapDefinition} def
  */
 export function createFreshMapSession(world, def) {
@@ -104,8 +108,9 @@ export function createFreshMapSession(world, def) {
     }
   }
 
-  world.backpack = createBackpackInventory();
-  world.jar = createJarInventory();
+  const state = getGameState(world);
+  state.backpack = createBackpackInventory();
+  state.jar = createJarInventory();
   clearGemPickups(world);
 
   if (def.worldGenerator) {
@@ -134,7 +139,7 @@ export function createFreshMapSession(world, def) {
 }
 
 /**
- * @param {import('../../world.js').World} world
+ * @param {import('../../../js/world.js').World} world
  * @param {MapSession} session
  * @param {import('./registry.js').MapDefinition} def
  */

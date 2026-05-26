@@ -1,17 +1,17 @@
 import { Species } from '../../../../js/catalog/species.js';
 import { getItemDef, isStorableItem } from '../inventory/item-catalog.js';
+import { getGameState } from '../game-state.js';
 
 /** @typedef {{ id: string, itemId: string, x: number, y: number, count: number }} GemPickup */
 
-/** @param {import('../../world.js').World} world */
+/** @param {import('../../../js/world.js').World} world */
 export function ensureGemPickups(world) {
-  if (!world.gemPickups) world.gemPickups = [];
-  return world.gemPickups;
+  return getGameState(world).gemPickups;
 }
 
 /**
  * Place a gem pickup in the world (spawn — separate from collect).
- * @param {import('../../world.js').World} world
+ * @param {import('../../../js/world.js').World} world
  * @param {number} x grid x
  * @param {number} y grid y
  * @param {string} [itemId]
@@ -37,7 +37,7 @@ export function spawnGemPickup(world, x, y, itemId = 'diamond', count = 1) {
 }
 
 /**
- * @param {import('../../world.js').World} world
+ * @param {import('../../../js/world.js').World} world
  * @param {{ x: number, y: number, itemId?: string, count?: number }[]} placements
  */
 export function spawnGemPickups(world, placements) {
@@ -49,10 +49,9 @@ export function spawnGemPickups(world, placements) {
   return spawned;
 }
 
-/** @param {import('../../world.js').World} world @param {string} id */
+/** @param {import('../../../js/world.js').World} world @param {string} id */
 export function removeGemPickup(world, id) {
-  const list = world.gemPickups;
-  if (!list) return false;
+  const list = getGameState(world).gemPickups;
   const i = list.findIndex((g) => g.id === id);
   if (i < 0) return false;
   list.splice(i, 1);
@@ -60,15 +59,15 @@ export function removeGemPickup(world, id) {
 }
 
 /**
- * @param {import('../../world.js').World} world
+ * @param {import('../../../js/world.js').World} world
  * @param {number} gx
  * @param {number} gy
  * @param {number} [radius] grid cells
  * @returns {GemPickup | null}
  */
 export function findGemPickupAt(world, gx, gy, radius = 0.85) {
-  const list = world.gemPickups;
-  if (!list?.length) return null;
+  const list = getGameState(world).gemPickups;
+  if (!list.length) return null;
 
   let best = null;
   let bestD = radius * radius;
@@ -86,7 +85,7 @@ export function findGemPickupAt(world, gx, gy, radius = 0.85) {
   return best;
 }
 
-/** @param {import('../../world.js').World} world */
+/** @param {import('../../../js/world.js').World} world */
 function canGemOccupy(world, x, y) {
   if (!world.inBounds(x, y)) return false;
   const cell = world.get(x, y);
@@ -95,8 +94,8 @@ function canGemOccupy(world, x, y) {
 
 /** Gravity — gems fall through air/water. */
 export function tickGemPickups(world) {
-  const list = world.gemPickups;
-  if (!list?.length) return;
+  const list = getGameState(world).gemPickups;
+  if (!list.length) return;
 
   for (const gem of list) {
     const below = gem.y + 1;
@@ -106,17 +105,17 @@ export function tickGemPickups(world) {
   }
 }
 
-/** @param {import('../../world.js').World} world */
+/** @param {import('../../../js/world.js').World} world */
 export function clearGemPickups(world) {
-  if (world.gemPickups) world.gemPickups.length = 0;
+  getGameState(world).gemPickups = [];
 }
 
-/** @param {import('../../world.js').World} world @returns {GemPickup[]} */
+/** @param {import('../../../js/world.js').World} world @returns {GemPickup[]} */
 export function cloneGemPickups(world) {
-  return structuredClone(world.gemPickups ?? []);
+  return structuredClone(getGameState(world).gemPickups);
 }
 
-/** @param {import('../../world.js').World} world @param {GemPickup[]} pickups */
+/** @param {import('../../../js/world.js').World} world @param {GemPickup[]} pickups */
 export function setGemPickups(world, pickups) {
-  world.gemPickups = structuredClone(pickups ?? []);
+  getGameState(world).gemPickups = structuredClone(pickups ?? []);
 }

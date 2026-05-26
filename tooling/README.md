@@ -16,7 +16,7 @@ cauldron/
 |--------------|-------|
 | Understand the sim engine | `js/README.md` |
 | Import the public API | `js/cauldron/` |
-| Add cave algorithms | `js/game/worldgen/` |
+| Add cave algorithms | `js/worldgen/` |
 | Play the demo game | `apps/gem-digger/` |
 | Read material specs | `apps/docs/` |
 | Run `npm test` | `tooling/tests/` |

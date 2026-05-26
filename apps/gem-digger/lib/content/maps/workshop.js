@@ -1,6 +1,9 @@
 import { Species } from '../../../../../js/catalog/species.js';
 import { addStack } from '../../inventory/slot-inventory.js';
+import { createBackpackInventory } from '../../inventory/backpack-inventory.js';
+import { createJarInventory } from '../../inventory/jar-inventory.js';
 import { spawnGemPickups } from '../../gems/pickups.js';
+import { getGameState } from '../../game-state.js';
 
 /** Stone chamber with water pocket — hand-authored challenge map. */
 export function bootstrapWorkshop(world) {
@@ -72,8 +75,11 @@ export const workshopMap = {
   defaultRules: { grenade: true },
   hooks: {
     afterBootstrap(world) {
-      addStack(world.jar, 'sand', 5);
-      addStack(world.backpack, 'stone', 3);
+      const state = getGameState(world);
+      if (!state.jar) state.jar = createJarInventory();
+      if (!state.backpack) state.backpack = createBackpackInventory();
+      addStack(state.jar, 'sand', 5);
+      addStack(state.backpack, 'stone', 3);
     },
   },
 };

@@ -1,5 +1,6 @@
 import { countItem } from '../inventory/slot-inventory.js';
 import { getItemDef } from '../inventory/item-catalog.js';
+import { getGameState } from '../game-state.js';
 
 /**
  * @typedef {object} GemGoalProgress
@@ -19,22 +20,23 @@ import { getItemDef } from '../inventory/item-catalog.js';
  * @property {boolean} allComplete
  */
 
-/** @param {import('../../world.js').World} world @param {string} itemId */
+/** @param {import('../../../js/world.js').World} world @param {string} itemId */
 export function countGemsInWorld(world, itemId) {
-  return (world.gemPickups ?? [])
+  return getGameState(world).gemPickups
     .filter((g) => g.itemId === itemId)
     .reduce((sum, g) => sum + g.count, 0);
 }
 
-/** @param {import('../../world.js').World} world @param {string} itemId */
+/** @param {import('../../../js/world.js').World} world @param {string} itemId */
 export function countGemsInInventory(world, itemId) {
-  const backpack = world.backpack ? countItem(world.backpack, itemId) : 0;
-  const jar = world.jar ? countItem(world.jar, itemId) : 0;
+  const state = getGameState(world);
+  const backpack = state.backpack ? countItem(state.backpack, itemId) : 0;
+  const jar = state.jar ? countItem(state.jar, itemId) : 0;
   return backpack + jar;
 }
 
 /**
- * @param {import('../../world.js').World} world
+ * @param {import('../../../js/world.js').World} world
  * @param {import('./registry.js').MapDefinition} def
  * @returns {MapGoalProgress}
  */

@@ -1,9 +1,10 @@
 import { addStack } from '../inventory/slot-inventory.js';
+import { getGameState } from '../game-state.js';
 import { findGemPickupAt, removeGemPickup } from './pickups.js';
 
 /**
  * Collect gem at grid cell into backpack or jar (store — separate from spawn).
- * @param {import('../../world.js').World} world
+ * @param {import('../../../js/world.js').World} world
  * @param {number} gx
  * @param {number} gy
  * @param {{ target?: 'backpack' | 'jar', radius?: number }} [opts]
@@ -13,7 +14,8 @@ export function tryCollectGem(world, gx, gy, opts = {}) {
   const gem = findGemPickupAt(world, gx, gy, opts.radius);
   if (!gem) return { collected: false };
 
-  const inv = target === 'jar' ? world.jar : world.backpack;
+  const state = getGameState(world);
+  const inv = target === 'jar' ? state.jar : state.backpack;
   if (!inv) return { collected: false };
 
   const leftover = addStack(inv, gem.itemId, gem.count);
