@@ -1,4 +1,4 @@
-import { Species } from '../../catalog/species.js';
+import { Species } from '../../../../js/catalog/species.js';
 import { getItemDef, isStorableItem } from '../inventory/item-catalog.js';
 
 /** @typedef {{ id: string, itemId: string, x: number, y: number, count: number }} GemPickup */

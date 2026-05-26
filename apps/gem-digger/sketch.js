@@ -1,6 +1,6 @@
 /**
- * Gem Digger — demo game built on the Cauldron library.
- * This file is the app host (p5 loop). The library lives in ../../js/cauldron/.
+ * Gem Digger — demo game host (p5).
+ * Library: ../../js/cauldron/  |  Game kit: ./lib/
  */
 import {
   World,
@@ -20,10 +20,12 @@ import { mountMapTabs } from './ui/map-tabs.js';
 import { mountMapHud } from './ui/map-hud.js';
 import {
   registerMapDefinitions,
+  registerMapDefinition,
   createMapManager,
   installGemSystem,
-} from '../../js/cauldron/game.js';
-import { BUILTIN_MAPS } from '../../js/game/content/index.js';
+  BUILTIN_MAPS,
+  blankMap,
+} from './lib/index.js';
 
 let world;
 let ui;

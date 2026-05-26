@@ -8,8 +8,7 @@
     "./plugin": "./js/cauldron/plugin.js",
     "./extend": "./js/cauldron/extend.js",
     "./app": "./js/cauldron/app.js",
-    "./game": "./js/cauldron/game.js",
-    "./game/content": "./js/game/content/index.js",
+    "./worldgen": "./js/cauldron/worldgen.js",
     "./tooling": "./js/cauldron/tooling.js",
     "./bootstrap": "./js/cauldron/bootstrap.js"
   },

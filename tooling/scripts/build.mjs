@@ -15,8 +15,7 @@ const exportEntries = Object.values(pkg.exports ?? {});
 /** @type {string[]} */
 const libraryModules = [
   ...exportEntries.map((p) => join(ROOT, p.replace(/^\.\//, ''))),
-  join(ROOT, 'js/game/index.js'),
-  join(ROOT, 'js/game/worldgen/index.js'),
+  join(ROOT, 'js/worldgen/index.js'),
 ];
 
 for (const file of libraryModules) {

@@ -1,12 +1,6 @@
 /**
- * World generation library — algorithms for procedural maps.
- * Games compose these; they do not ship as a finished game.
- *
- * @example
- * import { runWorldGenerator } from './js/cauldron/game.js';
- * runWorldGenerator(world, 'cavern', {
- *   oreVeins: [{ minDepth: 10, maxDepth: 40, count: 3, itemId: 'diamond' }],
- * });
+ * World generation — procedural algorithms (library).
+ * @module worldgen
  */
 
 export {
@@ -23,8 +17,6 @@ export {
 } from './cave-stabilize.js';
 
 export { rollingSurfaceHeight, buildSurfaceProfile } from './surface.js';
-
-export { placeOreVeins } from './ore-veins.js';
 
 export { generateCavernWorld } from './cavern.js';
 

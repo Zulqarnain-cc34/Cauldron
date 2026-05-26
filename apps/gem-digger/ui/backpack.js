@@ -2,7 +2,7 @@ import {
   BACKPACK_COLS,
   BACKPACK_ROWS,
   createBackpackInventory,
-} from '../../../js/cauldron/game.js';
+} from '../lib/index.js';
 import { mountInventoryContainer } from './inventory-ui.js';
 
 const BACKPACK_ICON = '/apps/gem-digger/assets/backpack.png';

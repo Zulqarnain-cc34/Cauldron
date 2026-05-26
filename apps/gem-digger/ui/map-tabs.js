@@ -1,8 +1,8 @@
-import { getMapDefinition } from '../../../js/cauldron/game.js';
+import { getMapDefinition } from '../lib/index.js';
 
 /**
  * Map tab bar — open tabs with + (new) and × (close).
- * @param {import('../../../js/game/maps/manager.js').MapManager} manager
+ * @param {import('../lib/maps/manager.js').MapManager} manager
  * @param {HTMLElement | null} hostEl
  */
 export function mountMapTabs(manager, hostEl) {

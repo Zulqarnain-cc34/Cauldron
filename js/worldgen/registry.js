@@ -7,7 +7,7 @@ import { generateCavernWorld } from './cavern.js';
  */
 
 /**
- * @typedef {(world: import('../../world.js').World, opts?: Record<string, unknown>) => unknown} WorldGeneratorFn
+ * @typedef {(world: import('../world.js').World, opts?: Record<string, unknown>) => unknown} WorldGeneratorFn
  */
 
 /** @type {Map<string, { fn: WorldGeneratorFn, meta: WorldGeneratorMeta }>} */
@@ -46,7 +46,7 @@ export function getAllWorldGenerators() {
 }
 
 /**
- * @param {import('../../world.js').World} world
+ * @param {import('../world.js').World} world
  * @param {string} id
  * @param {Record<string, unknown>} [opts]
  */

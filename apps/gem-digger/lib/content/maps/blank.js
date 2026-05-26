@@ -1,4 +1,4 @@
-import { Species } from '../../../catalog/species.js';
+import { Species } from '../../../../../js/catalog/species.js';
 
 /** Empty floor — used when opening a new tab from + */
 export function bootstrapBlank(world) {

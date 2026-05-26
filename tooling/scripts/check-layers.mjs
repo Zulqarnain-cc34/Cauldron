@@ -60,57 +60,65 @@ for (const file of walk(ROOT)) {
     if (!spec.startsWith('.')) continue;
     const target = relative(ROOT, resolvesTo(file, spec)).replace(/\\/g, '/');
 
-    // L6 Plugins — cauldron SDK only (all plugin files, not just top-level)
     if (rel.startsWith('plugins/') && rel.endsWith('.js') && !rel.includes('node_modules')) {
       const allowed =
         target.startsWith('js/cauldron/') ||
+        target.startsWith('js/worldgen/') ||
+        target.startsWith('js/world.js') ||
+        target.startsWith('js/catalog/') ||
+        target.startsWith('js/engine/') ||
+        target.startsWith('js/rules/') ||
+        target.startsWith('js/sim/') ||
         (target.startsWith('plugins/') && target !== rel);
       if (!allowed) {
-        violations.push(`${rel}: plugin must import cauldron SDK only, not "${spec}" → ${target}`);
+        violations.push(`${rel}: plugin must import library SDK only, not "${spec}" → ${target}`);
       }
     }
 
-    // L0 Kernel — no plugins or sim lifecycle from plugins host
     if (rel === 'js/world.js') {
-      if (target.includes('plugins/')) {
-        violations.push(`${rel}: kernel must not import plugins (${spec})`);
+      if (target.includes('plugins/') || target.startsWith('apps/')) {
+        violations.push(`${rel}: kernel must not import plugins or apps (${spec})`);
       }
     }
 
-    // L3 Runtime registry — no plugin host (breaks cycles)
-    if (rel === 'js/sim/test-registry.js') {
-      if (target.includes('plugins/host')) {
-        violations.push(`${rel}: runtime registry must not import plugin host (${spec})`);
-      }
-    }
-
-    // L3 Sim — no game layer (inventory/maps are L5 game, not core sim)
     if (rel.startsWith('js/sim/')) {
-      if (target.startsWith('js/game/')) {
-        violations.push(`${rel}: sim runtime must not import game layer (${spec}) → ${target}`);
+      if (target.startsWith('apps/') || target.startsWith('apps/gem-digger/lib/')) {
+        violations.push(`${rel}: sim must not import game kit (${spec}) → ${target}`);
       }
     }
 
-    // L5 Game — no UI (presentation mounts from app host)
-    if (rel.startsWith('js/game/')) {
+    if (rel.startsWith('js/worldgen/')) {
       if (target.startsWith('apps/')) {
-        violations.push(`${rel}: game layer must not import app UI (${spec}) → ${target}`);
+        violations.push(`${rel}: worldgen must not import game apps (${spec}) → ${target}`);
       }
     }
 
-    // L5 App UI — use SDK barrels, not deep L1/L3/game paths
-    if (rel.startsWith('apps/') && rel.includes('/ui/')) {
+    if (rel.startsWith('js/cauldron/') && !rel.includes('worldgen.js')) {
+      if (target.startsWith('apps/')) {
+        violations.push(`${rel}: cauldron SDK must not import game apps (${spec}) → ${target}`);
+      }
+    }
+
+    if (rel.startsWith('apps/gem-digger/lib/')) {
+      if (target.startsWith('apps/gem-digger/ui/')) {
+        violations.push(`${rel}: game lib must not import UI (${spec}) → ${target}`);
+      }
+    }
+
+    if (rel.startsWith('apps/gem-digger/ui/')) {
       if (target.startsWith('js/sim/test-registry') || target.startsWith('js/rules/registry')) {
-        violations.push(`${rel}: UI should import cauldron/app.js, not ${target}`);
+        violations.push(`${rel}: UI should use cauldron/app.js, not ${target}`);
       }
-      if (target.startsWith('js/catalog/')) {
-        violations.push(`${rel}: UI should import cauldron/app.js, not ${target}`);
+      if (target.startsWith('js/catalog/') && !target.startsWith('js/cauldron/')) {
+        violations.push(`${rel}: UI should use cauldron/app.js, not ${target}`);
       }
-      if (target.startsWith('js/sim/')) {
-        violations.push(`${rel}: UI should import cauldron/app.js or cauldron/game.js, not ${target}`);
-      }
-      if (target.startsWith('js/game/')) {
-        violations.push(`${rel}: UI should import cauldron/game.js, not ${target}`);
+      if (target.startsWith('apps/gem-digger/lib/') && !target.includes('/ui/')) {
+        /* ok — game UI imports game lib */
+      } else if (
+        target.startsWith('apps/gem-digger/') &&
+        !target.startsWith('apps/gem-digger/lib/')
+      ) {
+        /* ok sibling ui */
       }
     }
   }

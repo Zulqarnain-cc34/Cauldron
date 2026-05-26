@@ -1,4 +1,4 @@
-import { Species } from '../../../catalog/species.js';
+import { Species } from '../../../../../js/catalog/species.js';
 import { spawnGemPickups } from '../../gems/pickups.js';
 
 /** Intro level — shaped sand mound, all three gem types, easy dig. */

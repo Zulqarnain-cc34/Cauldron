@@ -1,4 +1,4 @@
-import { JAR_COLS, JAR_ROWS, createJarInventory } from '../../../js/cauldron/game.js';
+import { JAR_COLS, JAR_ROWS, createJarInventory } from '../lib/index.js';
 import { mountInventoryContainer } from './inventory-ui.js';
 
 const JAR_ICON = '/apps/gem-digger/assets/jar.png';

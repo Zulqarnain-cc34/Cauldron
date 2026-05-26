@@ -1,4 +1,4 @@
-import { Species } from '../../catalog/species.js';
+import { Species } from '../catalog/species.js';
 
 /** Remove sand/stone that would fall into open caves on the first physics tick. */
 export function removeUnsupportedGranular(world) {
@@ -33,7 +33,7 @@ export function paintSupportedSurfaceSand(world, surfaceY, depth = 3) {
   }
 }
 
-/** @param {import('../../world.js').World} world @param {number} species */
+/** @param {import('../world.js').World} world @param {number} species */
 export function countSpecies(world, species) {
   let n = 0;
   for (let y = 0; y < world.height; y++) {

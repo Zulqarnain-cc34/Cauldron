@@ -1,4 +1,4 @@
-import { runWorldGenerator } from '../../worldgen/registry.js';
+import { runMapWorldGenerator } from '../../worldgen-bridge.js';
 
 const SHAFT_ORE = [
   { minDepth: 8, maxDepth: 35, count: 4, itemId: 'diamond' },
@@ -6,9 +6,9 @@ const SHAFT_ORE = [
   { minDepth: 55, maxDepth: 120, count: 2, itemId: 'ruby' },
 ];
 
-/** Demo map — uses library `cavern` world generator. */
+/** Demo map — uses library `cavern` world generator + gem ore pass. */
 export function bootstrapShaft(world) {
-  runWorldGenerator(world, 'cavern', { oreVeins: SHAFT_ORE });
+  runMapWorldGenerator(world, 'cavern', { oreVeins: SHAFT_ORE });
 }
 
 /** @type {import('../../maps/registry.js').MapDefinition} */

@@ -1,4 +1,4 @@
-import { computeMapGoalProgress } from '../../../js/cauldron/game.js';
+import { computeMapGoalProgress } from '../lib/index.js';
 
 /**
  * Map context HUD — active level name, objective, gem progress.

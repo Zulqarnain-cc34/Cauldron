@@ -1,20 +1,21 @@
 /**
- * Cauldron — public SDK (Layer 4)
+ * Cauldron — public SDK (simulation library only)
  *
- * Prefer focused subpaths for tree-shaking and clear boundaries:
- *   js/cauldron/plugin.js   — L6 plugin authors
- *   js/cauldron/app.js      — L5 host apps (sketch, UI)
- *   js/cauldron/tooling.js  — L7 docs & tests
+ * Subpaths:
+ *   cauldron/app.js      — host: World, runRules, render, input
+ *   cauldron/plugin.js   — plugins
+ *   cauldron/extend.js   — materials, reactions
+ *   cauldron/worldgen.js — procedural terrain (optional)
+ *   cauldron/bootstrap.js — quick sandbox startup
  *
- * This barrel re-exports everything for convenience.
+ * Games (inventory, maps, gems) live under apps/<your-game>/lib/ — not here.
  */
 
 export * from './plugin.js';
 export * from './app.js';
 export * from './tooling.js';
 export * from './extend.js';
-
-export * from './game.js';
+export * from './worldgen.js';
 
 export { bootstrapSandbox, bootstrapPlugins, loadPlugins } from './bootstrap.js';
 

@@ -1,4 +1,4 @@
-import { displayCellPx } from '../../world.js';
+import { displayCellPx } from '../../../../js/world.js';
 import { getItemDef } from '../inventory/item-catalog.js';
 import { ensureGemPickups } from './pickups.js';
 

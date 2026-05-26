@@ -1,15 +1,10 @@
-import { Species } from '../../catalog/species.js';
+import { Species } from '../catalog/species.js';
 import { generateCellularAutomataMask } from './cellular-automata.js';
 import {
   removeUnsupportedGranular,
   paintSupportedSurfaceSand,
 } from './cave-stabilize.js';
 import { buildSurfaceProfile } from './surface.js';
-import { placeOreVeins } from './ore-veins.js';
-
-/**
- * @typedef {import('./ore-veins.js').OreVeinSpec} OreVeinSpec
- */
 
 /**
  * @typedef {object} CavernWorldOptions
@@ -21,10 +16,9 @@ import { placeOreVeins } from './ore-veins.js';
  * @property {boolean} [entryShaft=true] vertical air column + sand plug at center
  * @property {boolean} [waterPool=true]
  * @property {number} [stonePocketCount=180] diggable stone grains in supported wall
- * @property {OreVeinSpec[]} [oreVeins] gem placements after generation
  */
 
-/** @param {import('../../world.js').World} world @param {number} x @param {number} y */
+/** @param {import('../world.js').World} world @param {number} x @param {number} y */
 function setWall(world, x, y) {
   world.set(x, y, { species: Species.WALL, flags: 0, ra: 0, rb: 0 });
 }
@@ -33,9 +27,9 @@ function setWall(world, x, y) {
  * CA cavern world — static WALL bedrock, carved air caves, gravity-safe surface sand.
  * Library algorithm; games/plugins compose via options (ore veins, etc.).
  *
- * @param {import('../../world.js').World} world uses world.seed for determinism
+ * @param {import('../world.js').World} world uses world.seed for determinism
  * @param {CavernWorldOptions} [opts]
- * @returns {{ surfaceY: Int16Array, surfaceBase: number, gemCount: number, minSurface: number }}
+ * @returns {{ surfaceY: Int16Array, surfaceBase: number, minSurface: number }}
  */
 export function generateCavernWorld(world, opts = {}) {
   const w = world.width;
@@ -141,10 +135,5 @@ export function generateCavernWorld(world, opts = {}) {
     }
   }
 
-  let gemCount = 0;
-  if (opts.oreVeins?.length) {
-    gemCount = placeOreVeins(world, surfaceY, opts.oreVeins);
-  }
-
-  return { surfaceY, surfaceBase, gemCount, minSurface };
+  return { surfaceY, surfaceBase, minSurface };
 }

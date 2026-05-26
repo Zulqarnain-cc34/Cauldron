@@ -1,5 +1,5 @@
-import { Species } from '../../catalog/species.js';
-import { getMaterial } from '../../catalog/materials.js';
+import { Species } from '../../../../js/catalog/species.js';
+import { getMaterial } from '../../../../js/catalog/materials.js';
 
 /** @typedef {'material' | 'tool' | 'gem'} ItemKind */
 

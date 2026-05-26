@@ -1,4 +1,4 @@
-import { displayCellPx } from '../../world.js';
+import { displayCellPx } from '../../../../js/world.js';
 import { tryCollectGem } from './collect.js';
 
 /**
