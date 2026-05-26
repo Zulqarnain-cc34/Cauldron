@@ -1,4 +1,4 @@
-import { DISPLAY_SCALE } from './world.js';
+import { CELL_PX, DISPLAY_SCALE } from './world.js';
 import { fillWorldPixelBuffer, simTextureSize } from './pixel-buffer.js';
 
 const VS = `#version 300 es
@@ -99,8 +99,8 @@ export function createWebGLRenderer(canvas) {
     /** @param {import('./world.js').World} world */
     render(world) {
       const { width: tw, height: th } = simTextureSize(world);
-      const displayW = Math.round(tw * DISPLAY_SCALE);
-      const displayH = Math.round(th * DISPLAY_SCALE);
+      const displayW = Math.round(tw * CELL_PX * DISPLAY_SCALE);
+      const displayH = Math.round(th * CELL_PX * DISPLAY_SCALE);
 
       if (canvas.width !== displayW || canvas.height !== displayH) {
         canvas.width = displayW;
@@ -121,7 +121,7 @@ export function createWebGLRenderer(canvas) {
         gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, tw, th, 0, gl.RGBA, gl.UNSIGNED_BYTE, null);
       }
 
-      fillWorldPixelBuffer(world, pixels, tw, th);
+      fillWorldPixelBuffer(world, pixels);
 
       gl.viewport(0, 0, displayW, displayH);
       gl.clearColor(0.07, 0.07, 0.09, 1);
