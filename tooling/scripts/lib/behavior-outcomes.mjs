@@ -1,9 +1,9 @@
-import { bootstrapSandbox } from '../../js/cauldron/bootstrap.js';
-import { World } from '../../js/world.js';
-import { getAllBehaviors } from '../../js/cauldron/tooling.js';
+import { bootstrapSandbox } from '../../../js/cauldron/bootstrap.js';
+import { World } from '../../../js/world.js';
+import { getAllBehaviors } from '../../../js/cauldron/tooling.js';
 import { prepareScenario, stepScenario } from '../../tests/helpers/harness.js';
 import { asciiFromWorld, rowsEqual } from '../../tests/helpers/grid.js';
-import { Species } from '../../js/catalog/species.js';
+import { Species } from '../../../js/catalog/species.js';
 
 let booted = false;
 
@@ -16,7 +16,7 @@ export async function ensureTestBootstrap() {
   booted = true;
 }
 
-/** @param {import('../../js/world.js').World} world */
+/** @param {import('../../../js/world.js').World} world */
 export function worldDigest(world) {
   const rows = asciiFromWorld(world);
   const rb = [];

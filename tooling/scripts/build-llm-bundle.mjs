@@ -4,9 +4,9 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const JSON_PATH = join(ROOT, 'tests/exports/verification-report.json');
-const BUNDLE_PATH = join(ROOT, 'tests/exports/llm-paste-bundle.txt');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const JSON_PATH = join(ROOT, 'tooling/tests/exports/verification-report.json');
+const BUNDLE_PATH = join(ROOT, 'tooling/tests/exports/llm-paste-bundle.txt');
 
 if (!existsSync(JSON_PATH)) {
   console.error('Missing verification-report.json — run: npm run export:verification:quick');

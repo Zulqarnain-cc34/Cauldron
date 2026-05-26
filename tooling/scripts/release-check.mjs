@@ -8,15 +8,15 @@ import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
 /** @type {{ name: string, cmd: string, args: string[] }[]} */
 const STEPS = [
-  { name: 'Headless tests (behaviors)', cmd: 'node', args: ['--test', 'tests/run-node.js'] },
-  { name: 'Layer boundaries', cmd: 'node', args: ['scripts/check-layers.mjs'] },
-  { name: 'Behavior quality', cmd: 'node', args: ['scripts/check-behaviors.mjs'] },
-  { name: 'Catalog coverage', cmd: 'node', args: ['scripts/check-coverage.mjs'] },
-  { name: 'Golden snapshots', cmd: 'node', args: ['scripts/behavior-snapshot.mjs'] },
+  { name: 'Headless tests (behaviors)', cmd: 'node', args: ['--test', 'tooling/tests/run-node.js'] },
+  { name: 'Layer boundaries', cmd: 'node', args: ['tooling/scripts/check-layers.mjs'] },
+  { name: 'Behavior quality', cmd: 'node', args: ['tooling/scripts/check-behaviors.mjs'] },
+  { name: 'Catalog coverage', cmd: 'node', args: ['tooling/scripts/check-coverage.mjs'] },
+  { name: 'Golden snapshots', cmd: 'node', args: ['tooling/scripts/behavior-snapshot.mjs'] },
 ];
 
 console.log('');
@@ -42,7 +42,7 @@ for (const step of STEPS) {
 console.log('');
 
 let snapCount = '?';
-const snapPath = join(ROOT, 'tests/snapshots/behaviors.json');
+const snapPath = join(ROOT, 'tooling/tests/snapshots/behaviors.json');
 if (existsSync(snapPath)) {
   try {
     snapCount = String(JSON.parse(readFileSync(snapPath, 'utf8')).behaviorCount ?? '?');

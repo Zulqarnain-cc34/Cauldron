@@ -12,10 +12,9 @@ Open in your browser:
 
 | URL | What |
 |-----|------|
-| http://localhost:3456/ | Redirects to **Gem Digger** demo |
-| http://localhost:3456/apps/gem-digger/ | **Play** — maps, gems, dig caves |
-| http://localhost:3456/docs/ | **Live docs** — materials & plugins with runnable tests |
-| http://localhost:3456/tests/ | **Test runner** — all behavior specs |
+| http://localhost:3456/apps/gem-digger/ | **Play** — Gem Digger demo |
+| http://localhost:3456/apps/docs/ | **Live docs** — materials & plugins |
+| http://localhost:3456/apps/test-runner/ | **Visual tests** — debug behaviors |
 
 No build step. Static files + ES modules.
 
@@ -29,7 +28,7 @@ npm run test:watch     # background auto-rerun while coding
 npm run snapshot:update  # after intentional sim changes
 npm run export:verification  # JSON audit for LLM second opinion
 npm run copy:llm             # ~0.3s clipboard (pre-built bundle)
-bash scripts/copy-llm.sh     # ~0.02s — fastest, no npm
+bash tooling/scripts/copy-llm.sh     # ~0.02s — fastest, no npm
 npm run copy:llm -- --fresh  # ~1s — refresh behaviors then copy
 npm run setup:hooks    # optional git pre-commit + pre-push gates
 ```
@@ -76,12 +75,10 @@ See [plugins/README.md](plugins/README.md) and [ARCHITECTURE.md](ARCHITECTURE.md
 ## Project layout
 
 ```
-js/              Library — sim engine + cauldron SDK + game framework
-apps/            Runnable games (gem-digger demo)
-plugins/         Optional extensions (grenade, …)
-docs/            Live documentation UI
-tests/           Behavior specs + golden snapshots
-scripts/         Build, CI, layer checks
+js/              Library — sim engine + SDK + game framework
+apps/            Browser apps (game, docs, test-runner)
+plugins/         Optional extensions
+tooling/         Dev-only: tests/ + scripts/
 ```
 
 See [ARCHITECTURE.md](ARCHITECTURE.md) for the full library vs game vs tooling split.

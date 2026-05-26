@@ -1,8 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { World } from '../js/cauldron/app.js';
-import { getAllTestSuites } from '../js/cauldron/tooling.js';
-import { bootstrapSandbox } from '../js/cauldron/bootstrap.js';
+import { World } from '../../js/cauldron/app.js';
+import { getAllTestSuites } from '../../js/cauldron/tooling.js';
+import { bootstrapSandbox } from '../../js/cauldron/bootstrap.js';
 import { runScenario } from './helpers/harness.js';
 
 await bootstrapSandbox({

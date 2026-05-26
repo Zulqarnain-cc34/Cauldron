@@ -3,9 +3,10 @@
  * Layer boundary checker — fails CI when imports violate ARCHITECTURE.md.
  */
 import { readFileSync, readdirSync, statSync } from 'node:fs';
-import { join, relative } from 'node:path';
+import { join, relative, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-const ROOT = new URL('..', import.meta.url).pathname;
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
 
 /** @param {string} dir */
 function walk(dir, out = []) {

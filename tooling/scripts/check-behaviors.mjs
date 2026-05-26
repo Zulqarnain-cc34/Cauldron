@@ -7,9 +7,9 @@
  *  2. Ignite/burn tests with unchanged ASCII must use inspect().
  *  3. Mutation: wrong expect must fail (detects tests that pass regardless).
  */
-import { bootstrapSandbox } from '../js/cauldron/bootstrap.js';
-import { World } from '../js/world.js';
-import { getAllBehaviors } from '../js/cauldron/tooling.js';
+import { bootstrapSandbox } from '../../js/cauldron/bootstrap.js';
+import { World } from '../../js/world.js';
+import { getAllBehaviors } from '../../js/cauldron/tooling.js';
 import { runScenario } from '../tests/helpers/harness.js';
 
 await bootstrapSandbox({

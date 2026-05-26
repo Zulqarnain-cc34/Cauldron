@@ -9,14 +9,14 @@ import { writeFileSync, mkdirSync, readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
-import { getRuleModules, getAllTestSuites } from '../js/cauldron/tooling.js';
-import { getRegisteredPlugins } from '../js/plugins/host.js';
-import { MATERIALS } from '../js/catalog/materials.js';
+import { getRuleModules, getAllTestSuites } from '../../js/cauldron/tooling.js';
+import { getRegisteredPlugins } from '../../js/plugins/host.js';
+import { MATERIALS } from '../../js/catalog/materials.js';
 import { collectBehaviorSnapshots, behaviorCount } from './lib/behavior-outcomes.mjs';
 import { parseNodeTestOutput } from './lib/parse-test-output.mjs';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const OUT_DIR = join(ROOT, 'tests/exports');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const OUT_DIR = join(ROOT, 'tooling/tests/exports');
 const OUT_JSON = join(OUT_DIR, 'verification-report.json');
 const OUT_PROMPT = join(OUT_DIR, 'llm-review-prompt.txt');
 const OUT_BUNDLE = join(OUT_DIR, 'llm-paste-bundle.txt');
@@ -36,7 +36,7 @@ Your job:
 Do NOT re-run code. Judge only from this JSON. Be concise.`;
 
 function runGate(script, args = []) {
-  const r = spawnSync('node', [join(ROOT, 'scripts', script), ...args], {
+  const r = spawnSync('node', [join(ROOT, 'tooling/scripts', script), ...args], {
     cwd: ROOT,
     encoding: 'utf8',
     maxBuffer: 10 * 1024 * 1024,
@@ -90,7 +90,7 @@ if (!quick) {
     snapshots: runGate('behavior-snapshot.mjs'),
   };
 
-  const headless = spawnSync('node', ['--test', 'tests/run-node.js'], {
+  const headless = spawnSync('node', ['--test', 'tooling/tests/run-node.js'], {
     cwd: ROOT,
     encoding: 'utf8',
     maxBuffer: 10 * 1024 * 1024,
@@ -102,7 +102,7 @@ if (!quick) {
 }
 
 let snapshotVersion = null;
-const snapPath = join(ROOT, 'tests/snapshots/behaviors.json');
+const snapPath = join(ROOT, 'tooling/tests/snapshots/behaviors.json');
 if (existsSync(snapPath)) {
   try {
     snapshotVersion = JSON.parse(readFileSync(snapPath, 'utf8')).version;

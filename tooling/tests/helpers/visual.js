@@ -1,5 +1,5 @@
-import { PALETTE } from '../../js/catalog/materials.js';
-import { resolveCharToSpecies } from '../../js/catalog/ascii-map.js';
+import { PALETTE } from '../../../js/catalog/materials.js';
+import { resolveCharToSpecies } from '../../../js/catalog/ascii-map.js';
 
 const GAP = 1;
 const LABEL_H = 14;

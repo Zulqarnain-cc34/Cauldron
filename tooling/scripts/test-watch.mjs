@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Rerun headless tests when js/, plugins/, tests/, or scripts/ change.
+ * Rerun headless tests when js/, plugins/, apps/, or tooling/ change.
  * Layer check runs after a passing test pass (same as npm test, minus initial delay).
  */
 import { spawn } from 'node:child_process';
@@ -8,8 +8,8 @@ import { watch } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const WATCH_DIRS = ['js', 'plugins', 'tests', 'scripts'];
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
+const WATCH_DIRS = ['js', 'plugins', 'apps', 'tooling'];
 
 let debounce = null;
 let child = null;
@@ -24,7 +24,7 @@ function runSuite(label = 'test') {
 
   child = spawn(
     process.execPath,
-    ['--test', 'tests/run-node.js'],
+    ['--test', 'tooling/tests/run-node.js'],
     { cwd: ROOT, stdio: 'inherit' }
   );
 

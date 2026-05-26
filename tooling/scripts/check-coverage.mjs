@@ -3,8 +3,8 @@
  * Catalog coverage — every core material/reaction rule must have at least one behavior.
  */
 import { ensureTestBootstrap } from './lib/behavior-outcomes.mjs';
-import { getRuleModules } from '../js/cauldron/tooling.js';
-import { getRegisteredPlugins } from '../js/plugins/host.js';
+import { getRuleModules } from '../../js/cauldron/tooling.js';
+import { getRegisteredPlugins } from '../../js/plugins/host.js';
 
 await ensureTestBootstrap();
 

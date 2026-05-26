@@ -1,5 +1,5 @@
-import { normalizeScope } from '../../js/sim/scope.js';
-import { WorldSlice } from '../../js/sim/world-slice.js';
+import { normalizeScope } from '../../../js/sim/scope.js';
+import { WorldSlice } from '../../../js/sim/world-slice.js';
 import { worldFromAscii, asciiFromWorld, rowsEqual, diffCells } from './grid.js';
 
 export function prepareScenario(test) {

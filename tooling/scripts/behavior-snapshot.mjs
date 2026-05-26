@@ -9,8 +9,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { collectBehaviorSnapshots, behaviorCount } from './lib/behavior-outcomes.mjs';
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const SNAPSHOT_PATH = join(ROOT, 'tests/snapshots/behaviors.json');
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), '../..');
+const SNAPSHOT_PATH = join(ROOT, 'tooling/tests/snapshots/behaviors.json');
 const write = process.argv.includes('--write');
 
 const current = await collectBehaviorSnapshots();
@@ -27,7 +27,7 @@ if (write) {
   mkdirSync(dirname(SNAPSHOT_PATH), { recursive: true });
   writeFileSync(SNAPSHOT_PATH, `${JSON.stringify(payload, null, 2)}\n`);
   const failed = ids.filter((id) => (current[id].verdict ?? (current[id].pass ? 'PASS' : 'FAIL')) !== 'PASS');
-  console.log(`snapshot:update — wrote ${ids.length} behaviors → tests/snapshots/behaviors.json`);
+  console.log(`snapshot:update — wrote ${ids.length} behaviors → tooling/tests/snapshots/behaviors.json`);
   if (failed.length) {
     console.error(`  ✗ ${failed.length} behavior(s) failing — fix before release:`);
     for (const id of failed) console.error(`    - ${id}`);
@@ -37,7 +37,7 @@ if (write) {
 }
 
 if (!existsSync(SNAPSHOT_PATH)) {
-  console.error('Missing tests/snapshots/behaviors.json — run: npm run snapshot:update');
+  console.error('Missing tooling/tests/snapshots/behaviors.json — run: npm run snapshot:update');
   process.exit(1);
 }
 

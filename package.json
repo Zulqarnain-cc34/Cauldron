@@ -16,20 +16,20 @@
   "scripts": {
     "start": "npx --yes serve . -p 3456",
     "dev": "npm start",
-    "build": "node scripts/build.mjs",
-    "test": "node --test tests/run-node.js",
-    "test:watch": "node scripts/test-watch.mjs",
+    "build": "node tooling/scripts/build.mjs",
+    "test": "node --test tooling/tests/run-node.js",
+    "test:watch": "node tooling/scripts/test-watch.mjs",
     "test:visual": "npm start",
     "verify": "npm run build && npm test && npm run check:layers && npm run check:behaviors && npm run check:coverage && npm run check:snapshots",
-    "release": "node scripts/release-check.mjs",
-    "check:layers": "node scripts/check-layers.mjs",
-    "check:behaviors": "node scripts/check-behaviors.mjs",
-    "check:coverage": "node scripts/check-coverage.mjs",
-    "check:snapshots": "node scripts/behavior-snapshot.mjs",
-    "snapshot:update": "node scripts/behavior-snapshot.mjs --write",
-    "export:verification": "node scripts/export-verification.mjs",
-    "export:verification:quick": "node scripts/export-verification.mjs --quick",
-    "copy:llm": "bash scripts/copy-llm.sh",
-    "setup:hooks": "bash scripts/install-hooks.sh"
+    "release": "node tooling/scripts/release-check.mjs",
+    "check:layers": "node tooling/scripts/check-layers.mjs",
+    "check:behaviors": "node tooling/scripts/check-behaviors.mjs",
+    "check:coverage": "node tooling/scripts/check-coverage.mjs",
+    "check:snapshots": "node tooling/scripts/behavior-snapshot.mjs",
+    "snapshot:update": "node tooling/scripts/behavior-snapshot.mjs --write",
+    "export:verification": "node tooling/scripts/export-verification.mjs",
+    "export:verification:quick": "node tooling/scripts/export-verification.mjs --quick",
+    "copy:llm": "bash tooling/scripts/copy-llm.sh",
+    "setup:hooks": "bash tooling/scripts/install-hooks.sh"
   }
 }

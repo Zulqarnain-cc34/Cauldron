@@ -1,8 +1,8 @@
-import { getAllTestSuites } from '../js/cauldron/index.js';
-import { World, initPlugins } from '../js/cauldron/index.js';
-import { runSuite } from './helpers/harness.js';
-import { drawAsciiGrid, rowsToPre } from './helpers/visual.js';
-import { LiveDemoPlayer } from './helpers/live-demo.js';
+import { getAllTestSuites } from '../../js/cauldron/index.js';
+import { World, initPlugins } from '../../js/cauldron/index.js';
+import { runSuite } from '../../tooling/tests/helpers/harness.js';
+import { drawAsciiGrid, rowsToPre } from '../../tooling/tests/helpers/visual.js';
+import { LiveDemoPlayer } from '../../tooling/tests/helpers/live-demo.js';
 import '../plugins/index.js';
 
 initPlugins({

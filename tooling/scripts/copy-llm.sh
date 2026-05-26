@@ -5,9 +5,9 @@
 #   npm run copy:llm -- --full
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
-BUNDLE="$ROOT/tests/exports/llm-paste-bundle.txt"
-JSON="$ROOT/tests/exports/verification-report.json"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+BUNDLE="$ROOT/tooling/tests/exports/llm-paste-bundle.txt"
+JSON="$ROOT/tooling/tests/exports/verification-report.json"
 
 fresh=false
 full=false
@@ -19,12 +19,12 @@ for arg in "$@"; do
 done
 
 if $full; then
-  node "$ROOT/scripts/export-verification.mjs"
+  node "$ROOT/tooling/scripts/export-verification.mjs"
 elif $fresh || [[ ! -f "$BUNDLE" ]]; then
   if $fresh || [[ ! -f "$JSON" ]]; then
-    node "$ROOT/scripts/export-verification.mjs" --quick
+    node "$ROOT/tooling/scripts/export-verification.mjs" --quick
   else
-    node "$ROOT/scripts/build-llm-bundle.mjs"
+    node "$ROOT/tooling/scripts/build-llm-bundle.mjs"
   fi
 fi
 

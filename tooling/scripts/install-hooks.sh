@@ -2,7 +2,7 @@
 # Install git hooks — optional local gate before commit/push.
 set -euo pipefail
 
-ROOT="$(cd "$(dirname "$0")/.." && pwd)"
+ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
 INSTALL="${1:-all}"
 
 install_hook() {

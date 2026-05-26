@@ -1,6 +1,6 @@
-import { World, initPlugins, buildDocCatalog, getDocEntry, getDocStats, searchDocEntries } from '../js/cauldron/index.js';
-import { runScenario } from '../tests/helpers/harness.js';
-import { LiveDemoPlayer } from '../tests/helpers/live-demo.js';
+import { World, initPlugins, buildDocCatalog, getDocEntry, getDocStats, searchDocEntries } from '../../js/cauldron/index.js';
+import { runScenario } from '../../tooling/tests/helpers/harness.js';
+import { LiveDemoPlayer } from '../../tooling/tests/helpers/live-demo.js';
 import '../plugins/index.js';
 
 initPlugins({

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cauldron — Visual Tests</title>
+  <link rel="stylesheet" href="/apps/test-runner/tests.css" />
+</head>
+
+<body>
+  <header class="page-header">
+    <div>
+      <h1>Cauldron visual tests</h1>
+      <p class="subtitle">Click a test to run a <strong>live slice demo</strong> on the production renderer.</p>
+    </div>
+    <div class="header-actions">
+      <span id="global-summary" class="global-summary">…</span>
+      <button type="button" id="btn-rerun">Re-run all</button>
+      <a href="/apps/docs/">Docs</a>
+      <a href="/apps/gem-digger/">← Game</a>
+    </div>
+  </header>
+
+  <div class="layout">
+    <main id="test-root" class="test-list"></main>
+
+    <aside id="demo-panel" class="demo-panel">
+      <h2>Live slice demo</h2>
+      <dl id="demo-meta" class="demo-meta">
+        <div><dt>Engine</dt><dd id="demo-engine">—</dd></div>
+        <div><dt>Active rules</dt><dd id="demo-rules">—</dd></div>
+        <div><dt>Slice</dt><dd id="demo-slice">—</dd></div>
+        <div><dt>Viewport</dt><dd id="demo-size">—</dd></div>
+        <div><dt>Ticks</dt><dd id="demo-ticks">—</dd></div>
+      </dl>
+      <p id="demo-status" class="demo-status">Select a test</p>
+      <div class="demo-canvas-wrap">
+        <canvas id="demo-canvas" aria-label="Live test grid"></canvas>
+      </div>
+      <p id="demo-result" class="demo-result"></p>
+      <p id="demo-verify" class="demo-verify"></p>
+      <div class="demo-controls">
+        <button type="button" id="btn-play">Play</button>
+        <button type="button" id="btn-pause">Pause</button>
+        <button type="button" id="btn-step">Step</button>
+        <button type="button" id="btn-replay">Replay</button>
+      </div>
+    </aside>
+  </div>
+
+  <footer class="legend">
+    <strong>Legend:</strong>
+    <code>.</code> empty &nbsp;
+    <code>#</code> wall &nbsp;
+    <code>S</code> sand &nbsp;
+    <code>W</code> water &nbsp;
+    <code>T</code> stone &nbsp;
+    <code>F</code> fire &nbsp;
+    <code>O</code> organic &nbsp;
+    <code>^</code> steam
+  </footer>
+
+  <script type="module" src="/apps/test-runner/runner.js"></script>
+</body>
+
+</html>

@@ -1,4 +1,4 @@
-import { renderWorldToCanvas, computeDemoCellPx, canvasPixelSize } from '../../js/render-canvas.js';
+import { renderWorldToCanvas, computeDemoCellPx, canvasPixelSize } from '../../../js/render-canvas.js';
 import { prepareScenario, stepScenario, finishScenario, runScenario } from './harness.js';
 
 const DEFAULT_DELAY_MS = 350;

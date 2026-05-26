@@ -113,8 +113,7 @@ export function mountPanel(world, callbacks) {
     <header class="bar bar-top">
       <h1>Cauldron</h1>
       <section class="map-hud-host" id="map-hud" aria-live="polite"></section>
-      <a href="/docs/index.html">Docs</a>
-      <a href="/docs/index.html">Docs</a>
+      <a href="/apps/docs/">Docs</a>
       <span class="tick" id="tick-label">tick 0</span>
       <button type="button" id="btn-pause" title="Space">Pause</button>
       <button type="button" id="btn-step" title="Step one frame">&gt;</button>

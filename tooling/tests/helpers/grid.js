@@ -1,5 +1,5 @@
-import { World } from '../../js/world.js';
-import { resolveCharToSpecies, resolveSpeciesToChar } from '../../js/catalog/ascii-map.js';
+import { World } from '../../../js/world.js';
+import { resolveCharToSpecies, resolveSpeciesToChar } from '../../../js/catalog/ascii-map.js';
 
 export function worldFromAscii(rows, seed = 1) {
   const height = rows.length;
