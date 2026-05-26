@@ -118,5 +118,41 @@ export function createOverlay(canvas) {
       ctx.fill();
       ctx.restore();
     },
+
+    /**
+     * Soft flow streak (tail → head), for wind / current visualization.
+     * @param {number} cx head x
+     * @param {number} cy head y
+     * @param {number} angle radians (direction of flow)
+     * @param {number} length streak length in px
+     * @param {Rgba} rgba head color
+     * @param {number} [lineWidth]
+     */
+    strokeFlowStreak(cx, cy, angle, length, rgba, lineWidth = 1.25) {
+      const cos = Math.cos(angle);
+      const sin = Math.sin(angle);
+      const tx = cx - cos * length;
+      const ty = cy - sin * length;
+      const [r, g, b, a] = rgba;
+      const aNorm = a / 255;
+
+      ctx.lineCap = 'round';
+      ctx.lineWidth = lineWidth;
+
+      const grad = ctx.createLinearGradient(tx, ty, cx, cy);
+      grad.addColorStop(0, `rgba(${r},${g},${b},0)`);
+      grad.addColorStop(0.55, `rgba(${r},${g},${b},${aNorm * 0.35})`);
+      grad.addColorStop(1, `rgba(${r},${g},${b},${aNorm})`);
+      ctx.strokeStyle = grad;
+      ctx.beginPath();
+      ctx.moveTo(tx, ty);
+      ctx.lineTo(cx, cy);
+      ctx.stroke();
+
+      ctx.fillStyle = `rgba(${r},${g},${b},${Math.min(1, aNorm * 1.1)})`;
+      ctx.beginPath();
+      ctx.arc(cx, cy, lineWidth * 0.65, 0, Math.PI * 2);
+      ctx.fill();
+    },
   };
 }

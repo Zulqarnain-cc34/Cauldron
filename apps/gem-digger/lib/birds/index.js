@@ -1,9 +1,14 @@
 /**
  * Flocking birds — game-only (not Cauldron library).
- * Same bird kind flocks together (sparrows with sparrows, etc.).
  */
 
 export { BIRD_KINDS, getBirdKindDef } from './catalog.js';
+export {
+  birdSimConfig,
+  BIRD_SIM_PRESETS,
+  applyBirdSimPreset,
+  resetBirdSimConfig,
+} from './config.js';
 export {
   ensureBirds,
   clearBirds,
@@ -14,10 +19,13 @@ export {
   tickBirds,
 } from './birds.js';
 export { renderBirds } from './render.js';
-export { FLOCK_PERCEPTION, FLOCK_MIN_SIZE } from './flock.js';
+export { renderWindField, resetWindParticles } from './wind-viz.js';
+export { getFlockMinSize } from './flock.js';
+export { flowVelocity, windSteer } from './wind.js';
 
 import { tickBirds, spawnDemoFlocks } from './birds.js';
 import { renderBirds } from './render.js';
+import { renderWindField, resetWindParticles } from './wind-viz.js';
 
 /**
  * @param {import('../../../../js/overlay.js').OverlayContext} overlay
@@ -34,9 +42,11 @@ export function installBirdSystem(overlay, world, opts = {}) {
       tickBirds(world);
     },
     render() {
+      renderWindField(overlay, world);
       renderBirds(overlay, world);
     },
     respawnDemo() {
+      resetWindParticles();
       spawnDemoFlocks(world);
     },
   };

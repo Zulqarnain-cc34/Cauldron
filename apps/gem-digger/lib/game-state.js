@@ -30,8 +30,9 @@ export function getGameState(world) {
       birds: [],
     };
   }
+  const state = world[STATE];
   if (!state.birds) state.birds = [];
-  return world[STATE];
+  return state;
 }
 
 /** @param {import('../../../js/world.js').World} world */

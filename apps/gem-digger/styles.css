@@ -781,3 +781,151 @@ body {
   color: #8888a0;
   text-align: center;
 }
+
+/* Birds / flocking / wind controls */
+.birds-panel {
+  position: fixed;
+  bottom: 0.75rem;
+  left: 0.75rem;
+  z-index: 12;
+  pointer-events: auto;
+  width: min(17rem, 92vw);
+  max-height: min(52vh, 28rem);
+  display: flex;
+  flex-direction: column;
+  background: rgba(13, 13, 18, 0.94);
+  border: 1px solid #2a2a38;
+  border-radius: 8px;
+  font-size: 0.72rem;
+  color: #e8e8f0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+}
+
+.birds-panel.collapsed .birds-panel-body {
+  display: none;
+}
+
+.birds-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.6rem;
+  border-bottom: 1px solid #2a2a38;
+}
+
+.birds-panel-title {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.birds-panel-collapse {
+  background: #1a1a24;
+  border: 1px solid #2a2a38;
+  color: #c8c8dc;
+  border-radius: 4px;
+  padding: 0.1rem 0.45rem;
+  cursor: pointer;
+  font-size: 0.85rem;
+  line-height: 1.2;
+}
+
+.birds-panel-body {
+  overflow-y: auto;
+  padding: 0.45rem 0.55rem 0.55rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.birds-preset-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.15rem;
+}
+
+.birds-preset-select {
+  flex: 1;
+  min-width: 0;
+  background: #1a1a24;
+  color: #e8e8f0;
+  border: 1px solid #2a2a38;
+  border-radius: 4px;
+  padding: 0.2rem 0.35rem;
+  font-size: 0.72rem;
+}
+
+.birds-section {
+  border: 1px solid #252530;
+  border-radius: 6px;
+  padding: 0.2rem 0.35rem 0.35rem;
+}
+
+.birds-section summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: #a8b8ff;
+  padding: 0.15rem 0.1rem;
+  list-style: none;
+}
+
+.birds-section summary::-webkit-details-marker {
+  display: none;
+}
+
+.birds-section-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding-top: 0.25rem;
+}
+
+.birds-slider-row {
+  display: grid;
+  grid-template-columns: 5.2rem 1fr 2.2rem;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.birds-slider-label {
+  color: #9898b0;
+}
+
+.birds-slider-val {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: #c8c8dc;
+}
+
+.birds-slider-row input[type="range"] {
+  width: 100%;
+  accent-color: #6a8cff;
+}
+
+.birds-check-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: #c8c8dc;
+  margin-bottom: 0.15rem;
+}
+
+.birds-respawn-btn {
+  margin-top: 0.25rem;
+  width: 100%;
+  padding: 0.35rem 0.5rem;
+  background: #1e2848;
+  border: 1px solid #3a4a78;
+  color: #e8e8f0;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.72rem;
+}
+
+.birds-respawn-btn:hover {
+  background: #2a3860;
+}

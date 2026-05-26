@@ -25,6 +25,7 @@ import {
   BUILTIN_MAPS,
   blankMap,
 } from './lib/index.js';
+import { mountBirdsPanel } from './ui/birds-panel.js';
 
 let world;
 let ui;
@@ -96,6 +97,7 @@ async function init() {
   });
 
   birds = installBirdSystem(host.overlay, world, { spawnDemo: false });
+  mountBirdsPanel(world);
 
   mapHud = mountMapHud({
     world,

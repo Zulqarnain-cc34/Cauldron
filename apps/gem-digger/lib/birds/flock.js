@@ -3,15 +3,9 @@
  * Only birds of the same {@link BirdKind} interact.
  */
 
+import { birdSimConfig } from './config.js';
+
 /** @typedef {import('./birds.js').Bird} Bird */
-
-const PERCEPTION = 42;
-const SEPARATION = 14;
-const MIN_FLOCK = 3;
-
-const WEIGHT_SEP = 1.6;
-const WEIGHT_ALI = 1.0;
-const WEIGHT_COH = 0.85;
 
 /**
  * @param {number} x
@@ -26,10 +20,9 @@ function clampMag(x, y, max) {
 }
 
 /**
- * Steer toward desired velocity.
  * @param {Bird} bird
- * @param {number} tx target vx
- * @param {number} ty target vy
+ * @param {number} tx
+ * @param {number} ty
  * @param {number} maxForce
  */
 function steer(bird, tx, ty, maxForce) {
@@ -41,12 +34,40 @@ function steer(bird, tx, ty, maxForce) {
 
 /**
  * @param {Bird} bird
- * @param {Bird[]} neighbors same kind, within perception
+ * @param {number} tx
+ * @param {number} ty
+ * @param {number} maxSpeed
  * @param {number} maxForce
- * @returns {[number, number]} acceleration
  */
-export function computeFlockAcceleration(bird, neighbors, maxForce) {
-  if (neighbors.length < MIN_FLOCK) return [0, 0];
+function seek(bird, tx, ty, maxSpeed, maxForce) {
+  let dx = tx - bird.x;
+  let dy = ty - bird.y;
+  const d = Math.hypot(dx, dy);
+  if (d < 0.5) return [0, 0];
+  dx = (dx / d) * maxSpeed;
+  dy = (dy / d) * maxSpeed;
+  return steer(bird, dx, dy, maxForce);
+}
+
+/**
+ * @param {Bird} bird
+ * @param {Bird[]} neighbors
+ * @param {number} maxSpeed
+ * @param {number} maxForce
+ * @returns {[number, number]}
+ */
+export function computeFlockAcceleration(bird, neighbors, maxSpeed, maxForce) {
+  const {
+    perception,
+    separationRadius,
+    minFlockSize,
+    weightSep,
+    weightAli,
+    weightCoh,
+    cohesionSpeed,
+  } = birdSimConfig.flock;
+
+  if (neighbors.length < minFlockSize) return [0, 0];
 
   let sepX = 0;
   let sepY = 0;
@@ -55,6 +76,7 @@ export function computeFlockAcceleration(bird, neighbors, maxForce) {
   let cohX = 0;
   let cohY = 0;
   let sepN = 0;
+  let avgDist = 0;
   const n = neighbors.length;
 
   for (const other of neighbors) {
@@ -63,8 +85,10 @@ export function computeFlockAcceleration(bird, neighbors, maxForce) {
     const d = Math.hypot(dx, dy);
     if (d < 0.001) continue;
 
-    if (d < SEPARATION) {
-      const w = 1 / d;
+    avgDist += d;
+
+    if (d < separationRadius) {
+      const w = 1 / (d * d);
       sepX += (dx / d) * w;
       sepY += (dy / d) * w;
       sepN++;
@@ -76,28 +100,31 @@ export function computeFlockAcceleration(bird, neighbors, maxForce) {
     cohY += other.y;
   }
 
+  avgDist /= n;
+  const crowd = avgDist < 10 ? 2.5 : avgDist < 18 ? 1.4 : 1;
+
   let ax = 0;
   let ay = 0;
 
   if (sepN > 0) {
     const [sx, sy] = steer(bird, sepX / sepN, sepY / sepN, maxForce);
-    ax += sx * WEIGHT_SEP;
-    ay += sy * WEIGHT_SEP;
+    ax += sx * weightSep * crowd;
+    ay += sy * weightSep * crowd;
   }
 
   aliX /= n;
   aliY /= n;
   const [alx, aly] = steer(bird, aliX, aliY, maxForce);
-  ax += alx * WEIGHT_ALI;
-  ay += aly * WEIGHT_ALI;
+  ax += alx * weightAli;
+  ay += aly * weightAli;
 
-  cohX = cohX / n - bird.x;
-  cohY = cohY / n - bird.y;
-  const [cx, cy] = steer(bird, cohX, cohY, maxForce);
-  ax += cx * WEIGHT_COH;
-  ay += cy * WEIGHT_COH;
+  const centerX = cohX / n;
+  const centerY = cohY / n;
+  const [cx, cy] = seek(bird, centerX, centerY, maxSpeed * cohesionSpeed, maxForce);
+  ax += cx * weightCoh;
+  ay += cy * weightCoh;
 
-  return clampMag(ax, ay, maxForce * 2.2);
+  return clampMag(ax, ay, maxForce * 1.8);
 }
 
 /** @param {Bird} a @param {Bird} b */
@@ -105,8 +132,10 @@ export function withinPerception(a, b) {
   if (a.kind !== b.kind) return false;
   const dx = a.x - b.x;
   const dy = a.y - b.y;
-  return dx * dx + dy * dy <= PERCEPTION * PERCEPTION;
+  const p = birdSimConfig.flock.perception;
+  return dx * dx + dy * dy <= p * p;
 }
 
-export const FLOCK_PERCEPTION = PERCEPTION;
-export const FLOCK_MIN_SIZE = MIN_FLOCK;
+export function getFlockMinSize() {
+  return birdSimConfig.flock.minFlockSize;
+}
