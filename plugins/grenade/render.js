@@ -7,11 +7,12 @@ let sprite = null;
 const GRENADE_SPRITE = '/apps/gem-digger/assets/grenade.png';
 
 function ensureGrenadeSprite() {
-  if (sprite) return;
+  if (sprite?.naturalWidth) return;
   loadOverlayImage(GRENADE_SPRITE, (img) => {
     sprite = img;
   });
-  sprite = getOverlayImage(GRENADE_SPRITE);
+  const cached = getOverlayImage(GRENADE_SPRITE);
+  if (cached?.naturalWidth) sprite = cached;
 }
 
 /**
