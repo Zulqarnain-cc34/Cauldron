@@ -1,35 +1,40 @@
 /**
  * Live-tweakable bird / flock / wind settings (game UI reads & writes this).
+ *
+ * Tuning goal: turbulent wind drives motion; flocking groups birds without overlap.
+ * Rule of thumb — separation strongest, alignment medium, cohesion weakest.
  */
 
 /** @typedef {typeof DEFAULT_BIRD_SIM_CONFIG} BirdSimConfig */
 
 export const DEFAULT_BIRD_SIM_CONFIG = {
   flock: {
-    perception: 38,
-    separationRadius: 14,
+    perception: 42,
+    separationRadius: 22,
+    personalSpace: 5,
     minFlockSize: 3,
-    weightSep: 1.9,
-    weightAli: 0.72,
-    weightCoh: 0.42,
-    cohesionSpeed: 0.55,
+    weightSep: 2.4,
+    weightAli: 0.55,
+    weightCoh: 0.28,
+    cohesionSpeed: 0.42,
   },
   wind: {
-    noiseScale: 0.014,
-    timeScale: 0.011,
+    noiseScale: 0.012,
+    timeScale: 0.012,
     speedFactor: 0.72,
     steerWeight: 1.35,
-    gustMin: 0.52,
+    gustMin: 0.42,
   },
   motion: {
-    minSpeedRatio: 0.42,
+    simSpeed: 1,
+    minSpeedRatio: 0.28,
   },
   display: {
     showWindField: true,
-    windParticleCount: 160,
-    windStreakLength: 20,
-    windOpacity: 32,
-    windDriftSpeed: 0.9,
+    windParticleCount: 140,
+    windStreakLength: 18,
+    windOpacity: 28,
+    windDriftSpeed: 0.85,
   },
 };
 
@@ -41,46 +46,48 @@ export const BIRD_SIM_PRESETS = {
   default: {},
   tightFlocks: {
     flock: {
-      weightCoh: 0.72,
-      weightSep: 1.35,
-      weightAli: 0.88,
-      perception: 32,
-      separationRadius: 11,
-      cohesionSpeed: 0.48,
+      weightCoh: 0.38,
+      weightSep: 2.8,
+      weightAli: 0.65,
+      perception: 36,
+      separationRadius: 20,
+      personalSpace: 4.5,
+      cohesionSpeed: 0.32,
     },
-    wind: { speedFactor: 0.62, steerWeight: 1.15 },
+    wind: { speedFactor: 0.68, steerWeight: 1.35 },
   },
   looseScatter: {
     flock: {
-      weightCoh: 0.22,
-      weightSep: 2.4,
-      weightAli: 0.45,
-      perception: 48,
-      separationRadius: 18,
+      weightCoh: 0.12,
+      weightSep: 3.8,
+      weightAli: 0.35,
+      perception: 52,
+      separationRadius: 30,
+      personalSpace: 7,
     },
-    wind: { speedFactor: 0.85, steerWeight: 1.65, noiseScale: 0.018 },
+    wind: { speedFactor: 0.88, steerWeight: 1.75, noiseScale: 0.015 },
   },
   strongWind: {
     wind: {
-      noiseScale: 0.02,
-      timeScale: 0.016,
-      speedFactor: 0.88,
-      steerWeight: 1.85,
-      gustMin: 0.58,
+      noiseScale: 0.018,
+      timeScale: 0.018,
+      speedFactor: 0.92,
+      steerWeight: 2.0,
+      gustMin: 0.55,
     },
-    flock: { weightCoh: 0.3, weightAli: 0.55, weightSep: 2.1 },
-    display: { windDriftSpeed: 1.25, windOpacity: 40 },
+    flock: { weightCoh: 0.15, weightAli: 0.42, weightSep: 3.2 },
+    display: { windDriftSpeed: 1.1, windOpacity: 34 },
   },
   calm: {
     wind: {
-      noiseScale: 0.01,
-      timeScale: 0.006,
-      speedFactor: 0.5,
-      steerWeight: 0.95,
-      gustMin: 0.4,
+      noiseScale: 0.008,
+      timeScale: 0.007,
+      speedFactor: 0.55,
+      steerWeight: 1.1,
+      gustMin: 0.38,
     },
-    flock: { weightCoh: 0.55, weightSep: 1.6, weightAli: 0.6 },
-    display: { windParticleCount: 100, windOpacity: 22, windDriftSpeed: 0.55 },
+    flock: { weightCoh: 0.35, weightSep: 2.6, weightAli: 0.55, personalSpace: 6 },
+    display: { windParticleCount: 90, windOpacity: 20, windDriftSpeed: 0.5 },
   },
 };
 

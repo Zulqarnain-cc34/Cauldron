@@ -5,6 +5,7 @@ import {
   resetBirdSimConfig,
 } from '../lib/birds/config.js';
 import { spawnDemoFlocks } from '../lib/birds/birds.js';
+import { resetWindParticles } from '../lib/birds/wind-viz.js';
 
 /**
  * @param {string} label
@@ -67,6 +68,10 @@ export function mountBirdsPanel(world, opts = {}) {
         <select class="birds-preset-select" aria-label="Bird simulation preset"></select>
       </label>
       <details class="birds-section" open>
+        <summary>Simulation</summary>
+        <div class="birds-section-inner" data-section="sim"></div>
+      </details>
+      <details class="birds-section" open>
         <summary>Flocking</summary>
         <div class="birds-section-inner" data-section="flock"></div>
       </details>
@@ -96,13 +101,24 @@ export function mountBirdsPanel(world, opts = {}) {
     syncSlidersFromConfig();
   });
 
+  const simEl = root.querySelector('[data-section="sim"]');
+  const wrapNote = document.createElement('p');
+  wrapNote.className = 'birds-wrap-note';
+  wrapNote.textContent =
+    'Sky wraps on all edges (right → left, left → right, top → bottom, bottom → top).';
+  simEl.append(
+    wrapNote,
+    sliderRow('Sim speed', 'motion.simSpeed', 0.5, 10, 0.25, (v) => `${Number(v.toFixed(2))}×`)
+  );
+
   const flockEl = root.querySelector('[data-section="flock"]');
   flockEl.append(
     sliderRow('Cohesion', 'flock.weightCoh', 0, 2, 0.05),
-    sliderRow('Separation', 'flock.weightSep', 0, 4, 0.05),
+    sliderRow('Separation', 'flock.weightSep', 0, 6, 0.05),
     sliderRow('Alignment', 'flock.weightAli', 0, 2, 0.05),
+    sliderRow('Personal space', 'flock.personalSpace', 2, 12, 0.25),
     sliderRow('Perception', 'flock.perception', 12, 80, 1, (v) => String(Math.round(v))),
-    sliderRow('Sep. radius', 'flock.separationRadius', 4, 32, 1, (v) => String(Math.round(v))),
+    sliderRow('Sep. radius', 'flock.separationRadius', 8, 40, 1, (v) => String(Math.round(v))),
     sliderRow('Min flock', 'flock.minFlockSize', 2, 8, 1, (v) => String(Math.round(v))),
     sliderRow('Cohesion speed', 'flock.cohesionSpeed', 0.1, 1.2, 0.05)
   );
@@ -144,9 +160,11 @@ export function mountBirdsPanel(world, opts = {}) {
       const row = input.closest('.birds-slider-row');
       const label = row?.querySelector('.birds-slider-label')?.textContent;
       const map = {
+        'Sim speed': ['motion', 'simSpeed'],
         Cohesion: ['flock', 'weightCoh'],
         Separation: ['flock', 'weightSep'],
         Alignment: ['flock', 'weightAli'],
+        'Personal space': ['flock', 'personalSpace'],
         Perception: ['flock', 'perception'],
         'Sep. radius': ['flock', 'separationRadius'],
         'Min flock': ['flock', 'minFlockSize'],

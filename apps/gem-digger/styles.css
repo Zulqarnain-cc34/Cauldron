@@ -840,6 +840,13 @@ body {
   gap: 0.35rem;
 }
 
+.birds-wrap-note {
+  margin: 0 0 0.25rem;
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: #9a9ab0;
+}
+
 .birds-preset-row {
   display: flex;
   align-items: center;

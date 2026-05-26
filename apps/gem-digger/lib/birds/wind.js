@@ -1,8 +1,9 @@
 /**
- * Perlin-noise flow field — birds steer toward local wind velocity.
+ * Perlin-noise flow field — toroidal so wind matches across wrap edges.
  */
 
 import { birdSimConfig } from './config.js';
+import { wrapCoord } from './boundaries.js';
 
 const PERM = new Uint8Array(512);
 const GRAD = [
@@ -60,17 +61,28 @@ function perlin2(x, y) {
 }
 
 /**
+ * Flow velocity in grid space. Uses toroidal UV so left/right and top/bottom match.
  * @param {number} x
  * @param {number} y
  * @param {number} tick
  * @param {number} maxSpeed
+ * @param {number} worldW
+ * @param {number} worldH
  * @returns {[number, number]}
  */
-export function flowVelocity(x, y, tick, maxSpeed) {
+export function flowVelocity(x, y, tick, maxSpeed, worldW, worldH) {
   const { noiseScale, timeScale, gustMin } = birdSimConfig.wind;
   const t = tick * timeScale;
-  const nx = x * noiseScale + t;
-  const ny = y * noiseScale + t * 0.37;
+
+  const wx = worldW > 0 ? wrapCoord(x, worldW) : x;
+  const wy = worldH > 0 ? wrapCoord(y, worldH) : y;
+
+  const u = worldW > 0 ? wx / worldW : wx * noiseScale;
+  const v = worldH > 0 ? wy / worldH : wy * noiseScale;
+  const periods = 5.5;
+
+  const nx = u * periods + t;
+  const ny = v * periods + t * 0.37;
 
   const n1 = perlin2(nx, ny);
   const n2 = perlin2(nx + 17.3, ny + 9.1);
@@ -89,11 +101,19 @@ export function flowVelocity(x, y, tick, maxSpeed) {
  * @param {number} tick
  * @param {number} maxSpeed
  * @param {number} maxForce
- * @returns {[number, number]}
+ * @param {number} worldW
+ * @param {number} worldH
  */
-export function windSteer(bird, tick, maxSpeed, maxForce) {
+export function windSteer(bird, tick, maxSpeed, maxForce, worldW, worldH) {
   const { speedFactor, steerWeight } = birdSimConfig.wind;
-  const [tx, ty] = flowVelocity(bird.x, bird.y, tick, maxSpeed * speedFactor);
+  const [tx, ty] = flowVelocity(
+    bird.x,
+    bird.y,
+    tick,
+    maxSpeed * speedFactor,
+    worldW,
+    worldH
+  );
   let sx = tx - bird.vx;
   let sy = ty - bird.vy;
   const m = Math.hypot(sx, sy);

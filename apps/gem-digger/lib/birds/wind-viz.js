@@ -1,4 +1,5 @@
 import { displayCellPx } from '../../../../js/world.js';
+import { toroidalRenderOffsets, wrapWindParticle } from './boundaries.js';
 import { flowVelocity } from './wind.js';
 import { birdSimConfig } from './config.js';
 
@@ -10,17 +11,10 @@ import { birdSimConfig } from './config.js';
 let particles = [];
 let lastWorldKey = '';
 
-/**
- * @param {import('../../../../js/world.js').World} world
- */
 function worldKey(world) {
   return `${world.width}x${world.height}`;
 }
 
-/**
- * @param {import('../../../../js/world.js').World} world
- * @param {number} count
- */
 function seedParticles(world, count) {
   particles = [];
   const margin = 12;
@@ -33,9 +27,6 @@ function seedParticles(world, count) {
   }
 }
 
-/**
- * @param {import('../../../../js/world.js').World} world
- */
 function respawnParticle(world, p) {
   const margin = 8;
   p.x = margin + world.rand() * (world.width - margin * 2);
@@ -44,10 +35,18 @@ function respawnParticle(world, p) {
 }
 
 /**
- * Animated flow streaks — particles drift along the Perlin field (no arrow grid).
  * @param {import('../../../../js/overlay.js').OverlayContext} overlay
- * @param {import('../../../../js/world.js').World} world
+ * @param {number} px
+ * @param {number} py
+ * @param {number} angle
+ * @param {number} len
+ * @param {number} alpha
+ * @param {number} width
  */
+function drawStreak(overlay, px, py, angle, len, alpha, width) {
+  overlay.strokeFlowStreak(px, py, angle, len, [160, 210, 255, alpha], width);
+}
+
 export function renderWindField(overlay, world) {
   const { showWindField, windParticleCount, windStreakLength, windOpacity, windDriftSpeed } =
     birdSimConfig.display;
@@ -60,12 +59,17 @@ export function renderWindField(overlay, world) {
   }
 
   const cellPx = displayCellPx();
+  const worldW = world.width;
+  const worldH = world.height;
   const refSpeed = 1.15;
   const baseAlpha = Math.round(windOpacity * 2.2);
-  const drift = windDriftSpeed * 0.38;
+  const drift = windDriftSpeed * 0.38 * birdSimConfig.motion.simSpeed;
+  const ghostMargin = 22;
 
   for (const p of particles) {
-    const [vx, vy] = flowVelocity(p.x, p.y, world.tick, refSpeed);
+    wrapWindParticle(p, worldW, worldH);
+
+    const [vx, vy] = flowVelocity(p.x, p.y, world.tick, refSpeed, worldW, worldH);
     const mag = Math.hypot(vx, vy);
     if (mag < 0.02) {
       respawnParticle(world, p);
@@ -78,30 +82,38 @@ export function renderWindField(overlay, world) {
     p.y += ny * drift * (0.7 + mag * 0.35);
     p.life += 0.012 + mag * 0.008;
 
-    const px = p.x * cellPx;
-    const py = p.y * cellPx;
+    wrapWindParticle(p, worldW, worldH);
+
     const angle = Math.atan2(vy, vx);
     const strength = Math.min(1, mag / refSpeed);
     const len = windStreakLength * (0.45 + strength * 0.55);
     const alpha = Math.round(baseAlpha * (0.35 + strength * 0.65));
     const width = 0.9 + strength * 0.6;
 
-    overlay.strokeFlowStreak(px, py, angle, len, [160, 210, 255, alpha], width);
+    for (const [ox, oy] of toroidalRenderOffsets(
+      p.x,
+      p.y,
+      worldW,
+      worldH,
+      ghostMargin
+    )) {
+      drawStreak(
+        overlay,
+        (p.x + ox) * cellPx,
+        (p.y + oy) * cellPx,
+        angle,
+        len,
+        alpha,
+        width
+      );
+    }
 
-    const margin = 6;
-    if (
-      p.x < margin ||
-      p.y < margin ||
-      p.x > world.width - margin ||
-      p.y > world.height - margin ||
-      p.life > 1
-    ) {
+    if (p.life > 1.2) {
       respawnParticle(world, p);
     }
   }
 }
 
-/** Call after map reset if particles should redistribute. */
 export function resetWindParticles() {
   particles = [];
   lastWorldKey = '';
