@@ -25,8 +25,12 @@ let flockTick = {
   queryR: 50,
   queryR2: 2500,
   sepR2: 784,
+  aliR2: 784,
+  cohR2: 784,
   perception: 50,
   separationRadius: 28,
+  alignmentRadius: 28,
+  cohesionRadius: 28,
   closeDist: 12.6,
   minSocialDist: 15.4,
   crowdedDist: 14,
@@ -48,17 +52,24 @@ let flockTick = {
 
 function refreshFlockTick(maxForce) {
   const f = birdSimConfig.flock;
+  const sepR = f.separationRadius;
+  const aliR = f.alignmentRadius ?? f.perception;
+  const cohR = f.cohesionRadius ?? f.perception;
+  const socialR = Math.max(aliR, cohR, f.perception);
   const queryR =
     f.interactionMode === 'metric'
-      ? Math.max(f.perception, f.separationRadius)
-      : Math.max(f.separationRadius, f.topologicalNeighbors * 8, 40);
+      ? Math.max(sepR, socialR)
+      : Math.max(sepR, aliR, cohR, f.topologicalNeighbors * 8, 40);
 
   flockTick.queryR = queryR;
   flockTick.queryR2 = queryR * queryR;
-  flockTick.sepR2 = f.separationRadius * f.separationRadius;
+  flockTick.sepR2 = sepR * sepR;
+  flockTick.aliR2 = aliR * aliR;
+  flockTick.cohR2 = cohR * cohR;
   flockTick.perception = f.perception;
-  flockTick.separationRadius = f.separationRadius;
-  const sepR = f.separationRadius;
+  flockTick.separationRadius = sepR;
+  flockTick.alignmentRadius = aliR;
+  flockTick.cohesionRadius = cohR;
   flockTick.closeDist = sepR * 0.45;
   flockTick.minSocialDist = sepR * 0.55;
   flockTick.crowdedDist = sepR * 0.5;
@@ -216,7 +227,7 @@ export function computeBirdForces(bird, spatial, arena, maxForce, maxSpeed, tick
     distSum += d;
     distN++;
 
-    if (isMetric && d > ft.perception) return;
+    if (isMetric && d > Math.max(ft.alignmentRadius, ft.cohesionRadius, ft.perception)) return;
     if (isTopo) {
       neighborCount = pushNearest(neighborCount, other, dx, dy, d, ft.topologicalK);
     } else if (neighborCount < MAX_NEIGHBORS) {
@@ -265,6 +276,7 @@ export function computeBirdForces(bird, spatial, arena, maxForce, maxSpeed, tick
 
     for (let i = 0; i < neighborCount; i++) {
       const n = neighborSlots[i];
+      if (n.d > ft.alignmentRadius) continue;
       if (n.d < minSd) continue;
       const focus = (fwdX * n.dx + fwdY * n.dy) / Math.max(n.d, 0.001);
       if (focus <= 0.05) continue;
@@ -303,6 +315,7 @@ export function computeBirdForces(bird, spatial, arena, maxForce, maxSpeed, tick
       let cohW = 0;
       for (let i = 0; i < cohPick; i++) {
         const n = neighborSlots[i];
+        if (n.d > ft.cohesionRadius) continue;
         const focus = (fwdX * n.dx + fwdY * n.dy) / Math.max(n.d, 0.001);
         if (focus < 0.5 || n.d < ft.separationRadius * 0.65) continue;
         cohDx += n.dx * focus;
@@ -413,7 +426,7 @@ export function computeLocalFlockData(bird, spatial, arena, maxForce) {
     if (!neighborInVision(fwdX, fwdY, dx, dy, cosFov)) return;
     distSum += d;
     distN++;
-    if (isMetric && d > ft.perception) return;
+    if (isMetric && d > Math.max(ft.alignmentRadius, ft.cohesionRadius, ft.perception)) return;
     if (isTopo) {
       neighborCount = pushNearest(neighborCount, other, dx, dy, d, ft.topologicalK);
     } else if (neighborCount < MAX_NEIGHBORS) {
@@ -448,14 +461,16 @@ export function computeLocalFlockData(bird, spatial, arena, maxForce) {
 }
 
 export function getFlockNeighbors(bird, flockmates, arena) {
-  const { interactionMode, perception, topologicalNeighbors } = birdSimConfig.flock;
+  const { interactionMode, perception, alignmentRadius, topologicalNeighbors } =
+    birdSimConfig.flock;
+  const socialR = alignmentRadius ?? perception;
   const candidates = [];
 
   for (const other of flockmates) {
     if (other === bird) continue;
     const [dx, dy] = toroidalDelta(bird.x, bird.y, other.x, other.y, arena);
     const d = Math.hypot(dx, dy);
-    if (interactionMode === 'metric' && d > perception) continue;
+    if (interactionMode === 'metric' && d > socialR) continue;
     candidates.push({ other, d });
   }
 

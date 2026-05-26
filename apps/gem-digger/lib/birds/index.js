@@ -8,6 +8,10 @@ export {
   BIRD_SIM_PRESETS,
   BIRD_PRESET_LABELS,
   applyBirdSimPreset,
+  applyBirdSimConfig,
+  cloneBirdSimConfig,
+  exportBirdSimConfigJson,
+  importBirdSimConfigJson,
   resetBirdSimConfig,
 } from './config.js';
 export {
@@ -38,6 +42,7 @@ export {
 import { birdSimConfig } from './config.js';
 import { tickBirds, spawnDemoFlocks, ensureBirds } from './birds.js';
 import { renderBirds } from './render.js';
+import { renderBirdVisionDebug } from './vision-viz.js';
 import { renderWindField, resetWindParticles } from './wind-viz.js';
 import {
   sampleBirdMetrics,
@@ -69,6 +74,7 @@ export function installBirdSystem(overlay, world, opts = {}) {
     },
     render() {
       renderWindField(overlay, world);
+      renderBirdVisionDebug(overlay, world);
       renderBirds(overlay, world);
     },
     respawnDemo() {

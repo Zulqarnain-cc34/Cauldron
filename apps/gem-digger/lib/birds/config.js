@@ -6,21 +6,20 @@
 
 export const DEFAULT_BIRD_SIM_CONFIG = {
   flock: {
-    /** Metric neighbours — tuned for Vicsek φ ≥ ~85% (single flock, headless sweep). */
+    /** User-tuned defaults (topological flock, tight local neighbourhood). */
     interactionMode: 'topological',
-    topologicalNeighbors: 7,
-    perception: 50,
-    separationRadius: 28,
+    topologicalNeighbors: 20,
+    perception: 12,
+    separationRadius: 12,
+    alignmentRadius: 12,
+    cohesionRadius: 12,
     minFlockSize: 2,
-    weightSep: 3.2,
-    /** Heading match with birds in front — not position pull. */
-    weightAli: 0.32,
-    /** Off by default (position pull causes ring/orbit). Raise in UI if needed. */
-    weightCoh: 0,
+    weightSep: 3.3,
+    weightAli: 0.3,
+    weightCoh: 0.55,
     cohesionSpeed: 0.15,
-    cohesionNeighbors: 4,
-    visionFovDeg: 100,
-    /** Organic motion — breaks robot lock-step. */
+    cohesionNeighbors: 5,
+    visionFovDeg: 110,
     wanderWeight: 0.1,
   },
   wind: {
@@ -33,17 +32,19 @@ export const DEFAULT_BIRD_SIM_CONFIG = {
     gustMin: 0.2,
   },
   spawn: {
-    /** One flock keeps global φ high; multiple flocks move in different directions. */
-    flockCount: 1,
-    birdsPerFlock: 22,
+    flockCount: 4,
+    birdsPerFlock: 30,
   },
   motion: {
-    simSpeed: 1,
+    simSpeed: 20,
     minSpeedRatio: 0.15,
   },
   display: {
     showWindField: false,
     showDiagnostics: false,
+    showVisionDebug: false,
+    /** When many birds, draw cones for a spaced sample only. */
+    visionDebugAll: false,
     windParticleCount: 35,
     windStreakLength: 18,
     windOpacity: 24,
@@ -56,7 +57,7 @@ export const birdSimConfig = structuredClone(DEFAULT_BIRD_SIM_CONFIG);
 
 /** Human-readable preset names for the UI. */
 export const BIRD_PRESET_LABELS = {
-  default: 'Natural flock (vision)',
+  default: 'Default flock',
 };
 
 /** @type {Record<string, Partial<BirdSimConfig>>} */
@@ -89,4 +90,72 @@ export function applyBirdSimPreset(presetId) {
 /** Reset all fields to defaults. */
 export function resetBirdSimConfig() {
   return applyBirdSimPreset('default');
+}
+
+const CONFIG_EXPORT_VERSION = 1;
+
+/**
+ * Deep-merge a partial config onto DEFAULT shape and apply to live birdSimConfig.
+ * @param {Partial<BirdSimConfig>} partial
+ */
+export function applyBirdSimConfig(partial) {
+  const base = structuredClone(DEFAULT_BIRD_SIM_CONFIG);
+  if (partial.flock) Object.assign(base.flock, partial.flock);
+  if (partial.wind) Object.assign(base.wind, partial.wind);
+  if (partial.spawn) Object.assign(base.spawn, partial.spawn);
+  if (partial.motion) Object.assign(base.motion, partial.motion);
+  if (partial.display) Object.assign(base.display, partial.display);
+
+  Object.assign(birdSimConfig.flock, base.flock);
+  Object.assign(birdSimConfig.wind, base.wind);
+  Object.assign(birdSimConfig.spawn, base.spawn);
+  Object.assign(birdSimConfig.motion, base.motion);
+  Object.assign(birdSimConfig.display, base.display);
+  return birdSimConfig;
+}
+
+/** @returns {BirdSimConfig} */
+export function cloneBirdSimConfig() {
+  return structuredClone(birdSimConfig);
+}
+
+/**
+ * @param {string} [name]
+ */
+export function exportBirdSimConfigJson(name = 'custom') {
+  return JSON.stringify(
+    {
+      version: CONFIG_EXPORT_VERSION,
+      name,
+      exportedAt: new Date().toISOString(),
+      config: cloneBirdSimConfig(),
+    },
+    null,
+    2
+  );
+}
+
+/**
+ * @param {string} json
+ * @returns {{ ok: boolean, name?: string, error?: string }}
+ */
+export function importBirdSimConfigJson(json) {
+  try {
+    const data = JSON.parse(json);
+    const cfg = data?.config ?? data;
+    if (!cfg || typeof cfg !== 'object') {
+      return { ok: false, error: 'Missing config object' };
+    }
+    const required = ['flock', 'wind', 'spawn', 'motion', 'display'];
+    for (const key of required) {
+      if (!cfg[key] || typeof cfg[key] !== 'object') {
+        return { ok: false, error: `Missing section: ${key}` };
+      }
+    }
+    applyBirdSimConfig(cfg);
+    const name = typeof data.name === 'string' ? data.name : 'imported';
+    return { ok: true, name };
+  } catch (e) {
+    return { ok: false, error: e instanceof Error ? e.message : 'Invalid JSON' };
+  }
 }

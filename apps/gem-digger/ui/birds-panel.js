@@ -3,6 +3,8 @@ import {
   BIRD_SIM_PRESETS,
   BIRD_PRESET_LABELS,
   applyBirdSimPreset,
+  exportBirdSimConfigJson,
+  importBirdSimConfigJson,
   resetBirdSimConfig,
 } from '../lib/birds/config.js';
 import { spawnDemoFlocks } from '../lib/birds/birds.js';
@@ -73,6 +75,23 @@ export function mountBirdsPanel(world, opts = {}) {
         <span>Preset</span>
         <select class="birds-preset-select" aria-label="Bird simulation preset"></select>
       </label>
+      <details class="birds-section birds-config-section">
+        <summary>Config export / import</summary>
+        <div class="birds-section-inner birds-config-inner">
+          <p class="birds-wrap-note">Export current sliders as JSON, or paste / load a saved tuning file.</p>
+          <textarea class="birds-config-json" rows="5" spellcheck="false" placeholder="Paste exported JSON here…"></textarea>
+          <div class="birds-config-actions">
+            <button type="button" class="birds-export-btn">Download JSON</button>
+            <button type="button" class="birds-import-btn">Apply JSON</button>
+            <button type="button" class="birds-copy-btn">Copy</button>
+            <label class="birds-file-import">
+              <span>Load file</span>
+              <input type="file" class="birds-config-file" accept="application/json,.json" />
+            </label>
+          </div>
+          <p class="birds-config-status" aria-live="polite"></p>
+        </div>
+      </details>
       <details class="birds-section" open>
         <summary>Simulation</summary>
         <div class="birds-section-inner" data-section="sim"></div>
@@ -110,6 +129,73 @@ export function mountBirdsPanel(world, opts = {}) {
   presetSelect.addEventListener('change', () => {
     applyBirdSimPreset(presetSelect.value);
     syncSlidersFromConfig();
+  });
+
+  const configJson = root.querySelector('.birds-config-json');
+  const configStatus = root.querySelector('.birds-config-status');
+
+  function setConfigStatus(msg, ok = true) {
+    if (!configStatus) return;
+    configStatus.textContent = msg;
+    configStatus.className = `birds-config-status${ok ? '' : ' birds-config-error'}`;
+  }
+
+  root.querySelector('.birds-export-btn')?.addEventListener('click', () => {
+    const json = exportBirdSimConfigJson('custom');
+    if (configJson) configJson.value = json;
+    const blob = new Blob([json], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bird-sim-${Date.now()}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    setConfigStatus('Downloaded current config.');
+  });
+
+  root.querySelector('.birds-copy-btn')?.addEventListener('click', async () => {
+    const json = exportBirdSimConfigJson('custom');
+    if (configJson) configJson.value = json;
+    try {
+      await navigator.clipboard.writeText(json);
+      setConfigStatus('Copied to clipboard.');
+    } catch {
+      setConfigStatus('Copy failed — use Download or select the textarea.', false);
+    }
+  });
+
+  root.querySelector('.birds-import-btn')?.addEventListener('click', () => {
+    const raw = configJson?.value?.trim() ?? '';
+    if (!raw) {
+      setConfigStatus('Paste JSON in the box first.', false);
+      return;
+    }
+    const result = importBirdSimConfigJson(raw);
+    if (!result.ok) {
+      setConfigStatus(result.error ?? 'Import failed', false);
+      return;
+    }
+    syncSlidersFromConfig();
+    setConfigStatus(`Applied “${result.name}”.`);
+  });
+
+  root.querySelector('.birds-config-file')?.addEventListener('change', async (ev) => {
+    const file = ev.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      if (configJson) configJson.value = text;
+      const result = importBirdSimConfigJson(text);
+      if (!result.ok) {
+        setConfigStatus(result.error ?? 'Import failed', false);
+        return;
+      }
+      syncSlidersFromConfig();
+      setConfigStatus(`Loaded “${file.name}”.`);
+    } catch (e) {
+      setConfigStatus(e instanceof Error ? e.message : 'Could not read file', false);
+    }
+    ev.target.value = '';
   });
 
   const simEl = root.querySelector('[data-section="sim"]');
@@ -157,6 +243,8 @@ export function mountBirdsPanel(world, opts = {}) {
     sliderRow('Alignment', 'flock.weightAli', 0, 2, 0.05),
     sliderRow('Perception', 'flock.perception', 12, 80, 1, (v) => String(Math.round(v))),
     sliderRow('Sep. radius', 'flock.separationRadius', 8, 40, 1, (v) => String(Math.round(v))),
+    sliderRow('Align radius', 'flock.alignmentRadius', 8, 80, 1, (v) => String(Math.round(v))),
+    sliderRow('Cohesion radius', 'flock.cohesionRadius', 8, 80, 1, (v) => String(Math.round(v))),
     sliderRow('Cohesion speed', 'flock.cohesionSpeed', 0, 1.2, 0.05),
     sliderRow('Vision FOV°', 'flock.visionFovDeg', 0, 180, 5, (v) => String(Math.round(v))),
     sliderRow('Wander', 'flock.wanderWeight', 0, 0.35, 0.01)
@@ -192,6 +280,31 @@ export function mountBirdsPanel(world, opts = {}) {
   });
   windToggle.append(windCheck, document.createTextNode(' Show wind flow'));
   displayEl.append(windToggle);
+
+  const visionToggle = document.createElement('label');
+  visionToggle.className = 'birds-check-row';
+  const visionCheck = document.createElement('input');
+  visionCheck.type = 'checkbox';
+  visionCheck.checked = birdSimConfig.display.showVisionDebug;
+  visionCheck.addEventListener('change', () => {
+    birdSimConfig.display.showVisionDebug = visionCheck.checked;
+  });
+  visionToggle.append(visionCheck, document.createTextNode(' Vision debug (FOV + radii)'));
+
+  const visionAllToggle = document.createElement('label');
+  visionAllToggle.className = 'birds-check-row';
+  const visionAllCheck = document.createElement('input');
+  visionAllCheck.type = 'checkbox';
+  visionAllCheck.checked = birdSimConfig.display.visionDebugAll;
+  visionAllCheck.addEventListener('change', () => {
+    birdSimConfig.display.visionDebugAll = visionAllCheck.checked;
+  });
+  visionAllToggle.append(
+    visionAllCheck,
+    document.createTextNode(' Draw all birds (off = sample ~24)')
+  );
+
+  displayEl.append(visionToggle, visionAllToggle);
   displayEl.append(
     sliderRow('Streak count', 'display.windParticleCount', 40, 280, 10, (v) =>
       String(Math.round(v))
@@ -335,6 +448,8 @@ export function mountBirdsPanel(world, opts = {}) {
         Alignment: ['flock', 'weightAli'],
         Perception: ['flock', 'perception'],
         'Sep. radius': ['flock', 'separationRadius'],
+        'Align radius': ['flock', 'alignmentRadius'],
+        'Cohesion radius': ['flock', 'cohesionRadius'],
         'Min flock': ['flock', 'minFlockSize'],
         'Cohesion speed': ['flock', 'cohesionSpeed'],
         'Vision FOV°': ['flock', 'visionFovDeg'],
@@ -355,6 +470,8 @@ export function mountBirdsPanel(world, opts = {}) {
       input.dispatchEvent(new Event('input'));
     });
     windCheck.checked = birdSimConfig.display.showWindField;
+    visionCheck.checked = birdSimConfig.display.showVisionDebug;
+    visionAllCheck.checked = birdSimConfig.display.visionDebugAll;
     windForceCheck.checked = birdSimConfig.wind.enabled;
     diagCheck.checked = birdSimConfig.display.showDiagnostics;
     interactionSelect.value = birdSimConfig.flock.interactionMode;

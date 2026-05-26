@@ -1020,6 +1020,52 @@ body {
   font-size: 0.72rem;
 }
 
+.birds-config-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.5rem;
+  margin-top: 0.35rem;
+}
+
+.birds-config-actions button {
+  font-size: 0.72rem;
+  padding: 0.25rem 0.45rem;
+  cursor: pointer;
+}
+
+.birds-config-json {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: ui-monospace, monospace;
+  font-size: 0.68rem;
+  margin-top: 0.35rem;
+  resize: vertical;
+  min-height: 4.5rem;
+}
+
+.birds-config-status {
+  font-size: 0.72rem;
+  margin: 0.35rem 0 0;
+  opacity: 0.85;
+}
+
+.birds-config-status.birds-config-error {
+  color: #f88;
+}
+
+.birds-file-import {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+}
+
+.birds-file-import input[type="file"] {
+  max-width: 7rem;
+  font-size: 0.65rem;
+}
+
 .birds-respawn-btn:hover {
   background: #2a3860;
 }

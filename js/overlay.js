@@ -154,5 +154,44 @@ export function createOverlay(canvas) {
       ctx.arc(cx, cy, lineWidth * 0.65, 0, Math.PI * 2);
       ctx.fill();
     },
+
+    /**
+     * Filled forward vision wedge (angle = forward direction).
+     * @param {number} cx
+     * @param {number} cy
+     * @param {number} angle radians
+     * @param {number} radius px
+     * @param {number} halfAngleRad half of FOV in radians
+     * @param {Rgba} rgba
+     */
+    fillVisionCone(cx, cy, angle, radius, halfAngleRad, rgba) {
+      if (radius <= 0 || halfAngleRad <= 0) return;
+      ctx.fillStyle = `rgba(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3] / 255})`;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, radius, angle - halfAngleRad, angle + halfAngleRad);
+      ctx.closePath();
+      ctx.fill();
+    },
+
+    /**
+     * @param {number} cx
+     * @param {number} cy
+     * @param {number} radius px
+     * @param {Rgba} rgba
+     * @param {number} [lineWidth]
+     * @param {number[]} [dash]
+     */
+    strokeCircle(cx, cy, radius, rgba, lineWidth = 1, dash = []) {
+      if (radius <= 0) return;
+      ctx.save();
+      ctx.strokeStyle = `rgba(${rgba[0]},${rgba[1]},${rgba[2]},${rgba[3] / 255})`;
+      ctx.lineWidth = lineWidth;
+      if (dash.length) ctx.setLineDash(dash);
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
+    },
   };
 }
