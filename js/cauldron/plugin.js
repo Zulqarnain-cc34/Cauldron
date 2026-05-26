@@ -32,6 +32,7 @@ export {
   getRegisteredPlugins,
 } from '../plugins/host.js';
 export { registerReaction } from '../sim/reaction-store.js';
+export { loadOverlayImage, getOverlayImage } from '../overlay.js';
 
 /** @typedef {import('../plugins/host.js').CauldronPlugin} Plugin */
 /** @typedef {import('../plugins/host.js').PluginSetupContext} PluginContext */

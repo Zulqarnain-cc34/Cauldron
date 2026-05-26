@@ -25,4 +25,6 @@ export {
 export { getToggleableRules } from '../sim/test-registry.js';
 export { ruleMatchesQuery } from '../catalog/rule-toggle-catalog.js';
 export { BRUSH_TOOLS, buildBrushTools, setupInput, queueBrush, applyBrushQueue } from '../input.js';
-export { renderWorld, canvasSize } from '../render.js';
+export { renderWorld, canvasSize, createWebGLRenderer } from '../render.js';
+export { createSimHost } from '../sim-host.js';
+export { createOverlay, loadOverlayImage } from '../overlay.js';

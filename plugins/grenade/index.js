@@ -45,9 +45,9 @@ export const grenadePlugin = {
       run: drainGrenadeBlastQueue,
     });
 
-    registerRender((p, w) => {
-      renderGrenades(p, w);
-      renderFragments(p, w);
+    registerRender((overlay, w) => {
+      renderGrenades(overlay, w);
+      renderFragments(overlay, w);
     });
 
     let mouseGx = Math.floor(world.width / 2);

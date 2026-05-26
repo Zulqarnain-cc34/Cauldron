@@ -1,5 +1,5 @@
 /**
- * Gem Digger — demo game host (p5).
+ * Gem Digger — demo game host (WebGL + Canvas2D overlay).
  * Library: ../../js/cauldron/  |  Game kit: ./lib/
  */
 import {
@@ -7,9 +7,7 @@ import {
   GRID_W,
   GRID_H,
   runRules,
-  renderPlugins,
-  renderWorld,
-  canvasSize,
+  createSimHost,
 } from '../../js/cauldron/app.js';
 import { bootstrapSandbox } from '../../js/cauldron/bootstrap.js';
 import { setupInput } from '../../js/input.js';
@@ -34,6 +32,7 @@ let backpackUi;
 let jarUi;
 let mapHud;
 let gems;
+let host;
 
 function syncSessionUi() {
   backpackUi?.refresh();
@@ -46,77 +45,86 @@ function syncSessionUi() {
   ui?.syncBrushRadius?.();
 }
 
-new window.p5((p) => {
-  p.setup = async () => {
-    registerMapDefinitions(BUILTIN_MAPS);
-    registerMapDefinition(blankMap);
+async function init() {
+  registerMapDefinitions(BUILTIN_MAPS);
+  registerMapDefinition(blankMap);
 
-    world = new World(GRID_W, GRID_H, Date.now() & 0xffffffff);
-    const { width, height } = canvasSize(world);
-    const canvas = p.createCanvas(width, height);
-    canvas.parent('sim-host');
+  world = new World(GRID_W, GRID_H, Date.now() & 0xffffffff);
 
-    setupInput(world, canvas.elt);
-    await bootstrapSandbox({ world, canvas: canvas.elt });
+  const parent = document.getElementById('sim-host');
+  if (!parent) throw new Error('#sim-host not found');
 
-    gems = installGemSystem(p, world, canvas.elt, {
-      onCollected() {
-        syncSessionUi();
-      },
-    });
+  host = createSimHost(parent, world);
+  host.syncCanvasSize();
 
-    mapManager = createMapManager({
-      world,
-      initialMapId: 'sandbox',
-      onSwitch: syncSessionUi,
-    });
+  setupInput(world, host.viewport);
+  await bootstrapSandbox({ world, canvas: host.viewport });
 
-    mountMapTabs(mapManager, document.getElementById('map-tabs'));
-    backpackUi = mountBackpack(world);
-    jarUi = mountJar(world);
+  gems = installGemSystem(host.overlay, world, host.viewport, {
+    onCollected() {
+      syncSessionUi();
+    },
+  });
 
-    ui = mountPanel(world, {
-      onPauseChange(paused) {
-        ui?.setPaused(paused);
-      },
-      onStep() {
-        runRules(world);
-        ui?.setTick(world.tick);
-      },
-      onReset() {
-        mapManager.resetActiveMap();
-        syncSessionUi();
-      },
-    });
-    ui.setPaused(false);
+  mapManager = createMapManager({
+    world,
+    initialMapId: 'sandbox',
+    onSwitch: syncSessionUi,
+  });
 
-    mapManager.init('sandbox');
+  mountMapTabs(mapManager, document.getElementById('map-tabs'));
+  backpackUi = mountBackpack(world);
+  jarUi = mountJar(world);
 
-    mapHud = mountMapHud({
-      world,
-      mapManager,
-      hostEl: document.getElementById('map-hud'),
-    });
+  ui = mountPanel(world, {
+    onPauseChange(paused) {
+      ui?.setPaused(paused);
+    },
+    onStep() {
+      runRules(world);
+      ui?.setTick(world.tick);
+    },
+    onReset() {
+      mapManager.resetActiveMap();
+      syncSessionUi();
+    },
+  });
+  ui.setPaused(false);
 
-    bindKeyboard(world, {
-      onPauseChange(paused) {
-        ui?.setPaused(paused);
-      },
-      onReset() {
-        mapManager.resetActiveMap();
-        syncSessionUi();
-      },
-    });
-  };
+  mapManager.init('sandbox');
 
-  p.draw = () => {
+  mapHud = mountMapHud({
+    world,
+    mapManager,
+    hostEl: document.getElementById('map-hud'),
+  });
+
+  bindKeyboard(world, {
+    onPauseChange(paused) {
+      ui?.setPaused(paused);
+    },
+    onReset() {
+      mapManager.resetActiveMap();
+      syncSessionUi();
+    },
+  });
+
+  host.start(() => {
     if (!world.paused) {
       runRules(world);
       gems?.tick();
     }
-    renderWorld(p, world);
-    renderPlugins(p, world);
-    gems?.render();
+    host.renderFrame(() => {
+      gems?.render();
+    });
     ui?.setTick(world.tick);
-  };
+  });
+}
+
+init().catch((err) => {
+  console.error(err);
+  const parent = document.getElementById('sim-host');
+  if (parent) {
+    parent.textContent = `Failed to start: ${err.message}`;
+  }
 });

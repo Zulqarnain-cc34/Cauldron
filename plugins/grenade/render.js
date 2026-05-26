@@ -1,53 +1,39 @@
 /** Draw in-flight grenades using grenade.png sprite overlay. */
 
-import { displayCellPx } from '../../js/cauldron/plugin.js';
+import { displayCellPx, getOverlayImage, loadOverlayImage } from '../../js/cauldron/plugin.js';
 
-/** @type {import('p5').Image | null} */
+/** @type {HTMLImageElement | null} */
 let sprite = null;
-let spriteFailed = false;
-let spriteLoading = false;
+const GRENADE_SPRITE = '/apps/gem-digger/assets/grenade.png';
+
+function ensureGrenadeSprite() {
+  if (sprite) return;
+  loadOverlayImage(GRENADE_SPRITE, (img) => {
+    sprite = img;
+  });
+  sprite = getOverlayImage(GRENADE_SPRITE);
+}
 
 /**
- * p5.image() requires a p5.Image — load via p.loadImage, not HTMLImageElement.
- * @param {import('p5')} p
+ * @param {import('../../js/overlay.js').OverlayContext} overlay
+ * @param {number} px
+ * @param {number} py
  */
-function ensureSprite(p) {
-  if (sprite || spriteFailed || spriteLoading) return;
-  spriteLoading = true;
-  p.loadImage(
-    '/apps/gem-digger/assets/grenade.png',
-    (img) => {
-      sprite = img;
-      spriteLoading = false;
-    },
-    () => {
-      spriteFailed = true;
-      spriteLoading = false;
-    }
-  );
-}
-
-function drawFallbackGrenade(p, px, py) {
-  p.fill(180, 60, 120);
-  p.noStroke();
-  p.ellipse(px, py, 10, 12);
-  p.fill(90, 110, 70);
-  p.rect(px - 3, py - 8, 6, 4);
+function drawFallbackGrenade(overlay, px, py) {
+  overlay.fillEllipse(px, py, 10, 12, [180, 60, 120, 255]);
+  overlay.fillRect(px - 3, py - 8, 6, 4, [90, 110, 70, 255]);
 }
 
 /**
- * @param {import('p5')} p
+ * @param {import('../../js/overlay.js').OverlayContext} overlay
  * @param {import('../../js/world.js').World} world
  */
-export function renderGrenades(p, world) {
+export function renderGrenades(overlay, world) {
   const agents = world.agents.filter((a) => a.type === 'grenade');
   if (!agents.length) return;
 
-  ensureSprite(p);
-
+  ensureGrenadeSprite();
   const cellPx = displayCellPx();
-  p.push();
-  p.imageMode(p.CENTER);
 
   for (const g of agents) {
     const px = g.x * cellPx;
@@ -56,37 +42,31 @@ export function renderGrenades(p, world) {
     const spriteW = 14 * (cellPx / 2);
     const spriteH = 18 * (cellPx / 2);
 
-    if (sprite && sprite.width > 0) {
-      p.push();
-      p.translate(px, py);
-      p.rotate(spin);
-      p.image(sprite, 0, 0, spriteW, spriteH);
-      p.pop();
+    if (sprite?.naturalWidth) {
+      overlay.save();
+      overlay.translate(px, py);
+      overlay.rotate(spin);
+      overlay.drawImageCenter(sprite, 0, 0, spriteW, spriteH);
+      overlay.restore();
     } else {
-      drawFallbackGrenade(p, px, py);
+      drawFallbackGrenade(overlay, px, py);
     }
   }
-
-  p.pop();
 }
 
 /**
- * @param {import('p5')} p
+ * @param {import('../../js/overlay.js').OverlayContext} overlay
  * @param {import('../../js/world.js').World} world
  */
-export function renderFragments(p, world) {
+export function renderFragments(overlay, world) {
   const frags = world.plugin?.grenade?.fragments;
   if (!frags?.length) return;
 
-  p.push();
-  p.noStroke();
   const cellPx = displayCellPx();
   for (const f of frags) {
     const px = f.x * cellPx;
     const py = f.y * cellPx;
     const s = Math.max(2, cellPx * 0.75);
-    p.fill(220, 100, 160, 200);
-    p.rect(px - s / 2, py - s / 2, s, s);
+    overlay.fillRect(px - s / 2, py - s / 2, s, s, [220, 100, 160, 200]);
   }
-  p.pop();
 }

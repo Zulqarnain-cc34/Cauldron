@@ -29,7 +29,7 @@ There is **no backend server application**. It is a static ES-module site served
 
 ### Tech stack summary (one paragraph)
 
-The runtime is **vanilla JavaScript (ES modules)**, rendered with **p5.js 1.11.13** (loaded from jsDelivr CDN in `index.html`). The simulation kernel uses typed arrays (`Uint8Array` grid), deterministic LCG randomness, and a phased rule registry. UI is hand-built DOM (no React/Vue). Testing uses **Node.js 22** built-in test runner (`node --test`). CI runs `npm run release` via GitHub Actions. There is **no bundler, no TypeScript, no database, no LangGraph, no FastAPI**.
+The runtime is **vanilla JavaScript (ES modules)** with **WebGL2** for the sim grid and a **Canvas2D overlay** for sprites (gems, grenades). The simulation kernel uses typed arrays (`Uint8Array` grid), deterministic LCG randomness, and a phased rule registry. UI is hand-built DOM (no React/Vue). Testing uses **Node.js 22** built-in test runner (`node --test`). CI runs `npm run release` via GitHub Actions. There is **no bundler, no TypeScript, no database, no LangGraph, no FastAPI**.
 
 ### Project maturity
 

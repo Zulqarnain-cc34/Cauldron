@@ -19,7 +19,7 @@ export const CAULDRON_API_VERSION = 1;
  * @property {(rxn: import('../sim/reaction-store.js').ReactionDef) => void} registerReaction
  * @property {(tool: import('../sim/brush-registry.js').BrushTool) => void} registerBrushTool
  * @property {(def: object) => void} registerRuleDef
- * @property {(fn: (p: object, world: import('../world.js').World) => void) => void} registerRender
+ * @property {(fn: (overlay: import('../overlay.js').OverlayContext, world: import('../world.js').World) => void) => void} registerRender
  * @property {(fn: (world: import('../world.js').World) => void) => void} onReset
  * @property {(key: string) => Record<string, unknown>} getState
  */
@@ -36,7 +36,7 @@ export const CAULDRON_API_VERSION = 1;
 /** @type {CauldronPlugin[]} */
 const plugins = [];
 
-/** @type {((p: object, world: import('../world.js').World) => void)[]} */
+/** @type {((overlay: import('../overlay.js').OverlayContext, world: import('../world.js').World) => void)[]} */
 const renderHooks = [];
 
 /**
@@ -133,6 +133,6 @@ export function resetPlugins(world) {
 }
 
 /** Draw plugin overlays after the grid render pass. */
-export function renderPlugins(p, world) {
-  for (const fn of renderHooks) fn(p, world);
+export function renderPlugins(overlay, world) {
+  for (const fn of renderHooks) fn(overlay, world);
 }

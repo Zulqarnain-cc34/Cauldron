@@ -24,12 +24,12 @@ import { tickGemPickups } from './pickups.js';
 import { renderGemPickups } from './render.js';
 
 /**
- * @param {import('p5')} p
- * @param {import('../../world.js').World} world
+ * @param {import('../../../../js/overlay.js').OverlayContext} overlay
+ * @param {import('../../../../js/world.js').World} world
  * @param {HTMLElement} canvas
  * @param {{ onCollected?: (result: { collected: boolean, itemId?: string, count?: number, target?: string }) => void }} [opts]
  */
-export function installGemSystem(p, world, canvas, opts = {}) {
+export function installGemSystem(overlay, world, canvas, opts = {}) {
   const teardown = setupGemCollectInput(world, canvas, opts);
   return {
     teardown,
@@ -37,7 +37,7 @@ export function installGemSystem(p, world, canvas, opts = {}) {
       tickGemPickups(world);
     },
     render() {
-      renderGemPickups(p, world);
+      renderGemPickups(overlay, world);
     },
   };
 }

@@ -17,7 +17,7 @@ They are decoupled by **folder**, **exports**, **import rules**, and **runtime s
 │  (validates library; never loaded in browser)                 │
 ├─────────────────────────────────────────────────────────────┤
 │  APPS             apps/gem-digger/  (and future games)      │
-│    sketch.js      host loop (p5)                              │
+│    sketch.js      host loop (WebGL + rAF)                     │
 │    ui/            DOM for this game only                      │
 │    lib/           game kit (inventory, maps, gems, content) │
 ├─────────────────────────────────────────────────────────────┤
@@ -87,12 +87,14 @@ There is **no** `cauldron/game` export.
 
 ```javascript
 // Library
-import { World, runRules, renderWorld } from '../../js/cauldron/app.js';
+import { World, runRules, createSimHost } from '../../js/cauldron/app.js';
 import { bootstrapSandbox } from '../../js/cauldron/bootstrap.js';
 
 // This game only
 import { createMapManager, installGemSystem, BUILTIN_MAPS } from './lib/index.js';
 ```
+
+Rendering: **WebGL2** uploads the sim pixel texture (`js/render-gl.js`); **Canvas2D overlay** draws gems and plugin sprites (`js/overlay.js`). The host loop uses `requestAnimationFrame` via `createSimHost` — no p5.js.
 
 ---
 

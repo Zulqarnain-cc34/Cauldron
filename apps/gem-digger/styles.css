@@ -35,13 +35,24 @@ body {
   justify-content: center;
 }
 
-#sim-host canvas {
-  display: block;
+#sim-host .sim-viewport {
+  position: relative;
+  display: inline-block;
   border: 1px solid #2a2a38;
   border-radius: 4px;
   cursor: crosshair;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
+}
+
+#sim-host .sim-gl,
+#sim-host .sim-overlay {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border: none;
+  border-radius: 0;
 }
 
 #map-tabs.map-tabs {
