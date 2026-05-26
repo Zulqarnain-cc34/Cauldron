@@ -4,6 +4,9 @@
 
 /** @typedef {typeof DEFAULT_BIRD_SIM_CONFIG} BirdSimConfig */
 
+/** Bump when DEFAULT_BIRD_SIM_CONFIG changes so saved maps pick up new defaults. */
+export const BIRD_SIM_CONFIG_VERSION = 2;
+
 export const DEFAULT_BIRD_SIM_CONFIG = {
   flock: {
     /** User-tuned defaults (topological flock). */

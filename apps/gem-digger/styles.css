@@ -798,6 +798,12 @@ body {
 }
 
 /* Birds / flocking / wind controls */
+.birds-panel[hidden],
+.birds-panel.birds-panel--hidden {
+  display: none !important;
+  pointer-events: none;
+}
+
 .birds-panel {
   position: fixed;
   bottom: 0.75rem;

@@ -1,5 +1,8 @@
 import { Species } from '../../../../../js/catalog/species.js';
-import { DEFAULT_BIRD_SIM_CONFIG } from '../../birds/config.js';
+import {
+  BIRD_SIM_CONFIG_VERSION,
+  DEFAULT_BIRD_SIM_CONFIG,
+} from '../../birds/config.js';
 import { spawnDemoFlocks } from '../../birds/birds.js';
 import { spawnGemPickups } from '../../gems/pickups.js';
 
@@ -32,13 +35,17 @@ export const sandboxMap = {
   id: 'sandbox',
   label: 'Tutorial',
   description: 'Open sky — dig the floor, collect gems (Alt+click), watch flocks in the wind.',
+  birds: true,
   seed: 42,
   bootstrap: bootstrapSandbox,
   goals: { gems: { diamond: 2, topaz: 1, ruby: 1 } },
   defaultRules: { grenade: true },
   hooks: {
     initialCustom() {
-      return { birdSimConfig: structuredClone(DEFAULT_BIRD_SIM_CONFIG) };
+      return {
+        birdSimConfigVersion: BIRD_SIM_CONFIG_VERSION,
+        birdSimConfig: structuredClone(DEFAULT_BIRD_SIM_CONFIG),
+      };
     },
     afterBootstrap(world) {
       spawnDemoFlocks(world);

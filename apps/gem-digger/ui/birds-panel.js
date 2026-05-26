@@ -83,7 +83,7 @@ export function mountBirdsPanel(world, opts = {}) {
       <button type="button" class="birds-panel-collapse" title="Collapse panel" aria-expanded="true">▾</button>
     </header>
     <div class="birds-panel-body">
-      <p class="birds-wrap-note birds-panel-map-note">Saved per map tab — double-click a tab name to rename.</p>
+      <p class="birds-wrap-note birds-panel-map-note">Tutorial map type only. Use the <strong>+</strong> tab for a new map without birds (renaming a tab does not change its type).</p>
       <label class="birds-preset-row">
         <span>Preset</span>
         <select class="birds-preset-select" aria-label="Bird simulation preset"></select>
@@ -137,7 +137,6 @@ export function mountBirdsPanel(world, opts = {}) {
     presetSelect.appendChild(opt);
   }
   presetSelect.value = 'default';
-  applyBirdSimPreset('default');
 
   presetSelect.addEventListener('change', () => {
     applyBirdSimPreset(presetSelect.value);
@@ -510,12 +509,24 @@ export function mountBirdsPanel(world, opts = {}) {
     collapseBtn.textContent = collapsed ? '▸' : '▾';
   });
 
+  root.hidden = true;
   document.body.appendChild(root);
 
   return {
     el: root,
     syncFromConfig: syncSlidersFromConfig,
     refreshDiagnostics,
+    /** @param {boolean} visible */
+    setVisible(visible) {
+      root.hidden = !visible;
+      root.classList.toggle('birds-panel--hidden', !visible);
+      if (visible) {
+        startDiagPoll();
+        refreshDiagnostics();
+      } else {
+        stopDiagPoll();
+      }
+    },
     destroy() {
       stopDiagPoll();
     },

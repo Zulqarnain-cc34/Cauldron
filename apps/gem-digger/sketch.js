@@ -31,6 +31,7 @@ import {
   saveMapManagerState,
 } from './lib/maps/persistence.js';
 import {
+  isBirdsMapDefId,
   restoreBirdSimConfigForSession,
   stashBirdSimConfigOnSession,
 } from './lib/birds/map-config.js';
@@ -58,34 +59,47 @@ function schedulePersistMaps() {
   }, 350);
 }
 
+function isActiveBirdsMap() {
+  return isBirdsMapDefId(mapManager?.getActiveTab()?.defId);
+}
+
 function persistMapsNow() {
   if (!mapManager) return;
+  const tab = mapManager.getActiveTab();
   const tabId = mapManager.getActiveTabId();
   if (tabId) {
     mapManager.persistActive();
-    const session = mapManager.getSession(tabId);
-    if (session) stashBirdSimConfigOnSession(session);
+    if (isBirdsMapDefId(tab?.defId)) {
+      const session = mapManager.getSession(tabId);
+      if (session) stashBirdSimConfigOnSession(session);
+    }
   }
   saveMapManagerState(mapManager);
 }
 
 function stashBirdConfigForTab(tabId) {
+  const tab = mapManager?.getOpenTabs().find((t) => t.instanceId === tabId);
+  if (!isBirdsMapDefId(tab?.defId)) return;
   const session = mapManager?.getSession(tabId);
   if (session) stashBirdSimConfigOnSession(session);
 }
 
-function restoreBirdConfigForActiveTab() {
-  const tab = mapManager?.getActiveTab();
-  const session = tab ? mapManager.getSession(tab.instanceId) : undefined;
-  restoreBirdSimConfigForSession(session, tab?.defId);
-  birdsPanel?.syncFromConfig();
+function syncBirdsUiForActiveMap() {
+  const show = isActiveBirdsMap();
+  birdsPanel?.setVisible(show);
+  if (show) {
+    const tab = mapManager?.getActiveTab();
+    const session = tab ? mapManager.getSession(tab.instanceId) : undefined;
+    restoreBirdSimConfigForSession(session, tab?.defId);
+    birdsPanel?.syncFromConfig();
+  }
 }
 
 function onMapSwitch(ctx) {
   if (ctx.previousMapId) {
     stashBirdConfigForTab(ctx.previousMapId);
   }
-  restoreBirdConfigForActiveTab();
+  syncBirdsUiForActiveMap();
   syncSessionUi();
   schedulePersistMaps();
 }
@@ -128,6 +142,7 @@ async function init() {
       mapHud?.refresh();
       schedulePersistMaps();
     },
+    onActiveTabChange: () => syncBirdsUiForActiveMap(),
   });
   backpackUi = mountBackpack(world);
   jarUi = mountJar(world);
@@ -165,13 +180,15 @@ async function init() {
     onConfigChange: schedulePersistMaps,
     onRespawn: schedulePersistMaps,
   });
-  restoreBirdConfigForActiveTab();
+  syncBirdsUiForActiveMap();
 
   mapHud = mountMapHud({
     world,
     mapManager,
     hostEl: document.getElementById('map-hud'),
   });
+
+  syncBirdsUiForActiveMap();
 
   bindKeyboard(world, {
     onPauseChange(paused) {
@@ -189,11 +206,11 @@ async function init() {
     if (!world.paused) {
       runRules(world);
       gems?.tick();
-      birds?.tick();
+      if (isActiveBirdsMap()) birds?.tick();
     }
     host.renderFrame(() => {
       gems?.render();
-      birds?.render();
+      if (isActiveBirdsMap()) birds?.render();
     });
     ui?.setTick(world.tick);
   });

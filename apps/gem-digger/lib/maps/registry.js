@@ -26,6 +26,7 @@
  * @property {boolean} [resetClearsInventory] clear backpack/jar on Reset (default false)
  * @property {{ gems?: Record<string, number> }} [goals] collect targets per gem item id
  * @property {boolean} [randomSeedOnReset] new procedural layout each Reset (R)
+ * @property {boolean} [birds] flocking birds + Birds & wind panel (Tutorial only)
  * @property {MapHooks} [hooks] optional custom session data
  */
 

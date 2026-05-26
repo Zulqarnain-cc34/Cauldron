@@ -1,10 +1,11 @@
 import { getMapDefinition } from '../lib/index.js';
+import { isBirdsMapDefId } from '../lib/birds/map-config.js';
 
 /**
  * Map tab bar — open tabs with + (new) and × (close).
  * @param {import('../lib/maps/manager.js').MapManager} manager
  * @param {HTMLElement | null} hostEl
- * @param {{ onRenamed?: () => void }} [opts]
+ * @param {{ onRenamed?: () => void, onActiveTabChange?: () => void }} [opts]
  */
 export function mountMapTabs(manager, hostEl, opts = {}) {
   if (!hostEl) return null;
@@ -74,13 +75,15 @@ export function mountMapTabs(manager, hostEl, opts = {}) {
       btn.dataset.tabId = tab.instanceId;
       btn.setAttribute('role', 'tab');
       btn.setAttribute('aria-selected', String(tab.instanceId === activeId));
-      btn.title = `${def?.description ?? tab.label} — double-click to rename`;
+      const birdsHint = isBirdsMapDefId(tab.defId) ? ' · flocks' : ' · no birds';
+      btn.title = `${def?.description ?? tab.label}${birdsHint} — double-click to rename`;
       btn.textContent = tab.label;
 
       btn.addEventListener('click', (e) => {
         if (e.target.closest('.map-tab-close')) return;
         if (manager.getActiveTabId() === tab.instanceId) return;
         manager.switchTo(tab.instanceId);
+        opts.onActiveTabChange?.();
       });
 
       btn.addEventListener('dblclick', (e) => {
@@ -114,11 +117,12 @@ export function mountMapTabs(manager, hostEl, opts = {}) {
     add.type = 'button';
     add.className = 'map-tab-add';
     add.setAttribute('aria-label', 'New map');
-    add.title = 'New map';
+    add.title = 'New empty map (no birds or wind panel)';
     add.textContent = '+';
     add.addEventListener('click', () => {
       manager.openTab();
       renderTabs();
+      opts.onActiveTabChange?.();
     });
     hostEl.appendChild(add);
   }
@@ -141,6 +145,7 @@ export function mountMapTabs(manager, hostEl, opts = {}) {
       if (manager.getActiveTabId() === tab.instanceId) return;
       e.preventDefault();
       manager.switchTo(tab.instanceId);
+      opts.onActiveTabChange?.();
     });
   }
 
