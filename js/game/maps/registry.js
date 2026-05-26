@@ -34,8 +34,11 @@ const definitions = new Map();
 
 /** @param {MapDefinition} def */
 export function registerMapDefinition(def) {
-  if (!def?.id || typeof def.bootstrap !== 'function') {
-    throw new Error('MapDefinition requires id and bootstrap(world)');
+  if (!def?.id) {
+    throw new Error('MapDefinition requires id');
+  }
+  if (typeof def.bootstrap !== 'function' && !def.worldGenerator) {
+    throw new Error(`Map "${def.id}" needs bootstrap(world) or worldGenerator`);
   }
   if (definitions.has(def.id)) {
     throw new Error(`Map "${def.id}" is already registered`);

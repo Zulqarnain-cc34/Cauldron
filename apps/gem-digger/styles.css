@@ -486,6 +486,15 @@ body {
 }
 
 /* —— Inventory containers (backpack, jar) —— */
+/* ~10% larger than base slot grid (game canvas uses DISPLAY_SCALE in js/world.js) */
+:root {
+  --inv-slot-size: 4.125rem;
+  --inv-slot-gap: 0.58rem;
+  --inv-slot-icon: 2.73rem;
+  --inv-slot-swatch: 2.23rem;
+  --inv-toggle-size: 4.95rem;
+  --inv-toggle-icon-max: 3.85rem;
+}
 
 .container-toggle,
 .backpack-toggle {
@@ -503,17 +512,17 @@ body {
 
 .container-toggle-backpack,
 .container-toggle-jar {
-  width: 4.5rem;
-  height: 4.5rem;
-  padding: 0.4rem;
+  width: var(--inv-toggle-size);
+  height: var(--inv-toggle-size);
+  padding: 0.44rem;
 }
 
 .container-toggle-icon,
 .backpack-toggle-icon {
   width: 100%;
   height: 100%;
-  max-width: 3.5rem;
-  max-height: 3.5rem;
+  max-width: var(--inv-toggle-icon-max);
+  max-height: var(--inv-toggle-icon-max);
   image-rendering: pixelated;
   image-rendering: crisp-edges;
   pointer-events: none;
@@ -557,7 +566,7 @@ body {
 
 .container-modal,
 .backpack-modal {
-  width: min(calc(var(--inv-cols, 9) * 4.125rem + 2.25rem), 96vw);
+  width: min(calc(var(--inv-cols, 9) * var(--inv-slot-size) + var(--inv-slot-gap) + 2.25rem), 96vw);
   background: rgba(18, 18, 26, 0.98);
   border: 2px solid #3a3a4a;
   border-radius: 10px;
@@ -617,15 +626,15 @@ body {
 
 .inventory-grid {
   display: grid;
-  grid-template-columns: repeat(var(--inv-cols, 9), 3.75rem);
-  gap: 0.53rem;
+  grid-template-columns: repeat(var(--inv-cols, 9), var(--inv-slot-size));
+  gap: var(--inv-slot-gap);
   justify-content: center;
 }
 
 .inventory-slot {
   position: relative;
-  width: 3.75rem;
-  height: 3.75rem;
+  width: var(--inv-slot-size);
+  height: var(--inv-slot-size);
   padding: 0;
   background: #1a1a24;
   border: 2px solid #4a4a58;
@@ -662,8 +671,8 @@ body {
 }
 
 .inventory-slot-icon {
-  width: 2.48rem;
-  height: 2.48rem;
+  width: var(--inv-slot-icon);
+  height: var(--inv-slot-icon);
   object-fit: contain;
   image-rendering: pixelated;
   image-rendering: crisp-edges;
@@ -671,8 +680,8 @@ body {
 }
 
 .inventory-slot-swatch {
-  width: 2.03rem;
-  height: 2.03rem;
+  width: var(--inv-slot-swatch);
+  height: var(--inv-slot-swatch);
   border-radius: 3px;
   border: 1px solid rgba(255, 255, 255, 0.25);
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.35);
