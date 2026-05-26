@@ -117,8 +117,16 @@ export function mountBirdsPanel(world, opts = {}) {
   wrapNote.className = 'birds-wrap-note';
   wrapNote.textContent =
     'Sky is a seamless torus — birds re-enter on the opposite edge (no hard walls in the air).';
+  const spawnNote = document.createElement('p');
+  spawnNote.className = 'birds-wrap-note';
+  spawnNote.textContent =
+    'Change flock count or birds per flock, then click Respawn demo flocks. More birds = slower (flocking is O(n²)).';
+
   simEl.append(
     wrapNote,
+    spawnNote,
+    sliderRow('Flock count', 'spawn.flockCount', 1, 6, 1, (v) => String(Math.round(v))),
+    sliderRow('Birds per flock', 'spawn.birdsPerFlock', 3, 30, 1, (v) => String(Math.round(v))),
     sliderRow('Sim speed', 'motion.simSpeed', 0.5, 20, 0.5, (v) => `${Number(v.toFixed(1))}×`)
   );
 
@@ -318,6 +326,8 @@ export function mountBirdsPanel(world, opts = {}) {
       const row = input.closest('.birds-slider-row');
       const label = row?.querySelector('.birds-slider-label')?.textContent;
       const map = {
+        'Flock count': ['spawn', 'flockCount'],
+        'Birds per flock': ['spawn', 'birdsPerFlock'],
         'Sim speed': ['motion', 'simSpeed'],
         'K neighbours': ['flock', 'topologicalNeighbors'],
         Cohesion: ['flock', 'weightCoh'],

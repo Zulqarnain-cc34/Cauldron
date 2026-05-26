@@ -35,6 +35,7 @@ export {
   sparklineAscii,
 } from './metrics.js';
 
+import { birdSimConfig } from './config.js';
 import { tickBirds, spawnDemoFlocks, ensureBirds } from './birds.js';
 import { renderBirds } from './render.js';
 import { renderWindField, resetWindParticles } from './wind-viz.js';
@@ -54,10 +55,17 @@ export function installBirdSystem(overlay, world, opts = {}) {
     spawnDemoFlocks(world);
   }
 
+  let metricsFrame = 0;
+
   return {
     tick() {
       tickBirds(world);
-      sampleBirdMetrics(world, ensureBirds(world));
+      if (birdSimConfig.display.showDiagnostics) {
+        metricsFrame++;
+        if (metricsFrame % 20 === 0) {
+          sampleBirdMetrics(world, ensureBirds(world));
+        }
+      }
     },
     render() {
       renderWindField(overlay, world);

@@ -12,7 +12,8 @@ import { birdSimConfig } from './config.js';
 import { getBirdDef } from './catalog.js';
 import { getSkyArena, toroidalVectorTo } from './boundaries.js';
 import { flowVelocity } from './wind.js';
-import { computeVicsekOrder, getFlockNeighbors } from './flock.js';
+import { buildBirdSpatialIndex, forEachBirdNearby } from './spatial.js';
+import { computeLocalFlockData, computeVicsekOrder } from './flock.js';
 
 /** @typedef {import('./birds.js').Bird} Bird */
 
@@ -92,8 +93,10 @@ export function sampleBirdMetrics(world, birds) {
   let interactionDistN = 0;
   let interactionCountSum = 0;
 
+  const spatial = buildBirdSpatialIndex(birds, arena);
+  const nnRadius = personalSpace * 4;
+
   for (const bird of birds) {
-    const flockmates = birds;
     const sp = Math.hypot(bird.vx, bird.vy);
 
     sumVx += bird.vx;
@@ -106,39 +109,37 @@ export function sampleBirdMetrics(world, birds) {
     const bm = sp || 0.001;
     windCos += (bird.vx * fvx) / (bm * fm) + (bird.vy * fvy) / (bm * fm);
 
-    const interactNeighbors = getFlockNeighbors(bird, flockmates, arena);
-    interactionCountSum += interactNeighbors.length;
+    const { neighbors } = computeLocalFlockData(bird, spatial, arena, def.maxForce);
+    interactionCountSum += neighbors.length;
 
     let nearest = Infinity;
-    for (const other of flockmates) {
-      if (other === bird) continue;
+    for (const other of neighbors) {
       const [dx, dy] = toroidalVectorTo(bird.x, bird.y, other.x, other.y, arena);
       const d = Math.hypot(dx, dy);
-      if (d < nearest) nearest = d;
-      if (d < personalSpace) violations++;
-    }
-
-    for (const other of interactNeighbors) {
-      const [dx, dy] = toroidalVectorTo(bird.x, bird.y, other.x, other.y, arena);
-      interactionDistSum += Math.hypot(dx, dy);
+      interactionDistSum += d;
       interactionDistN++;
     }
+
+    forEachBirdNearby(spatial, bird, arena, nnRadius, (_other, _dx, _dy, d) => {
+      if (d < nearest) nearest = d;
+      if (d < personalSpace) violations++;
+    });
 
     if (nearest < Infinity) {
       nnDistSum += nearest;
       nnCount++;
     }
-    if (interactNeighbors.length >= minFlock) participating++;
+    if (neighbors.length >= minFlock) participating++;
 
-    if (flockmates.length > 1) {
+    if (neighbors.length > 0) {
       let cx = 0;
       let cy = 0;
-      for (const o of flockmates) {
+      for (const o of neighbors) {
         const [tx, ty] = toroidalVectorTo(bird.x, bird.y, o.x, o.y, arena);
         cx += tx;
         cy += ty;
       }
-      cohesionSum += Math.hypot(cx / flockmates.length, cy / flockmates.length);
+      cohesionSum += Math.hypot(cx / neighbors.length, cy / neighbors.length);
       cohesionN++;
     }
 

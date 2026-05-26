@@ -5,9 +5,17 @@
 
 import { birdSimConfig } from './config.js';
 import { toroidalDelta, toroidalVectorTo } from './boundaries.js';
+import { forEachBirdNearby } from './spatial.js';
 
 /** @typedef {import('./birds.js').Bird} Bird */
 /** @typedef {import('./boundaries.js').SkyArena} SkyArena */
+/** @typedef {ReturnType<import('./spatial.js').buildBirdSpatialIndex>} BirdSpatialIndex */
+
+function flockQueryRadius() {
+  const { interactionMode, perception, topologicalNeighbors } = birdSimConfig.flock;
+  if (interactionMode === 'metric') return Math.max(perception, birdSimConfig.flock.separationRadius);
+  return Math.max(birdSimConfig.flock.separationRadius, topologicalNeighbors * 8, 40);
+}
 
 function clampMag(x, y, max) {
   const m = Math.hypot(x, y);
@@ -31,9 +39,95 @@ function seek(bird, tx, ty, maxSpeed, maxForce, arena) {
   return steer(bird, sx, sy, maxForce);
 }
 
+/** @param {{ other: Bird, d: number }[]} nearest @param {Bird} other @param {number} d @param {number} k */
+function pushNearest(nearest, other, d, k) {
+  if (nearest.length < k) {
+    nearest.push({ other, d });
+    return;
+  }
+  let worst = 0;
+  for (let i = 1; i < nearest.length; i++) {
+    if (nearest[i].d > nearest[worst].d) worst = i;
+  }
+  if (d < nearest[worst].d) nearest[worst] = { other, d };
+}
+
 /**
- * Metric: all flockmates within perception radius.
- * Topological: k nearest neighbours (starling ~6–7, paper suggests 7–10).
+ * One spatial pass: separation + interaction neighbours.
+ * @param {Bird} bird
+ * @param {BirdSpatialIndex} spatial
+ * @param {SkyArena} arena
+ * @param {number} maxForce
+ * @returns {{ neighbors: Bird[], sepAx: number, sepAy: number, crowded: boolean }}
+ */
+export function computeLocalFlockData(bird, spatial, arena, maxForce) {
+  const { interactionMode, perception, topologicalNeighbors, separationRadius, personalSpace, weightSep } =
+    birdSimConfig.flock;
+
+  const queryR = flockQueryRadius();
+  const sepR2 = separationRadius * separationRadius;
+  const k = Math.max(1, Math.round(topologicalNeighbors));
+
+  /** @type {{ other: Bird, d: number }[]} */
+  const nearest = [];
+  let sx = 0;
+  let sy = 0;
+  let sepN = 0;
+  let crowded = false;
+
+  forEachBirdNearby(spatial, bird, arena, queryR, (other, dx, dy, d) => {
+    const d2 = d * d;
+    if (d < personalSpace * 1.15) crowded = true;
+    if (d2 <= sepR2) {
+      if (d < 0.001) {
+        const a = ((bird.x + bird.y * 3) % 628) / 100;
+        sx += Math.cos(a) * 8;
+        sy += Math.sin(a) * 8;
+      } else {
+        const ux = dx / d;
+        const uy = dy / d;
+        if (d < personalSpace) {
+          const push = ((personalSpace - d) / personalSpace) ** 2;
+          sx += ux * push * 5;
+          sy += uy * push * 5;
+        } else {
+          const w = 1 / (d * d);
+          sx += ux * w;
+          sy += uy * w;
+        }
+      }
+      sepN++;
+    }
+
+    if (interactionMode === 'metric' && d > perception) return;
+    if (interactionMode === 'topological') {
+      pushNearest(nearest, other, d, k);
+    } else {
+      nearest.push({ other, d });
+    }
+  });
+
+  let sepAx = 0;
+  let sepAy = 0;
+  if (sepN > 0) {
+    const [ax, ay] = steer(bird, sx / sepN, sy / sepN, maxForce);
+    sepAx = ax * weightSep;
+    sepAy = ay * weightSep;
+  }
+
+  if (interactionMode === 'topological') {
+    nearest.sort((a, b) => a.d - b.d);
+  }
+
+  return {
+    neighbors: nearest.map((c) => c.other),
+    sepAx,
+    sepAy,
+    crowded,
+  };
+}
+
+/**
  * @param {Bird} bird
  * @param {Bird[]} flockmates
  * @param {SkyArena} arena
@@ -63,57 +157,6 @@ export function getFlockNeighbors(bird, flockmates, arena) {
 
 /**
  * @param {Bird} bird
- * @param {Bird[]} flockmates
- * @param {number} maxForce
- * @param {SkyArena} arena
- */
-export function computeSeparationForce(bird, flockmates, maxForce, arena) {
-  const { separationRadius, personalSpace, weightSep } = birdSimConfig.flock;
-
-  let sx = 0;
-  let sy = 0;
-  let n = 0;
-
-  for (const other of flockmates) {
-    if (other === bird) continue;
-
-    const [dx, dy] = toroidalDelta(bird.x, bird.y, other.x, other.y, arena);
-    const d = Math.hypot(dx, dy);
-    if (d < 0.001) {
-      const a = ((bird.x + bird.y * 3) % 628) / 100;
-      sx += Math.cos(a) * 8;
-      sy += Math.sin(a) * 8;
-      n++;
-      continue;
-    }
-
-    if (d > separationRadius) continue;
-
-    const ux = dx / d;
-    const uy = dy / d;
-
-    if (d < personalSpace) {
-      const push = ((personalSpace - d) / personalSpace) ** 2;
-      sx += ux * push * 4;
-      sy += uy * push * 4;
-      n++;
-    } else {
-      const w = 1 / (d * d);
-      sx += ux * w;
-      sy += uy * w;
-      n++;
-    }
-  }
-
-  if (!n) return [0, 0];
-
-  const [ax, ay] = steer(bird, sx / n, sy / n, maxForce);
-  return [ax * weightSep, ay * weightSep];
-}
-
-/**
- * Alignment + cohesion over interaction neighbours (metric or topological).
- * @param {Bird} bird
  * @param {Bird[]} neighbors
  * @param {number} maxSpeed
  * @param {number} maxForce
@@ -142,7 +185,12 @@ export function computeFlockAcceleration(bird, neighbors, maxSpeed, maxForce, ar
   }
 
   avgDist /= n;
-  const crowd = avgDist < 12 ? 0.45 : avgDist < 22 ? 0.7 : 1;
+  const ps = birdSimConfig.flock.personalSpace;
+  // Tight rings: weaken align/cohesion (main cause of "birds orbiting each other").
+  const crowd =
+    avgDist < ps * 1.2 ? 0.12 : avgDist < ps * 2 ? 0.35 : avgDist < ps * 3.5 ? 0.65 : 1;
+  const alignScale =
+    avgDist < ps * 1.2 ? 0.2 : avgDist < ps * 2 ? 0.45 : 1;
 
   let ax = 0;
   let ay = 0;
@@ -150,8 +198,8 @@ export function computeFlockAcceleration(bird, neighbors, maxSpeed, maxForce, ar
   aliX /= n;
   aliY /= n;
   const [alx, aly] = steer(bird, aliX, aliY, maxForce);
-  ax += alx * weightAli;
-  ay += aly * weightAli;
+  ax += alx * weightAli * alignScale;
+  ay += aly * weightAli * alignScale;
 
   const targetX = bird.x + cohDx / n;
   const targetY = bird.y + cohDy / n;

@@ -12,10 +12,10 @@ export const DEFAULT_BIRD_SIM_CONFIG = {
     separationRadius: 30,
     personalSpace: 7,
     minFlockSize: 3,
-    weightSep: 1.7,
-    weightAli: 1.05,
-    weightCoh: 0.5,
-    cohesionSpeed: 0.48,
+    weightSep: 2.0,
+    weightAli: 0.85,
+    weightCoh: 0.38,
+    cohesionSpeed: 0.4,
   },
   wind: {
     /** When false, birds ignore wind forces (flocking only). Viz streaks still optional. */
@@ -26,14 +26,18 @@ export const DEFAULT_BIRD_SIM_CONFIG = {
     steerWeight: 0.45,
     gustMin: 0.2,
   },
+  spawn: {
+    flockCount: 2,
+    birdsPerFlock: 10,
+  },
   motion: {
     simSpeed: 1,
-    minSpeedRatio: 0.28,
+    minSpeedRatio: 0.22,
   },
   display: {
-    showWindField: true,
-    showDiagnostics: true,
-    windParticleCount: 120,
+    showWindField: false,
+    showDiagnostics: false,
+    windParticleCount: 35,
     windStreakLength: 18,
     windOpacity: 24,
     windDriftSpeed: 0.65,
@@ -181,11 +185,13 @@ export function applyBirdSimPreset(presetId) {
 
   if (patch.flock) Object.assign(base.flock, patch.flock);
   if (patch.wind) Object.assign(base.wind, patch.wind);
+  if (patch.spawn) Object.assign(base.spawn, patch.spawn);
   if (patch.motion) Object.assign(base.motion, patch.motion);
   if (patch.display) Object.assign(base.display, patch.display);
 
   Object.assign(birdSimConfig.flock, base.flock);
   Object.assign(birdSimConfig.wind, base.wind);
+  Object.assign(birdSimConfig.spawn, base.spawn);
   Object.assign(birdSimConfig.motion, base.motion);
   Object.assign(birdSimConfig.display, base.display);
   return birdSimConfig;

@@ -9,11 +9,8 @@ import {
   wrapCoord,
   wrapSkyY,
 } from './boundaries.js';
-import {
-  computeFlockAcceleration,
-  computeSeparationForce,
-  getFlockNeighbors,
-} from './flock.js';
+import { buildBirdSpatialIndex, forEachBirdNearby } from './spatial.js';
+import { computeFlockAcceleration, computeLocalFlockData } from './flock.js';
 import { flowVelocity, windSteer } from './wind.js';
 
 /**
@@ -120,9 +117,15 @@ function tickBirdsStep(world, dt) {
 
   const arena = getSkyArena(world);
   const def = getBirdDef();
+  const spatial = buildBirdSpatialIndex(birds, arena);
 
   for (const bird of birds) {
-    const neighbors = getFlockNeighbors(bird, birds, arena);
+    const { neighbors, sepAx, sepAy, crowded } = computeLocalFlockData(
+      bird,
+      spatial,
+      arena,
+      def.maxForce
+    );
 
     let ax = 0;
     let ay = 0;
@@ -130,10 +133,8 @@ function tickBirdsStep(world, dt) {
     const [wx, wy] = windSteer(bird, world.tick, def.maxSpeed, def.maxForce, arena);
     ax += wx;
     ay += wy;
-
-    const [sx, sy] = computeSeparationForce(bird, birds, def.maxForce, arena);
-    ax += sx;
-    ay += sy;
+    ax += sepAx;
+    ay += sepAy;
 
     const [fx, fy] = computeFlockAcceleration(
       bird,
@@ -163,7 +164,7 @@ function tickBirdsStep(world, dt) {
     }
 
     sp = Math.hypot(bird.vx, bird.vy);
-    const minSp = def.maxSpeed * birdSimConfig.motion.minSpeedRatio;
+    const minSp = def.maxSpeed * birdSimConfig.motion.minSpeedRatio * (crowded ? 0.35 : 1);
     if (sp < minSp && minSp > 0.02) {
       let dirX = bird.vx;
       let dirY = bird.vy;
@@ -230,10 +231,8 @@ function tickBirdsStep(world, dt) {
     }
   }
 
-  const simSpeed = birdSimConfig.motion.simSpeed;
-  const overlapPasses = simSpeed > 10 ? 3 : simSpeed > 3 ? 2 : 1;
-  for (let p = 0; p < overlapPasses; p++) {
-    resolveBirdOverlaps(birds, arena, dt);
+  if (birds.length > 1) {
+    resolveBirdOverlaps(birds, spatial, arena, dt);
   }
 }
 
@@ -260,37 +259,58 @@ export function tickBirds(world) {
  * Hard positional push so triangles never stack on the same spot.
  * @param {Bird[]} birds
  */
-function resolveBirdOverlaps(birds, arena, dt = 1) {
-  const minDist = birdSimConfig.flock.personalSpace * 0.92;
+function resolveBirdOverlaps(birds, spatial, arena, dt = 1) {
+  const minDist = birdSimConfig.flock.personalSpace * 0.95;
   const pushScale = Math.min(1, 0.35 + dt * 0.65);
+  const seen = new Set();
 
-  for (let i = 0; i < birds.length; i++) {
-    for (let j = i + 1; j < birds.length; j++) {
-      const a = birds[i];
-      const b = birds[j];
+  for (const a of birds) {
+    forEachBirdNearby(spatial, a, arena, minDist * 1.15, (b, dx, dy, d) => {
+      if (a === b) return;
+      const id = a.id < b.id ? `${a.id}|${b.id}` : `${b.id}|${a.id}`;
+      if (seen.has(id)) return;
+      seen.add(id);
 
-      let [dx, dy] = toroidalVectorTo(a.x, a.y, b.x, b.y, arena);
-      let d = Math.hypot(dx, dy);
-
-      if (d < 0.001) {
+      let tdx = dx;
+      let tdy = dy;
+      let td = d;
+      if (td < 0.001) {
         const angle = ((a.x + a.y) % 628) / 100;
-        dx = Math.cos(angle) * 0.01;
-        dy = Math.sin(angle) * 0.01;
-        d = 0.01;
+        tdx = Math.cos(angle) * 0.01;
+        tdy = Math.sin(angle) * 0.01;
+        td = 0.01;
       }
+      if (td >= minDist) return;
 
-      if (d >= minDist) continue;
-
-      const push = (minDist - d) * 0.55 * pushScale;
-      const ux = dx / d;
-      const uy = dy / d;
+      const push = (minDist - td) * 0.5 * pushScale;
+      const ux = tdx / td;
+      const uy = tdy / td;
       a.x -= ux * push;
       a.y -= uy * push;
       b.x += ux * push;
       b.y += uy * push;
+
+      // Damp relative velocity: stop approach + bleed tangential "orbit" slip.
+      const rvx = b.vx - a.vx;
+      const rvy = b.vy - a.vy;
+      const radialRel = rvx * ux + rvy * uy;
+      const slipScale = td < minDist * 0.85 ? 0.22 : 0.1;
+      if (radialRel < 0) {
+        a.vx += ux * radialRel * 0.35;
+        a.vy += uy * radialRel * 0.35;
+        b.vx -= ux * radialRel * 0.35;
+        b.vy -= uy * radialRel * 0.35;
+      }
+      const tvx = rvx - ux * radialRel;
+      const tvy = rvy - uy * radialRel;
+      a.vx += tvx * slipScale;
+      a.vy += tvy * slipScale;
+      b.vx -= tvx * slipScale;
+      b.vy -= tvy * slipScale;
+
       wrapBirdPosition(a, a.x, a.y, arena);
       wrapBirdPosition(b, b.x, b.y, arena);
-    }
+    });
   }
 }
 
@@ -298,20 +318,26 @@ function resolveBirdOverlaps(birds, arena, dt = 1) {
  * Demo flocks in open sky regions.
  * @param {import('../../../../js/world.js').World} world
  */
+/** Default spawn anchors (up to 6 flocks). */
+const DEMO_FLOCK_SPOTS = [
+  (w, h) => ({ x: w * 0.28, y: h * 0.2 }),
+  (w, h) => ({ x: w * 0.55, y: h * 0.16 }),
+  (w, h) => ({ x: w * 0.42, y: h * 0.32 }),
+  (w, h) => ({ x: w * 0.35, y: h * 0.45 }),
+  (w, h) => ({ x: w * 0.62, y: h * 0.28 }),
+  (w, h) => ({ x: w * 0.48, y: h * 0.38 }),
+];
+
 export function spawnDemoFlocks(world) {
   clearBirds(world);
   const w = world.width;
   const h = world.height;
+  const flockCount = Math.max(1, Math.round(birdSimConfig.spawn.flockCount));
+  const birdsPerFlock = Math.max(3, Math.round(birdSimConfig.spawn.birdsPerFlock));
 
-  const spots = [
-    { x: w * 0.28, y: h * 0.2, n: 18 },
-    { x: w * 0.55, y: h * 0.16, n: 16 },
-    { x: w * 0.42, y: h * 0.32, n: 14 },
-    { x: w * 0.35, y: h * 0.45, n: 15 },
-  ];
-
-  for (const s of spots) {
-    const open = findOpenAir(world, s.x, s.y);
-    spawnFlock(world, open.x, open.y, s.n);
+  for (let i = 0; i < Math.min(flockCount, DEMO_FLOCK_SPOTS.length); i++) {
+    const spot = DEMO_FLOCK_SPOTS[i](w, h);
+    const open = findOpenAir(world, spot.x, spot.y);
+    spawnFlock(world, open.x, open.y, birdsPerFlock);
   }
 }

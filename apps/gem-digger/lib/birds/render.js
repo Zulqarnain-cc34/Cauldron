@@ -10,29 +10,20 @@ export function renderBirds(overlay, world) {
 
   const cellPx = displayCellPx();
   const arena = getSkyArena(world);
-  const seamMargin = Math.max(32, arena.skyH * 0.1, arena.worldW * 0.06);
-
   const def = getBirdDef();
+  const size = def.size * (cellPx / 2);
+  const seamMargin = 24;
 
   for (const bird of birds) {
-    const size = def.size * (cellPx / 2);
-    const margin = Math.max(seamMargin, def.size * 4);
+    const nearSeam =
+      bird.x < seamMargin ||
+      bird.x > arena.worldW - seamMargin ||
+      bird.y < arena.skyTop + seamMargin ||
+      bird.y > arena.skyBottom - seamMargin;
 
-    const offsets = toroidalRenderOffsets(bird.x, bird.y, arena, margin);
-
-    if (bird.wrapCross) {
-      if (bird.wrapCross & 1) {
-        const gx = bird.x < arena.worldW * 0.5 ? arena.worldW - 2 : 2;
-        offsets.push([gx - bird.x, 0]);
-      }
-      if (bird.wrapCross & 2) {
-        const gy =
-          bird.y < (arena.skyTop + arena.skyBottom) * 0.5
-            ? arena.skyBottom - 2
-            : arena.skyTop + 2;
-        offsets.push([0, gy - bird.y]);
-      }
-    }
+    const offsets = nearSeam
+      ? toroidalRenderOffsets(bird.x, bird.y, arena, seamMargin)
+      : [[0, 0]];
 
     for (const [ox, oy] of offsets) {
       overlay.fillTriangle(
