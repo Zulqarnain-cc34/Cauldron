@@ -1,4 +1,4 @@
-import { getMapDefinition, computeMapGoalProgress } from '../../../js/cauldron/game.js';
+import { computeMapGoalProgress } from '../../../js/cauldron/game.js';
 
 /**
  * Map context HUD — active level name, objective, gem progress.
@@ -11,10 +11,10 @@ export function mountMapHud({ world, mapManager, hostEl }) {
   hostEl.setAttribute('aria-label', 'Active map');
 
   function render() {
-    const mapId = mapManager.getActiveMapId();
-    const def = mapId ? getMapDefinition(mapId) : null;
+    const def = mapManager.getActiveDefinition();
+    const tab = mapManager.getActiveTab();
 
-    if (!def) {
+    if (!def || !tab) {
       hostEl.innerHTML = '';
       hostEl.hidden = true;
       return;
@@ -30,7 +30,7 @@ export function mountMapHud({ world, mapManager, hostEl }) {
 
     const name = document.createElement('span');
     name.className = 'map-hud-name';
-    name.textContent = progress.mapLabel;
+    name.textContent = tab.label || progress.mapLabel;
 
     const desc = document.createElement('span');
     desc.className = 'map-hud-desc';

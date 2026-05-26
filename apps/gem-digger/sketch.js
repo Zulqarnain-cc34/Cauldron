@@ -47,6 +47,7 @@ function syncSessionUi() {
 new window.p5((p) => {
   p.setup = async () => {
     registerMapDefinitions(BUILTIN_MAPS);
+    registerMapDefinition(blankMap);
 
     world = new World(GRID_W, GRID_H, Date.now() & 0xffffffff);
     const { width, height } = canvasSize(world);

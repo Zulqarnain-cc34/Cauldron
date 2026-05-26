@@ -1,8 +1,8 @@
-import { getAllMapDefinitions } from '../../../js/cauldron/game.js';
+import { getMapDefinition } from '../../../js/cauldron/game.js';
 
 /**
- * Map tab bar — switch between registered map units (separate sessions).
- * @param {import('../game/maps/manager.js').MapManager} manager
+ * Map tab bar — open tabs with + (new) and × (close).
+ * @param {import('../../../js/game/maps/manager.js').MapManager} manager
  * @param {HTMLElement | null} hostEl
  */
 export function mountMapTabs(manager, hostEl) {
@@ -12,44 +12,64 @@ export function mountMapTabs(manager, hostEl) {
   hostEl.setAttribute('role', 'tablist');
   hostEl.setAttribute('aria-label', 'Maps');
 
-  /** @type {Map<string, HTMLButtonElement>} */
-  const tabButtons = new Map();
-
   function renderTabs() {
     hostEl.innerHTML = '';
-    tabButtons.clear();
+    const tabs = manager.getOpenTabs();
+    const activeId = manager.getActiveTabId();
 
-    const defs = getAllMapDefinitions();
-    defs.forEach((def, index) => {
-      const tab = document.createElement('button');
-      tab.type = 'button';
-      tab.className = 'map-tab';
-      tab.dataset.mapId = def.id;
-      tab.setAttribute('role', 'tab');
-      tab.setAttribute('aria-selected', 'false');
+    tabs.forEach((tab, index) => {
+      const def = getMapDefinition(tab.defId);
+      const wrap = document.createElement('div');
+      wrap.className = 'map-tab-wrap';
+      wrap.setAttribute('role', 'presentation');
+
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'map-tab';
+      btn.dataset.tabId = tab.instanceId;
+      btn.setAttribute('role', 'tab');
+      btn.setAttribute('aria-selected', String(tab.instanceId === activeId));
       const shortcut = index < 9 ? ` (${index + 1})` : '';
-      tab.title = `${def.description ?? def.label}${shortcut}`;
-      tab.textContent = def.label;
+      btn.title = def?.description ?? tab.label;
+      btn.textContent = tab.label;
 
-      tab.addEventListener('click', () => {
-        if (manager.getActiveMapId() === def.id) return;
-        manager.switchTo(def.id);
+      btn.addEventListener('click', (e) => {
+        if (e.target.closest('.map-tab-close')) return;
+        if (manager.getActiveTabId() === tab.instanceId) return;
+        manager.switchTo(tab.instanceId);
       });
 
-      hostEl.appendChild(tab);
-      tabButtons.set(def.id, tab);
+      const close = document.createElement('button');
+      close.type = 'button';
+      close.className = 'map-tab-close';
+      close.setAttribute('aria-label', `Close ${tab.label}`);
+      close.title = 'Close map';
+      close.textContent = '×';
+      close.addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (manager.getOpenTabs().length <= 1) return;
+        manager.closeTab(tab.instanceId);
+        renderTabs();
+      });
+
+      wrap.append(btn, close);
+      if (tab.instanceId === activeId) {
+        btn.classList.add('active');
+      }
+      hostEl.appendChild(wrap);
     });
 
-    syncActiveTab();
-  }
-
-  function syncActiveTab() {
-    const active = manager.getActiveMapId();
-    for (const [id, btn] of tabButtons) {
-      const selected = id === active;
-      btn.classList.toggle('active', selected);
-      btn.setAttribute('aria-selected', String(selected));
-    }
+    const add = document.createElement('button');
+    add.type = 'button';
+    add.className = 'map-tab-add';
+    add.setAttribute('aria-label', 'New map');
+    add.title = 'New map';
+    add.textContent = '+';
+    add.addEventListener('click', () => {
+      manager.openTab();
+      renderTabs();
+    });
+    hostEl.appendChild(add);
   }
 
   function bindTabKeyboard() {
@@ -63,12 +83,13 @@ export function mountMapTabs(manager, hostEl) {
       ) {
         return;
       }
+      const tabs = manager.getOpenTabs();
       const idx = Number(e.key) - 1;
-      if (idx < 0 || idx >= getAllMapDefinitions().length) return;
-      const def = getAllMapDefinitions()[idx];
-      if (manager.getActiveMapId() === def.id) return;
+      if (idx < 0 || idx >= tabs.length) return;
+      const tab = tabs[idx];
+      if (manager.getActiveTabId() === tab.instanceId) return;
       e.preventDefault();
-      manager.switchTo(def.id);
+      manager.switchTo(tab.instanceId);
     });
   }
 
@@ -77,12 +98,11 @@ export function mountMapTabs(manager, hostEl) {
 
   const priorOnSwitch = manager.onSwitch;
   manager.onSwitch = (ctx) => {
-    syncActiveTab();
+    renderTabs();
     priorOnSwitch?.(ctx);
   };
 
   return {
     refresh: renderTabs,
-    syncActiveTab,
   };
 }
