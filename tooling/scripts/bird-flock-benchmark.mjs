@@ -79,7 +79,7 @@ function printRow(r) {
   );
   if (m) {
     console.log(
-      `    verdict=${m.verdict} emerge=${(m.flockEmergence * 100).toFixed(0)}% ` +
+      `    n=${m.birdCount} verdict=${m.verdict} emerge=${(m.flockEmergence * 100).toFixed(0)}% ` +
         `sep=${(m.separationScore * 100).toFixed(0)}% ali=${(m.alignmentScore * 100).toFixed(0)}% ` +
         `coh=${(m.cohesionScore * 100).toFixed(0)}% windAlign=${m.windAlignment.toFixed(2)} ` +
         `stuck=${(m.stuckRate * 100).toFixed(0)}% part=${(m.flockParticipation * 100).toFixed(0)}%`

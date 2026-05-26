@@ -1,6 +1,6 @@
 import { displayCellPx } from '../../../../js/world.js';
 import { ensureBirds } from './birds.js';
-import { getBirdKindDef } from './catalog.js';
+import { getBirdDef } from './catalog.js';
 import { getSkyArena, toroidalRenderOffsets } from './boundaries.js';
 
 /** @param {import('../../../../js/overlay.js').OverlayContext} overlay @param {import('../../../../js/world.js').World} world */
@@ -12,8 +12,9 @@ export function renderBirds(overlay, world) {
   const arena = getSkyArena(world);
   const seamMargin = Math.max(32, arena.skyH * 0.1, arena.worldW * 0.06);
 
+  const def = getBirdDef();
+
   for (const bird of birds) {
-    const def = getBirdKindDef(bird.kind);
     const size = def.size * (cellPx / 2);
     const margin = Math.max(seamMargin, def.size * 4);
 

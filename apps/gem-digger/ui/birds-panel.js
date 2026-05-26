@@ -104,8 +104,8 @@ export function mountBirdsPanel(world, opts = {}) {
     opt.textContent = BIRD_PRESET_LABELS[id] ?? id;
     presetSelect.appendChild(opt);
   }
-  presetSelect.value = 'calmWind';
-  applyBirdSimPreset('calmWind');
+  presetSelect.value = 'default';
+  applyBirdSimPreset('default');
 
   presetSelect.addEventListener('change', () => {
     applyBirdSimPreset(presetSelect.value);
@@ -245,13 +245,6 @@ export function mountBirdsPanel(world, opts = {}) {
     }
 
     const hist = getBirdMetricsHistory();
-    const kindLines = ['sparrow', 'eagle', 'finch']
-      .filter((k) => m.byKind[k]?.count > 0)
-      .map(
-        (k) =>
-          `${k}: n=${m.byKind[k].count} pol=${(m.byKind[k].polarization * 100).toFixed(0)}% wind=${m.byKind[k].windAlignment.toFixed(2)}`
-      )
-      .join('<br>');
 
     const modeLabel =
       m.interactionMode === 'topological'
@@ -261,6 +254,10 @@ export function mountBirdsPanel(world, opts = {}) {
     diagBody.innerHTML = `
       <p class="birds-diag-verdict birds-diag-${m.verdict.replace(/\s+/g, '-').toLowerCase()}">${m.verdict}</p>
       <p class="birds-diag-hint">${m.hint}</p>
+      <div class="birds-metric-row">
+        <span class="birds-metric-label">Birds</span>
+        <span class="birds-metric-val">${m.birdCount}</span>
+      </div>
       <div class="birds-metric-row">
         <span class="birds-metric-label">Interaction</span>
         <span class="birds-metric-val">${modeLabel}</span>
@@ -300,7 +297,6 @@ export function mountBirdsPanel(world, opts = {}) {
       <code class="birds-spark">${sparklineAscii(hist.windAlignment.map((v) => (v + 1) / 2))}</code>
       <p class="birds-spark-label">Glitch history</p>
       <code class="birds-spark">${sparklineAscii(hist.glitchRate)}</code>
-      <p class="birds-diag-kinds">${kindLines}</p>
       <p class="birds-wrap-note">High sim speed uses extra physics substeps (stable up to 20×). Use wind presets to compare calm vs turbulent.</p>
     `;
   }
@@ -382,8 +378,8 @@ export function mountBirdsPanel(world, opts = {}) {
     },
     resetConfig() {
       resetBirdSimConfig();
-      presetSelect.value = 'calmWind';
-      applyBirdSimPreset('calmWind');
+      presetSelect.value = 'default';
+      applyBirdSimPreset('default');
       syncSlidersFromConfig();
     },
   };

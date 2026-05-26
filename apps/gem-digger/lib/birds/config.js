@@ -7,24 +7,24 @@
 export const DEFAULT_BIRD_SIM_CONFIG = {
   flock: {
     interactionMode: 'topological',
-    topologicalNeighbors: 7,
-    perception: 42,
-    separationRadius: 22,
-    personalSpace: 5,
+    topologicalNeighbors: 8,
+    perception: 50,
+    separationRadius: 30,
+    personalSpace: 7,
     minFlockSize: 3,
-    weightSep: 2.4,
-    weightAli: 0.65,
-    weightCoh: 0.32,
-    cohesionSpeed: 0.42,
+    weightSep: 1.7,
+    weightAli: 1.05,
+    weightCoh: 0.5,
+    cohesionSpeed: 0.48,
   },
   wind: {
     /** When false, birds ignore wind forces (flocking only). Viz streaks still optional. */
-    enabled: true,
+    enabled: false,
     noiseScale: 0.009,
     timeScale: 0.008,
-    speedFactor: 0.52,
-    steerWeight: 0.95,
-    gustMin: 0.28,
+    speedFactor: 0.4,
+    steerWeight: 0.45,
+    gustMin: 0.2,
   },
   motion: {
     simSpeed: 1,
@@ -45,7 +45,7 @@ export const birdSimConfig = structuredClone(DEFAULT_BIRD_SIM_CONFIG);
 
 /** Human-readable preset names for the UI. */
 export const BIRD_PRESET_LABELS = {
-  default: 'Balanced',
+  default: 'High order (φ≥75%)',
   noWind: 'No wind (flock only)',
   calmWind: 'Calm wind',
   windyDay: 'Windy day',
@@ -59,19 +59,22 @@ export const BIRD_PRESET_LABELS = {
 export const BIRD_SIM_PRESETS = {
   default: {},
 
-  /** Light breeze — flocking easy to see. */
+  /** Light breeze — wind visible; global φ often lower than default. */
   calmWind: {
     wind: {
+      enabled: true,
       noiseScale: 0.007,
       timeScale: 0.006,
-      speedFactor: 0.42,
-      steerWeight: 0.75,
-      gustMin: 0.22,
+      speedFactor: 0.38,
+      steerWeight: 0.5,
+      gustMin: 0.2,
     },
     flock: {
-      weightAli: 0.72,
-      weightCoh: 0.38,
-      weightSep: 2.2,
+      weightAli: 1.0,
+      weightCoh: 0.48,
+      weightSep: 1.75,
+      personalSpace: 6.5,
+      topologicalNeighbors: 8,
     },
     display: { windParticleCount: 80, windOpacity: 18, windDriftSpeed: 0.45 },
   },
@@ -110,18 +113,24 @@ export const BIRD_SIM_PRESETS = {
     display: { windParticleCount: 180, windOpacity: 36, windDriftSpeed: 1.05 },
   },
 
-  /** Weak wind, strong flock — best for tuning φ / groups. */
-  /** Flocking only — no wind steering (good baseline for φ / sep / coh). */
+  /** Same tuning as default — wind forces off, streaks optional. */
   noWind: {
     wind: { enabled: false, steerWeight: 0 },
-    flock: {
-      interactionMode: 'topological',
-      topologicalNeighbors: 7,
-      weightAli: 0.75,
-      weightCoh: 0.4,
-      weightSep: 2.3,
-    },
     display: { showWindField: false, windParticleCount: 0 },
+  },
+
+  /** Metric neighbours — very high φ in benchmarks; slightly different motion. */
+  metricHighOrder: {
+    flock: {
+      interactionMode: 'metric',
+      perception: 50,
+      weightAli: 1.0,
+      weightCoh: 0.48,
+      weightSep: 1.75,
+      personalSpace: 6.5,
+    },
+    wind: { enabled: false, steerWeight: 0 },
+    display: { showWindField: false },
   },
 
   flockFirst: {

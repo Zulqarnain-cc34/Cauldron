@@ -2,7 +2,7 @@
  * Flocking birds — game-only (not Cauldron library).
  */
 
-export { BIRD_KINDS, getBirdKindDef } from './catalog.js';
+export { BIRD_DEF, getBirdDef } from './catalog.js';
 export {
   birdSimConfig,
   BIRD_SIM_PRESETS,

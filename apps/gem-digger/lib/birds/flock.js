@@ -180,8 +180,10 @@ export function computeVicsekOrder(birds) {
   let sumVx = 0;
   let sumVy = 0;
   for (const b of birds) {
-    sumVx += b.vx;
-    sumVy += b.vy;
+    const m = Math.hypot(b.vx, b.vy);
+    if (m < 0.001) continue;
+    sumVx += b.vx / m;
+    sumVy += b.vy / m;
   }
   return Math.min(1, Math.hypot(sumVx, sumVy) / birds.length);
 }

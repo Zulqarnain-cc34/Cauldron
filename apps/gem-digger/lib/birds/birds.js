@@ -1,6 +1,6 @@
 import { Species } from '../../../../js/catalog/species.js';
 import { getGameState } from '../game-state.js';
-import { getBirdKindDef } from './catalog.js';
+import { getBirdDef } from './catalog.js';
 import { birdSimConfig } from './config.js';
 import {
   getSkyArena,
@@ -16,12 +16,9 @@ import {
 } from './flock.js';
 import { flowVelocity, windSteer } from './wind.js';
 
-/** @typedef {import('./catalog.js').BirdKind} BirdKind */
-
 /**
  * @typedef {object} Bird
  * @property {string} id
- * @property {BirdKind} kind
  * @property {number} x grid space
  * @property {number} y grid space
  * @property {number} vx
@@ -31,7 +28,6 @@ import { flowVelocity, windSteer } from './wind.js';
  */
 
 const STRIDE = 5;
-const MARGIN = 6;
 
 /** @param {import('../../../../js/world.js').World} world */
 export function ensureBirds(world) {
@@ -57,14 +53,13 @@ export function setBirds(world, birds) {
 
 /**
  * @param {import('../../../../js/world.js').World} world
- * @param {BirdKind} kind
  * @param {number} cx
  * @param {number} cy
  * @param {number} count
  */
-export function spawnFlock(world, kind, cx, cy, count) {
+export function spawnFlock(world, cx, cy, count) {
   const list = ensureBirds(world);
-  const def = getBirdKindDef(kind);
+  const def = getBirdDef();
   const minGap = birdSimConfig.flock.personalSpace;
   const spread = Math.sqrt(count) * minGap * 1.8;
 
@@ -77,8 +72,7 @@ export function spawnFlock(world, kind, cx, cy, count) {
     const [fvx, fvy] = flowVelocity(x, y, world.tick, def.maxSpeed, arena);
     const jitter = 0.15;
     list.push({
-      id: `bird-${kind}-${world.tick}-${list.length}-${world.randInt(1_000_000)}`,
-      kind,
+      id: `bird-${world.tick}-${list.length}-${world.randInt(1_000_000)}`,
       x,
       y,
       vx: fvx + (world.rand() - 0.5) * jitter,
@@ -124,18 +118,11 @@ function tickBirdsStep(world, dt) {
   const birds = ensureBirds(world);
   if (!birds.length) return;
 
-  /** @type {Bird[][]} */
-  const byKind = { sparrow: [], eagle: [], finch: [] };
-  for (const b of birds) {
-    (byKind[b.kind] ??= []).push(b);
-  }
-
   const arena = getSkyArena(world);
+  const def = getBirdDef();
 
   for (const bird of birds) {
-    const def = getBirdKindDef(bird.kind);
-    const flockmates = byKind[bird.kind] ?? [];
-    const neighbors = getFlockNeighbors(bird, flockmates, arena);
+    const neighbors = getFlockNeighbors(bird, birds, arena);
 
     let ax = 0;
     let ay = 0;
@@ -144,7 +131,7 @@ function tickBirdsStep(world, dt) {
     ax += wx;
     ay += wy;
 
-    const [sx, sy] = computeSeparationForce(bird, flockmates, def.maxForce, arena);
+    const [sx, sy] = computeSeparationForce(bird, birds, def.maxForce, arena);
     ax += sx;
     ay += sy;
 
@@ -281,7 +268,6 @@ function resolveBirdOverlaps(birds, arena, dt = 1) {
     for (let j = i + 1; j < birds.length; j++) {
       const a = birds[i];
       const b = birds[j];
-      if (a.kind !== b.kind) continue;
 
       let [dx, dy] = toroidalVectorTo(a.x, a.y, b.x, b.y, arena);
       let d = Math.hypot(dx, dy);
@@ -309,7 +295,7 @@ function resolveBirdOverlaps(birds, arena, dt = 1) {
 }
 
 /**
- * Demo flocks — separate groups per kind in open sky regions.
+ * Demo flocks in open sky regions.
  * @param {import('../../../../js/world.js').World} world
  */
 export function spawnDemoFlocks(world) {
@@ -318,15 +304,14 @@ export function spawnDemoFlocks(world) {
   const h = world.height;
 
   const spots = [
-    { kind: 'sparrow', x: w * 0.28, y: h * 0.2, n: 12 },
-    { kind: 'sparrow', x: w * 0.55, y: h * 0.16, n: 10 },
-    { kind: 'eagle', x: w * 0.42, y: h * 0.32, n: 5 },
-    { kind: 'finch', x: w * 0.35, y: h * 0.45, n: 11 },
-    { kind: 'finch', x: w * 0.62, y: h * 0.4, n: 9 },
+    { x: w * 0.28, y: h * 0.2, n: 18 },
+    { x: w * 0.55, y: h * 0.16, n: 16 },
+    { x: w * 0.42, y: h * 0.32, n: 14 },
+    { x: w * 0.35, y: h * 0.45, n: 15 },
   ];
 
   for (const s of spots) {
     const open = findOpenAir(world, s.x, s.y);
-    spawnFlock(world, s.kind, open.x, open.y, s.n);
+    spawnFlock(world, open.x, open.y, s.n);
   }
 }

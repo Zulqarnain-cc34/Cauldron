@@ -9,7 +9,7 @@
  */
 
 import { birdSimConfig } from './config.js';
-import { getBirdKindDef } from './catalog.js';
+import { getBirdDef } from './catalog.js';
 import { getSkyArena, toroidalVectorTo } from './boundaries.js';
 import { flowVelocity } from './wind.js';
 import { computeVicsekOrder, getFlockNeighbors } from './flock.js';
@@ -38,7 +38,6 @@ import { computeVicsekOrder, getFlockNeighbors } from './flock.js';
  * @property {number} alignmentScore 0–1 (φ with enough neighbours)
  * @property {number} cohesionScore 0–1 (grouped but not crushed)
  * @property {number} flockEmergence 0–1 composite boids health
- * @property {Record<string, { count: number, polarization: number, windAlignment: number }>} byKind
  */
 
 /** @type {Map<string, { x: number, y: number, vx: number, vy: number }>} */
@@ -62,43 +61,6 @@ function pushHistory(arr, value) {
 
 /**
  * @param {Bird[]} birds
- * @param {number} worldW
- * @param {number} worldH
- */
-function metricsForKind(birds, kind, tick, arena) {
-  const group = birds.filter((b) => b.kind === kind);
-  if (!group.length) return { count: 0, polarization: 0, windAlignment: 0 };
-
-  let sumVx = 0;
-  let sumVy = 0;
-  let sumSpeed = 0;
-  let windCos = 0;
-
-  for (const b of group) {
-    sumVx += b.vx;
-    sumVy += b.vy;
-    const sp = Math.hypot(b.vx, b.vy);
-    sumSpeed += sp || 0.001;
-
-    const def = getBirdKindDef(b.kind);
-    const [fvx, fvy] = flowVelocity(b.x, b.y, tick, def.maxSpeed, arena);
-    const fm = Math.hypot(fvx, fvy) || 1;
-    const wm = sp || 0.001;
-    windCos += (b.vx * fvx) / (wm * fm) + (b.vy * fvy) / (wm * fm);
-  }
-
-  const n = group.length;
-  const pol = Math.hypot(sumVx, sumVy) / sumSpeed;
-
-  return {
-    count: n,
-    polarization: Math.min(1, pol),
-    windAlignment: Math.max(-1, Math.min(1, windCos / n)),
-  };
-}
-
-/**
- * @param {Bird[]} birds
  * @param {import('../../../../js/world.js').World} world
  */
 export function sampleBirdMetrics(world, birds) {
@@ -108,6 +70,7 @@ export function sampleBirdMetrics(world, birds) {
   }
 
   const arena = getSkyArena(world);
+  const def = getBirdDef();
   const personalSpace = birdSimConfig.flock.personalSpace;
   const minFlock = birdSimConfig.flock.minFlockSize;
   const simSpeed = birdSimConfig.motion.simSpeed;
@@ -129,15 +92,8 @@ export function sampleBirdMetrics(world, birds) {
   let interactionDistN = 0;
   let interactionCountSum = 0;
 
-  /** @type {Bird[][]} */
-  const byKind = { sparrow: [], eagle: [], finch: [] };
-  for (const b of birds) {
-    (byKind[b.kind] ??= []).push(b);
-  }
-
   for (const bird of birds) {
-    const def = getBirdKindDef(bird.kind);
-    const flockmates = byKind[bird.kind] ?? [];
+    const flockmates = birds;
     const sp = Math.hypot(bird.vx, bird.vy);
 
     sumVx += bird.vx;
@@ -220,11 +176,6 @@ export function sampleBirdMetrics(world, birds) {
   const glitchRate = glitches / n;
   const stuckRate = stuck / n;
 
-  const byKindStats = {};
-  for (const kind of ['sparrow', 'eagle', 'finch']) {
-    byKindStats[kind] = metricsForKind(birds, kind, world.tick, arena);
-  }
-
   const { separationScore, alignmentScore, cohesionScore, flockEmergence } =
     computeBehaviorScores({
       polarization,
@@ -281,7 +232,6 @@ export function sampleBirdMetrics(world, birds) {
     flockEmergence,
     verdict,
     hint,
-    byKind: byKindStats,
   };
 
   latest = snap;
@@ -410,7 +360,7 @@ function interpretMetrics(m) {
   if (!m.windEnabled && m.flockEmergence < 0.35) {
     return {
       verdict: 'Flock not forming',
-      hint: 'Wind off — raise alignment/cohesion, lower separation, or add more birds per kind.',
+      hint: 'Wind off — raise alignment/cohesion, lower separation, or spawn more birds.',
     };
   }
 
@@ -422,6 +372,13 @@ function interpretMetrics(m) {
     return {
       verdict: 'Scattered',
       hint: `Weak order (φ low). ${modeHint}`,
+    };
+  }
+
+  if (polarization >= 0.75) {
+    return {
+      verdict: 'High Vicsek order',
+      hint: `φ=${(polarization * 100).toFixed(0)}% — strong alignment. Wind lowers φ when several flocks face different flow.`,
     };
   }
 
