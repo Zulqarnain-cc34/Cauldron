@@ -1,12 +1,13 @@
 /**
- * Boids flocking — separation (always), alignment + cohesion (when flock is large enough).
- * Same {@link BirdKind} only. Uses toroidal distance across wrap edges.
+ * Boids flocking with metric OR topological neighbor rules (Vicsek / Ballerini-style).
+ * Toroidal X + sky-band Y — see boundaries.js.
  */
 
 import { birdSimConfig } from './config.js';
 import { toroidalDelta, toroidalVectorTo } from './boundaries.js';
 
 /** @typedef {import('./birds.js').Bird} Bird */
+/** @typedef {import('./boundaries.js').SkyArena} SkyArena */
 
 function clampMag(x, y, max) {
   const m = Math.hypot(x, y);
@@ -21,9 +22,8 @@ function steer(bird, tx, ty, maxForce) {
   return clampMag(sx, sy, maxForce);
 }
 
-function seek(bird, tx, ty, maxSpeed, maxForce) {
-  const dx = tx - bird.x;
-  const dy = ty - bird.y;
+function seek(bird, tx, ty, maxSpeed, maxForce, arena) {
+  const [dx, dy] = toroidalVectorTo(bird.x, bird.y, tx, ty, arena);
   const d = Math.hypot(dx, dy);
   if (d < 0.5) return [0, 0];
   const sx = (dx / d) * maxSpeed;
@@ -32,14 +32,42 @@ function seek(bird, tx, ty, maxSpeed, maxForce) {
 }
 
 /**
+ * Metric: all flockmates within perception radius.
+ * Topological: k nearest neighbours (starling ~6–7, paper suggests 7–10).
+ * @param {Bird} bird
+ * @param {Bird[]} flockmates
+ * @param {SkyArena} arena
+ * @returns {Bird[]}
+ */
+export function getFlockNeighbors(bird, flockmates, arena) {
+  const { interactionMode, perception, topologicalNeighbors } = birdSimConfig.flock;
+  /** @type {{ other: Bird, d: number }[]} */
+  const candidates = [];
+
+  for (const other of flockmates) {
+    if (other === bird) continue;
+    const [dx, dy] = toroidalDelta(bird.x, bird.y, other.x, other.y, arena);
+    const d = Math.hypot(dx, dy);
+    if (interactionMode === 'metric' && d > perception) continue;
+    candidates.push({ other, d });
+  }
+
+  if (interactionMode === 'topological') {
+    candidates.sort((a, b) => a.d - b.d);
+    const k = Math.max(1, Math.round(topologicalNeighbors));
+    return candidates.slice(0, k).map((c) => c.other);
+  }
+
+  return candidates.map((c) => c.other);
+}
+
+/**
  * @param {Bird} bird
  * @param {Bird[]} flockmates
  * @param {number} maxForce
- * @param {number} worldW
- * @param {number} worldH
- * @returns {[number, number]}
+ * @param {SkyArena} arena
  */
-export function computeSeparationForce(bird, flockmates, maxForce, worldW, worldH) {
+export function computeSeparationForce(bird, flockmates, maxForce, arena) {
   const { separationRadius, personalSpace, weightSep } = birdSimConfig.flock;
 
   let sx = 0;
@@ -49,7 +77,7 @@ export function computeSeparationForce(bird, flockmates, maxForce, worldW, world
   for (const other of flockmates) {
     if (other === bird) continue;
 
-    const [dx, dy] = toroidalDelta(bird.x, bird.y, other.x, other.y, worldW, worldH);
+    const [dx, dy] = toroidalDelta(bird.x, bird.y, other.x, other.y, arena);
     const d = Math.hypot(dx, dy);
     if (d < 0.001) {
       const a = ((bird.x + bird.y * 3) % 628) / 100;
@@ -84,22 +112,14 @@ export function computeSeparationForce(bird, flockmates, maxForce, worldW, world
 }
 
 /**
+ * Alignment + cohesion over interaction neighbours (metric or topological).
  * @param {Bird} bird
  * @param {Bird[]} neighbors
  * @param {number} maxSpeed
  * @param {number} maxForce
- * @param {number} worldW
- * @param {number} worldH
- * @returns {[number, number]}
+ * @param {SkyArena} arena
  */
-export function computeFlockAcceleration(
-  bird,
-  neighbors,
-  maxSpeed,
-  maxForce,
-  worldW,
-  worldH
-) {
+export function computeFlockAcceleration(bird, neighbors, maxSpeed, maxForce, arena) {
   const { minFlockSize, weightAli, weightCoh, cohesionSpeed } = birdSimConfig.flock;
 
   if (neighbors.length < minFlockSize) return [0, 0];
@@ -112,18 +132,11 @@ export function computeFlockAcceleration(
   const n = neighbors.length;
 
   for (const other of neighbors) {
-    const [dx, dy] = toroidalDelta(bird.x, bird.y, other.x, other.y, worldW, worldH);
+    const [dx, dy] = toroidalDelta(bird.x, bird.y, other.x, other.y, arena);
     avgDist += Math.hypot(dx, dy);
     aliX += other.vx;
     aliY += other.vy;
-    const [towardX, towardY] = toroidalVectorTo(
-      bird.x,
-      bird.y,
-      other.x,
-      other.y,
-      worldW,
-      worldH
-    );
+    const [towardX, towardY] = toroidalVectorTo(bird.x, bird.y, other.x, other.y, arena);
     cohDx += towardX;
     cohDy += towardY;
   }
@@ -142,21 +155,33 @@ export function computeFlockAcceleration(
 
   const targetX = bird.x + cohDx / n;
   const targetY = bird.y + cohDy / n;
-  const [cx, cy] = seek(bird, targetX, targetY, maxSpeed * cohesionSpeed, maxForce);
+  const [cx, cy] = seek(bird, targetX, targetY, maxSpeed * cohesionSpeed, maxForce, arena);
   ax += cx * weightCoh * crowd;
   ay += cy * weightCoh * crowd;
 
   return clampMag(ax, ay, maxForce);
 }
 
-/** @param {Bird} a @param {Bird} b @param {number} worldW @param {number} worldH */
-export function withinPerception(a, b, worldW, worldH) {
-  if (a.kind !== b.kind) return false;
-  const [dx, dy] = toroidalDelta(a.x, a.y, b.x, b.y, worldW, worldH);
-  const p = birdSimConfig.flock.perception;
-  return dx * dx + dy * dy <= p * p;
+/** @deprecated use getFlockNeighbors */
+export function withinPerception(a, b, arena) {
+  return getFlockNeighbors(a, [b], arena).length > 0;
 }
 
 export function getFlockMinSize() {
   return birdSimConfig.flock.minFlockSize;
+}
+
+/**
+ * Vicsek order parameter φ = |Σ v̂| / N (global flock alignment, 0–1).
+ * @param {Bird[]} birds
+ */
+export function computeVicsekOrder(birds) {
+  if (!birds.length) return 0;
+  let sumVx = 0;
+  let sumVy = 0;
+  for (const b of birds) {
+    sumVx += b.vx;
+    sumVy += b.vy;
+  }
+  return Math.min(1, Math.hypot(sumVx, sumVy) / birds.length);
 }

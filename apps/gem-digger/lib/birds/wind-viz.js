@@ -1,5 +1,5 @@
 import { displayCellPx } from '../../../../js/world.js';
-import { toroidalRenderOffsets, wrapWindParticle } from './boundaries.js';
+import { getSkyArena, toroidalRenderOffsets, wrapCoord, wrapSkyY } from './boundaries.js';
 import { flowVelocity } from './wind.js';
 import { birdSimConfig } from './config.js';
 
@@ -17,20 +17,22 @@ function worldKey(world) {
 
 function seedParticles(world, count) {
   particles = [];
+  const arena = getSkyArena(world);
   const margin = 12;
   for (let i = 0; i < count; i++) {
     particles.push({
-      x: margin + world.rand() * (world.width - margin * 2),
-      y: margin + world.rand() * (world.height - margin * 2),
+      x: margin + world.rand() * (arena.worldW - margin * 2),
+      y: arena.skyTop + margin + world.rand() * Math.max(8, arena.skyH - margin * 2),
       life: world.rand(),
     });
   }
 }
 
 function respawnParticle(world, p) {
+  const arena = getSkyArena(world);
   const margin = 8;
-  p.x = margin + world.rand() * (world.width - margin * 2);
-  p.y = margin + world.rand() * (world.height - margin * 2);
+  p.x = margin + world.rand() * (arena.worldW - margin * 2);
+  p.y = arena.skyTop + margin + world.rand() * Math.max(8, arena.skyH - margin * 2);
   p.life = 0;
 }
 
@@ -59,17 +61,17 @@ export function renderWindField(overlay, world) {
   }
 
   const cellPx = displayCellPx();
-  const worldW = world.width;
-  const worldH = world.height;
+  const arena = getSkyArena(world);
   const refSpeed = 1.15;
   const baseAlpha = Math.round(windOpacity * 2.2);
   const drift = windDriftSpeed * 0.38 * birdSimConfig.motion.simSpeed;
-  const ghostMargin = 22;
+  const seamMargin = Math.max(32, arena.skyH * 0.1, arena.worldW * 0.06);
 
   for (const p of particles) {
-    wrapWindParticle(p, worldW, worldH);
+    const prevX = p.x;
+    const prevY = p.y;
 
-    const [vx, vy] = flowVelocity(p.x, p.y, world.tick, refSpeed, worldW, worldH);
+    const [vx, vy] = flowVelocity(p.x, p.y, world.tick, refSpeed, arena);
     const mag = Math.hypot(vx, vy);
     if (mag < 0.02) {
       respawnParticle(world, p);
@@ -82,7 +84,8 @@ export function renderWindField(overlay, world) {
     p.y += ny * drift * (0.7 + mag * 0.35);
     p.life += 0.012 + mag * 0.008;
 
-    wrapWindParticle(p, worldW, worldH);
+    p.x = wrapCoord(p.x, arena.worldW);
+    p.y = wrapSkyY(p.y, arena);
 
     const angle = Math.atan2(vy, vx);
     const strength = Math.min(1, mag / refSpeed);
@@ -90,13 +93,17 @@ export function renderWindField(overlay, world) {
     const alpha = Math.round(baseAlpha * (0.35 + strength * 0.65));
     const width = 0.9 + strength * 0.6;
 
-    for (const [ox, oy] of toroidalRenderOffsets(
-      p.x,
-      p.y,
-      worldW,
-      worldH,
-      ghostMargin
-    )) {
+    const offsets = toroidalRenderOffsets(p.x, p.y, arena, seamMargin);
+    if (Math.abs(p.x - prevX) > arena.worldW * 0.45) {
+      offsets.push([p.x < arena.worldW * 0.5 ? arena.worldW - 2 - p.x : 2 - p.x, 0]);
+    }
+    if (Math.abs(p.y - prevY) > arena.skyH * 0.45) {
+      const gy =
+        p.y < (arena.skyTop + arena.skyBottom) * 0.5 ? arena.skyBottom - 2 : arena.skyTop + 2;
+      offsets.push([0, gy - p.y]);
+    }
+
+    for (const [ox, oy] of offsets) {
       drawStreak(
         overlay,
         (p.x + ox) * cellPx,

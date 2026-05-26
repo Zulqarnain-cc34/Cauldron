@@ -6,6 +6,7 @@ export { BIRD_KINDS, getBirdKindDef } from './catalog.js';
 export {
   birdSimConfig,
   BIRD_SIM_PRESETS,
+  BIRD_PRESET_LABELS,
   applyBirdSimPreset,
   resetBirdSimConfig,
 } from './config.js';
@@ -20,12 +21,28 @@ export {
 } from './birds.js';
 export { renderBirds } from './render.js';
 export { renderWindField, resetWindParticles } from './wind-viz.js';
-export { getFlockMinSize } from './flock.js';
+export {
+  getFlockMinSize,
+  getFlockNeighbors,
+  computeVicsekOrder,
+} from './flock.js';
 export { flowVelocity, windSteer } from './wind.js';
+export {
+  sampleBirdMetrics,
+  getBirdMetricsSnapshot,
+  getBirdMetricsHistory,
+  resetBirdMetrics,
+  sparklineAscii,
+} from './metrics.js';
 
-import { tickBirds, spawnDemoFlocks } from './birds.js';
+import { tickBirds, spawnDemoFlocks, ensureBirds } from './birds.js';
 import { renderBirds } from './render.js';
 import { renderWindField, resetWindParticles } from './wind-viz.js';
+import {
+  sampleBirdMetrics,
+  resetBirdMetrics,
+  getBirdMetricsSnapshot,
+} from './metrics.js';
 
 /**
  * @param {import('../../../../js/overlay.js').OverlayContext} overlay
@@ -40,6 +57,7 @@ export function installBirdSystem(overlay, world, opts = {}) {
   return {
     tick() {
       tickBirds(world);
+      sampleBirdMetrics(world, ensureBirds(world));
     },
     render() {
       renderWindField(overlay, world);
@@ -47,7 +65,11 @@ export function installBirdSystem(overlay, world, opts = {}) {
     },
     respawnDemo() {
       resetWindParticles();
+      resetBirdMetrics();
       spawnDemoFlocks(world);
+    },
+    getMetrics() {
+      return getBirdMetricsSnapshot();
     },
   };
 }

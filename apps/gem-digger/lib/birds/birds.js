@@ -3,15 +3,16 @@ import { getGameState } from '../game-state.js';
 import { getBirdKindDef } from './catalog.js';
 import { birdSimConfig } from './config.js';
 import {
-  toroidalDelta,
+  getSkyArena,
   toroidalVectorTo,
+  wrapBirdPosition,
   wrapCoord,
-  wrapWorldPosition,
+  wrapSkyY,
 } from './boundaries.js';
 import {
   computeFlockAcceleration,
   computeSeparationForce,
-  withinPerception,
+  getFlockNeighbors,
 } from './flock.js';
 import { flowVelocity, windSteer } from './wind.js';
 
@@ -26,6 +27,7 @@ import { flowVelocity, windSteer } from './wind.js';
  * @property {number} vx
  * @property {number} vy
  * @property {number} angle radians, nose along velocity
+ * @property {number} [wrapCross] bitmask 1=X 2=Y seam crossed last step
  */
 
 const STRIDE = 5;
@@ -71,7 +73,8 @@ export function spawnFlock(world, kind, cx, cy, count) {
     const r = world.rand() * spread;
     const x = cx + Math.cos(angle) * r;
     const y = cy + Math.sin(angle) * r;
-    const [fvx, fvy] = flowVelocity(x, y, world.tick, def.maxSpeed, world.width, world.height);
+    const arena = getSkyArena(world);
+    const [fvx, fvy] = flowVelocity(x, y, world.tick, def.maxSpeed, arena);
     const jitter = 0.15;
     list.push({
       id: `bird-${kind}-${world.tick}-${list.length}-${world.randInt(1_000_000)}`,
@@ -86,9 +89,9 @@ export function spawnFlock(world, kind, cx, cy, count) {
 }
 
 /** Terrain only — canvas edges never block (sky wraps). */
-function isFlyableAt(world, x, y, worldW, worldH) {
-  const gx = Math.floor(wrapCoord(x, worldW));
-  const gy = Math.floor(wrapCoord(y, worldH));
+function isFlyableAt(world, x, y, arena) {
+  const gx = Math.floor(wrapCoord(x, arena.worldW));
+  const gy = Math.floor(wrapSkyY(y, arena));
   const i = (gx + gy * world.width) * STRIDE;
   const s = world.cells[i];
   return s === Species.EMPTY || s === Species.GAS || s === Species.STEAM;
@@ -96,26 +99,28 @@ function isFlyableAt(world, x, y, worldW, worldH) {
 
 /** Find open air near (cx, cy). */
 function findOpenAir(world, cx, cy, radius = 24) {
-  const w = world.width;
-  const h = world.height;
-  if (isFlyableAt(world, cx, cy, w, h)) return { x: wrapCoord(cx, w), y: wrapCoord(cy, h) };
+  const arena = getSkyArena(world);
+  if (isFlyableAt(world, cx, cy, arena)) {
+    return { x: wrapCoord(cx, arena.worldW), y: wrapSkyY(cy, arena) };
+  }
   for (let r = 2; r < radius; r += 2) {
     for (let a = 0; a < 12; a++) {
       const t = (a / 12) * Math.PI * 2;
       const x = cx + Math.cos(t) * r;
       const y = cy + Math.sin(t) * r;
-      if (isFlyableAt(world, x, y, w, h)) {
-        return { x: wrapCoord(x, w), y: wrapCoord(y, h) };
+      if (isFlyableAt(world, x, y, arena)) {
+        return { x: wrapCoord(x, arena.worldW), y: wrapSkyY(y, arena) };
       }
     }
   }
-  return { x: wrapCoord(cx, w), y: wrapCoord(cy, h) };
+  return { x: wrapCoord(cx, arena.worldW), y: wrapSkyY(cy, arena) };
 }
 
 /**
  * @param {import('../../../../js/world.js').World} world
+ * @param {number} dt integration step (≤ simSpeed)
  */
-export function tickBirds(world) {
+function tickBirdsStep(world, dt) {
   const birds = ensureBirds(world);
   if (!birds.length) return;
 
@@ -125,39 +130,21 @@ export function tickBirds(world) {
     (byKind[b.kind] ??= []).push(b);
   }
 
-  const worldW = world.width;
-  const worldH = world.height;
+  const arena = getSkyArena(world);
 
   for (const bird of birds) {
     const def = getBirdKindDef(bird.kind);
     const flockmates = byKind[bird.kind] ?? [];
-    const neighbors = [];
-    for (const other of flockmates) {
-      if (other === bird) continue;
-      if (withinPerception(bird, other, worldW, worldH)) neighbors.push(other);
-    }
+    const neighbors = getFlockNeighbors(bird, flockmates, arena);
 
     let ax = 0;
     let ay = 0;
 
-    const [wx, wy] = windSteer(
-      bird,
-      world.tick,
-      def.maxSpeed,
-      def.maxForce,
-      worldW,
-      worldH
-    );
+    const [wx, wy] = windSteer(bird, world.tick, def.maxSpeed, def.maxForce, arena);
     ax += wx;
     ay += wy;
 
-    const [sx, sy] = computeSeparationForce(
-      bird,
-      flockmates,
-      def.maxForce,
-      worldW,
-      worldH
-    );
+    const [sx, sy] = computeSeparationForce(bird, flockmates, def.maxForce, arena);
     ax += sx;
     ay += sy;
 
@@ -166,31 +153,57 @@ export function tickBirds(world) {
       neighbors,
       def.maxSpeed,
       def.maxForce,
-      worldW,
-      worldH
+      arena
     );
     ax += fx;
     ay += fy;
 
-    const dt = birdSimConfig.motion.simSpeed;
+    const accelMag = Math.hypot(ax, ay);
+    const maxAccel = def.maxForce * (2.2 + 2.8 / Math.max(dt, 0.15));
+    if (accelMag > maxAccel && accelMag > 0) {
+      ax = (ax / accelMag) * maxAccel;
+      ay = (ay / accelMag) * maxAccel;
+    }
 
     bird.vx += ax * dt;
     bird.vy += ay * dt;
 
+    const maxSp = def.maxSpeed * (1 + dt * 0.35);
     let sp = Math.hypot(bird.vx, bird.vy);
+    if (sp > maxSp && sp > 0) {
+      bird.vx = (bird.vx / sp) * maxSp;
+      bird.vy = (bird.vy / sp) * maxSp;
+    }
+
+    sp = Math.hypot(bird.vx, bird.vy);
     const minSp = def.maxSpeed * birdSimConfig.motion.minSpeedRatio;
     if (sp < minSp && minSp > 0.02) {
-      const [fvx, fvy] = flowVelocity(
-        bird.x,
-        bird.y,
-        world.tick,
-        def.maxSpeed,
-        worldW,
-        worldH
-      );
-      const fm = Math.hypot(fvx, fvy) || 1;
-      bird.vx = (fvx / fm) * minSp;
-      bird.vy = (fvy / fm) * minSp;
+      let dirX = bird.vx;
+      let dirY = bird.vy;
+      const useWind = birdSimConfig.wind.enabled && birdSimConfig.wind.steerWeight > 0;
+
+      if (useWind) {
+        const [fvx, fvy] = flowVelocity(bird.x, bird.y, world.tick, def.maxSpeed, arena);
+        const fm = Math.hypot(fvx, fvy) || 1;
+        const dot = bird.vx * fvx + bird.vy * fvy;
+        if (sp < 0.03 || dot >= 0) {
+          dirX = fvx / fm;
+          dirY = fvy / fm;
+        } else {
+          dirX /= sp;
+          dirY /= sp;
+        }
+      } else if (sp > 0.01) {
+        dirX /= sp;
+        dirY /= sp;
+      } else {
+        dirX = Math.cos(bird.angle);
+        dirY = Math.sin(bird.angle);
+      }
+
+      const dm = Math.hypot(dirX, dirY) || 1;
+      bird.vx = (dirX / dm) * minSp;
+      bird.vy = (dirY / dm) * minSp;
       sp = minSp;
     }
 
@@ -199,49 +212,70 @@ export function tickBirds(world) {
       bird.vy = (bird.vy / sp) * def.maxSpeed;
     }
 
-    let nx = bird.x + bird.vx * dt;
-    let ny = bird.y + bird.vy * dt;
-    nx = wrapCoord(nx, worldW);
-    ny = wrapCoord(ny, worldH);
+    const px = bird.x;
+    const py = bird.y;
+    bird.x += bird.vx * dt;
+    bird.y += bird.vy * dt;
+    wrapBirdPosition(bird, px, py, arena);
 
-    if (!isFlyableAt(world, nx, ny, worldW, worldH)) {
-      const [fvx, fvy] = flowVelocity(
-        bird.x,
-        bird.y,
-        world.tick,
-        def.maxSpeed,
-        worldW,
-        worldH
-      );
+    if (!isFlyableAt(world, bird.x, bird.y, arena)) {
+      bird.x = px;
+      bird.y = py;
+      const [fvx, fvy] = flowVelocity(bird.x, bird.y, world.tick, def.maxSpeed, arena);
       bird.vx = fvx * 0.5;
       bird.vy = fvy * 0.5;
-      nx = wrapCoord(bird.x + bird.vx * dt, worldW);
-      ny = wrapCoord(bird.y + bird.vy * dt, worldH);
-      if (!isFlyableAt(world, nx, ny, worldW, worldH)) {
+      bird.x += bird.vx * dt;
+      bird.y += bird.vy * dt;
+      wrapBirdPosition(bird, px, py, arena);
+      if (!isFlyableAt(world, bird.x, bird.y, arena)) {
+        bird.x = px;
+        bird.y = py;
         bird.vx *= -0.4;
         bird.vy *= -0.4;
-        nx = wrapCoord(bird.x + bird.vx * dt, worldW);
-        ny = wrapCoord(bird.y + bird.vy * dt, worldH);
+        bird.x += bird.vx * dt;
+        bird.y += bird.vy * dt;
+        wrapBirdPosition(bird, px, py, arena);
       }
     }
-
-    bird.x = nx;
-    bird.y = ny;
     sp = Math.hypot(bird.vx, bird.vy);
     if (sp > 0.05) {
       bird.angle = Math.atan2(bird.vy, bird.vx);
     }
   }
 
-  resolveBirdOverlaps(birds, worldW, worldH);
+  const simSpeed = birdSimConfig.motion.simSpeed;
+  const overlapPasses = simSpeed > 10 ? 3 : simSpeed > 3 ? 2 : 1;
+  for (let p = 0; p < overlapPasses; p++) {
+    resolveBirdOverlaps(birds, arena, dt);
+  }
+}
+
+/** Smaller dt per substep keeps motion stable up to 20× sim speed. */
+function integrationSubsteps(simSpeed) {
+  const maxDt = 0.35;
+  return Math.max(1, Math.ceil(simSpeed / maxDt));
+}
+
+/**
+ * @param {import('../../../../js/world.js').World} world
+ */
+export function tickBirds(world) {
+  const simSpeed = birdSimConfig.motion.simSpeed;
+  const steps = integrationSubsteps(simSpeed);
+  const dt = simSpeed / steps;
+
+  for (let i = 0; i < steps; i++) {
+    tickBirdsStep(world, dt);
+  }
 }
 
 /**
  * Hard positional push so triangles never stack on the same spot.
  * @param {Bird[]} birds
  */
-function resolveBirdOverlaps(birds, worldW, worldH) {
+function resolveBirdOverlaps(birds, arena, dt = 1) {
   const minDist = birdSimConfig.flock.personalSpace * 0.92;
+  const pushScale = Math.min(1, 0.35 + dt * 0.65);
 
   for (let i = 0; i < birds.length; i++) {
     for (let j = i + 1; j < birds.length; j++) {
@@ -249,7 +283,7 @@ function resolveBirdOverlaps(birds, worldW, worldH) {
       const b = birds[j];
       if (a.kind !== b.kind) continue;
 
-      let [dx, dy] = toroidalVectorTo(a.x, a.y, b.x, b.y, worldW, worldH);
+      let [dx, dy] = toroidalVectorTo(a.x, a.y, b.x, b.y, arena);
       let d = Math.hypot(dx, dy);
 
       if (d < 0.001) {
@@ -261,15 +295,15 @@ function resolveBirdOverlaps(birds, worldW, worldH) {
 
       if (d >= minDist) continue;
 
-      const push = (minDist - d) * 0.55;
+      const push = (minDist - d) * 0.55 * pushScale;
       const ux = dx / d;
       const uy = dy / d;
       a.x -= ux * push;
       a.y -= uy * push;
       b.x += ux * push;
       b.y += uy * push;
-      wrapWorldPosition(a, worldW, worldH);
-      wrapWorldPosition(b, worldW, worldH);
+      wrapBirdPosition(a, a.x, a.y, arena);
+      wrapBirdPosition(b, b.x, b.y, arena);
     }
   }
 }

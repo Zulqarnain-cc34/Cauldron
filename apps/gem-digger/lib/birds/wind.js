@@ -3,7 +3,9 @@
  */
 
 import { birdSimConfig } from './config.js';
-import { wrapCoord } from './boundaries.js';
+import { wrapCoord, wrapSkyY } from './boundaries.js';
+
+/** @typedef {import('./boundaries.js').SkyArena} SkyArena */
 
 const PERM = new Uint8Array(512);
 const GRAD = [
@@ -66,19 +68,18 @@ function perlin2(x, y) {
  * @param {number} y
  * @param {number} tick
  * @param {number} maxSpeed
- * @param {number} worldW
- * @param {number} worldH
+ * @param {SkyArena} arena
  * @returns {[number, number]}
  */
-export function flowVelocity(x, y, tick, maxSpeed, worldW, worldH) {
-  const { noiseScale, timeScale, gustMin } = birdSimConfig.wind;
+export function flowVelocity(x, y, tick, maxSpeed, arena) {
+  const { timeScale, gustMin } = birdSimConfig.wind;
   const t = tick * timeScale;
 
-  const wx = worldW > 0 ? wrapCoord(x, worldW) : x;
-  const wy = worldH > 0 ? wrapCoord(y, worldH) : y;
+  const wx = wrapCoord(x, arena.worldW);
+  const wy = wrapSkyY(y, arena);
 
-  const u = worldW > 0 ? wx / worldW : wx * noiseScale;
-  const v = worldH > 0 ? wy / worldH : wy * noiseScale;
+  const u = wx / arena.worldW;
+  const v = arena.skyH > 0 ? (wy - arena.skyTop) / arena.skyH : 0;
   const periods = 5.5;
 
   const nx = u * periods + t;
@@ -101,19 +102,39 @@ export function flowVelocity(x, y, tick, maxSpeed, worldW, worldH) {
  * @param {number} tick
  * @param {number} maxSpeed
  * @param {number} maxForce
- * @param {number} worldW
- * @param {number} worldH
+ * @param {SkyArena} arena
  */
-export function windSteer(bird, tick, maxSpeed, maxForce, worldW, worldH) {
-  const { speedFactor, steerWeight } = birdSimConfig.wind;
-  const [tx, ty] = flowVelocity(
-    bird.x,
-    bird.y,
-    tick,
-    maxSpeed * speedFactor,
-    worldW,
-    worldH
-  );
+/**
+ * Softer wind near wrap seams when the bird is trying to cross against the flow.
+ * @param {import('./birds.js').Bird} bird
+ * @param {SkyArena} arena
+ * @param {number} fvx flow x
+ * @param {number} fvy flow y
+ */
+function seamWindScale(bird, arena, fvx, fvy) {
+  const margin = Math.max(14, arena.worldW * 0.05, arena.skyH * 0.06);
+  let scale = 1;
+
+  if (bird.x < margin && bird.vx < -0.04 && fvx > 0.04) scale = Math.min(scale, 0.12);
+  if (bird.x > arena.worldW - margin && bird.vx > 0.04 && fvx < -0.04) {
+    scale = Math.min(scale, 0.12);
+  }
+
+  if (bird.y < arena.skyTop + margin && bird.vy < -0.04 && fvy > 0.04) {
+    scale = Math.min(scale, 0.12);
+  }
+  if (bird.y > arena.skyBottom - margin && bird.vy > 0.04 && fvy < -0.04) {
+    scale = Math.min(scale, 0.12);
+  }
+
+  return scale;
+}
+
+export function windSteer(bird, tick, maxSpeed, maxForce, arena) {
+  const { enabled, speedFactor, steerWeight } = birdSimConfig.wind;
+  if (!enabled || steerWeight <= 0) return [0, 0];
+
+  const [tx, ty] = flowVelocity(bird.x, bird.y, tick, maxSpeed * speedFactor, arena);
   let sx = tx - bird.vx;
   let sy = ty - bird.vy;
   const m = Math.hypot(sx, sy);
@@ -121,5 +142,7 @@ export function windSteer(bird, tick, maxSpeed, maxForce, worldW, worldH) {
     sx = (sx / m) * maxForce;
     sy = (sy / m) * maxForce;
   }
-  return [sx * steerWeight, sy * steerWeight];
+
+  const seam = seamWindScale(bird, arena, tx, ty);
+  return [sx * steerWeight * seam, sy * steerWeight * seam];
 }

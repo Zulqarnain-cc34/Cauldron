@@ -1,7 +1,7 @@
 import { displayCellPx } from '../../../../js/world.js';
 import { ensureBirds } from './birds.js';
 import { getBirdKindDef } from './catalog.js';
-import { toroidalRenderOffsets } from './boundaries.js';
+import { getSkyArena, toroidalRenderOffsets } from './boundaries.js';
 
 /** @param {import('../../../../js/overlay.js').OverlayContext} overlay @param {import('../../../../js/world.js').World} world */
 export function renderBirds(overlay, world) {
@@ -9,21 +9,31 @@ export function renderBirds(overlay, world) {
   if (!birds.length) return;
 
   const cellPx = displayCellPx();
-  const worldW = world.width;
-  const worldH = world.height;
+  const arena = getSkyArena(world);
+  const seamMargin = Math.max(32, arena.skyH * 0.1, arena.worldW * 0.06);
 
   for (const bird of birds) {
     const def = getBirdKindDef(bird.kind);
     const size = def.size * (cellPx / 2);
-    const margin = def.size + 4;
+    const margin = Math.max(seamMargin, def.size * 4);
 
-    for (const [ox, oy] of toroidalRenderOffsets(
-      bird.x,
-      bird.y,
-      worldW,
-      worldH,
-      margin
-    )) {
+    const offsets = toroidalRenderOffsets(bird.x, bird.y, arena, margin);
+
+    if (bird.wrapCross) {
+      if (bird.wrapCross & 1) {
+        const gx = bird.x < arena.worldW * 0.5 ? arena.worldW - 2 : 2;
+        offsets.push([gx - bird.x, 0]);
+      }
+      if (bird.wrapCross & 2) {
+        const gy =
+          bird.y < (arena.skyTop + arena.skyBottom) * 0.5
+            ? arena.skyBottom - 2
+            : arena.skyTop + 2;
+        offsets.push([0, gy - bird.y]);
+      }
+    }
+
+    for (const [ox, oy] of offsets) {
       overlay.fillTriangle(
         (bird.x + ox) * cellPx,
         (bird.y + oy) * cellPx,

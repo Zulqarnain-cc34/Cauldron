@@ -847,6 +847,93 @@ body {
   color: #9a9ab0;
 }
 
+.birds-diag-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.25rem;
+}
+
+.birds-diag-verdict {
+  margin: 0;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #b8d4ff;
+}
+
+.birds-diag-hint {
+  margin: 0 0 0.35rem;
+  font-size: 0.66rem;
+  line-height: 1.35;
+  color: #8a8aa0;
+}
+
+.birds-diag-unstable .birds-diag-verdict,
+.birds-diag-verdict.birds-diag-unstable {
+  color: #ff9a9a;
+}
+
+.birds-metric-row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr auto;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.66rem;
+}
+
+.birds-metric-label {
+  color: #a8a8c0;
+}
+
+.birds-metric-val {
+  color: #d0d0e8;
+  min-width: 2.5rem;
+  text-align: right;
+}
+
+.birds-metric-bar {
+  height: 5px;
+  border-radius: 3px;
+  background: #2a2a38;
+  overflow: hidden;
+}
+
+.birds-metric-bar i {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: #6a8ab8;
+}
+
+.birds-metric-good i {
+  background: #5cb88a;
+}
+
+.birds-metric-bad i {
+  background: #c86a6a;
+}
+
+.birds-spark-label {
+  margin: 0.25rem 0 0;
+  font-size: 0.62rem;
+  color: #7a7a94;
+}
+
+.birds-spark {
+  display: block;
+  margin: 0 0 0.15rem;
+  font-size: 0.62rem;
+  letter-spacing: 0.02em;
+  color: #9ab0d0;
+}
+
+.birds-diag-kinds {
+  margin: 0.35rem 0 0;
+  font-size: 0.62rem;
+  line-height: 1.45;
+  color: #8a9ab8;
+}
+
 .birds-preset-row {
   display: flex;
   align-items: center;
