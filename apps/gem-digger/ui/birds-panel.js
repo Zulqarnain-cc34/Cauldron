@@ -23,7 +23,15 @@ import {
  * @param {number} step
  * @param {(v: number) => string} [format]
  */
-function sliderRow(label, key, min, max, step, format = (v) => String(Number(v.toFixed(2)))) {
+function sliderRow(
+  label,
+  key,
+  min,
+  max,
+  step,
+  format = (v) => String(Number(v.toFixed(2))),
+  onChange
+) {
   const row = document.createElement('label');
   row.className = 'birds-slider-row';
 
@@ -50,6 +58,7 @@ function sliderRow(label, key, min, max, step, format = (v) => String(Number(v.t
     const n = Number(input.value);
     birdSimConfig[section][field] = n;
     val.textContent = format(n);
+    onChange?.();
   });
 
   row.append(name, input, val);
@@ -58,9 +67,12 @@ function sliderRow(label, key, min, max, step, format = (v) => String(Number(v.t
 
 /**
  * @param {import('../../../js/world.js').World} world
- * @param {{ onRespawn?: () => void }} [opts]
+ * @param {{ onRespawn?: () => void, onConfigChange?: () => void }} [opts]
  */
 export function mountBirdsPanel(world, opts = {}) {
+  function notifyConfigChange() {
+    opts.onConfigChange?.();
+  }
   const root = document.createElement('aside');
   root.className = 'birds-panel';
   root.id = 'birds-panel';
@@ -71,6 +83,7 @@ export function mountBirdsPanel(world, opts = {}) {
       <button type="button" class="birds-panel-collapse" title="Collapse panel" aria-expanded="true">▾</button>
     </header>
     <div class="birds-panel-body">
+      <p class="birds-wrap-note birds-panel-map-note">Saved per map tab — double-click a tab name to rename.</p>
       <label class="birds-preset-row">
         <span>Preset</span>
         <select class="birds-preset-select" aria-label="Bird simulation preset"></select>
@@ -129,6 +142,7 @@ export function mountBirdsPanel(world, opts = {}) {
   presetSelect.addEventListener('change', () => {
     applyBirdSimPreset(presetSelect.value);
     syncSlidersFromConfig();
+    notifyConfigChange();
   });
 
   const configJson = root.querySelector('.birds-config-json');
@@ -176,6 +190,7 @@ export function mountBirdsPanel(world, opts = {}) {
       return;
     }
     syncSlidersFromConfig();
+    notifyConfigChange();
     setConfigStatus(`Applied “${result.name}”.`);
   });
 
@@ -191,6 +206,7 @@ export function mountBirdsPanel(world, opts = {}) {
         return;
       }
       syncSlidersFromConfig();
+      notifyConfigChange();
       setConfigStatus(`Loaded “${file.name}”.`);
     } catch (e) {
       setConfigStatus(e instanceof Error ? e.message : 'Could not read file', false);
@@ -211,9 +227,9 @@ export function mountBirdsPanel(world, opts = {}) {
   simEl.append(
     wrapNote,
     spawnNote,
-    sliderRow('Flock count', 'spawn.flockCount', 1, 6, 1, (v) => String(Math.round(v))),
-    sliderRow('Birds per flock', 'spawn.birdsPerFlock', 3, 30, 1, (v) => String(Math.round(v))),
-    sliderRow('Sim speed', 'motion.simSpeed', 0.5, 20, 0.5, (v) => `${Number(v.toFixed(1))}×`)
+    sliderRow('Flock count', 'spawn.flockCount', 1, 6, 1, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Birds per flock', 'spawn.birdsPerFlock', 3, 30, 1, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Sim speed', 'motion.simSpeed', 0.5, 20, 0.5, (v) => `${Number(v.toFixed(1))}×`, notifyConfigChange)
   );
 
   const flockEl = root.querySelector('[data-section="flock"]');
@@ -230,24 +246,23 @@ export function mountBirdsPanel(world, opts = {}) {
   interactionSelect.addEventListener('change', () => {
     birdSimConfig.flock.interactionMode = interactionSelect.value;
     refreshDiagnostics();
+    notifyConfigChange();
   });
   interactionRow.append(interactionSelect);
   flockEl.append(interactionRow);
 
   flockEl.append(
-    sliderRow('K neighbours', 'flock.topologicalNeighbors', 3, 20, 1, (v) =>
-      String(Math.round(v))
-    ),
-    sliderRow('Cohesion', 'flock.weightCoh', 0, 2, 0.05),
-    sliderRow('Separation', 'flock.weightSep', 0, 6, 0.05),
-    sliderRow('Alignment', 'flock.weightAli', 0, 2, 0.05),
-    sliderRow('Perception', 'flock.perception', 12, 80, 1, (v) => String(Math.round(v))),
-    sliderRow('Sep. radius', 'flock.separationRadius', 8, 40, 1, (v) => String(Math.round(v))),
-    sliderRow('Align radius', 'flock.alignmentRadius', 8, 80, 1, (v) => String(Math.round(v))),
-    sliderRow('Cohesion radius', 'flock.cohesionRadius', 8, 80, 1, (v) => String(Math.round(v))),
-    sliderRow('Cohesion speed', 'flock.cohesionSpeed', 0, 1.2, 0.05),
-    sliderRow('Vision FOV°', 'flock.visionFovDeg', 0, 180, 5, (v) => String(Math.round(v))),
-    sliderRow('Wander', 'flock.wanderWeight', 0, 0.35, 0.01)
+    sliderRow('K neighbours', 'flock.topologicalNeighbors', 3, 20, 1, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Cohesion', 'flock.weightCoh', 0, 2, 0.05, undefined, notifyConfigChange),
+    sliderRow('Separation', 'flock.weightSep', 0, 6, 0.05, undefined, notifyConfigChange),
+    sliderRow('Alignment', 'flock.weightAli', 0, 2, 0.05, undefined, notifyConfigChange),
+    sliderRow('Perception', 'flock.perception', 12, 80, 1, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Sep. radius', 'flock.separationRadius', 8, 40, 1, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Align radius', 'flock.alignmentRadius', 8, 80, 1, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Cohesion radius', 'flock.cohesionRadius', 8, 80, 1, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Cohesion speed', 'flock.cohesionSpeed', 0, 1.2, 0.05, undefined, notifyConfigChange),
+    sliderRow('Vision FOV°', 'flock.visionFovDeg', 0, 180, 5, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Wander', 'flock.wanderWeight', 0, 0.35, 0.01, undefined, notifyConfigChange)
   );
 
   const windEl = root.querySelector('[data-section="wind"]');
@@ -258,15 +273,16 @@ export function mountBirdsPanel(world, opts = {}) {
   windForceCheck.checked = birdSimConfig.wind.enabled;
   windForceCheck.addEventListener('change', () => {
     birdSimConfig.wind.enabled = windForceCheck.checked;
+    notifyConfigChange();
   });
   windForceToggle.append(windForceCheck, document.createTextNode(' Apply wind forces'));
   windEl.append(windForceToggle);
   windEl.append(
-    sliderRow('Wind strength', 'wind.steerWeight', 0.2, 4, 0.05),
-    sliderRow('Flow speed', 'wind.speedFactor', 0.2, 1.2, 0.05),
-    sliderRow('Noise scale', 'wind.noiseScale', 0.005, 0.06, 0.001, (v) => v.toFixed(3)),
-    sliderRow('Time drift', 'wind.timeScale', 0.002, 0.05, 0.001, (v) => v.toFixed(3)),
-    sliderRow('Gust floor', 'wind.gustMin', 0, 0.9, 0.05)
+    sliderRow('Wind strength', 'wind.steerWeight', 0.2, 4, 0.05, undefined, notifyConfigChange),
+    sliderRow('Flow speed', 'wind.speedFactor', 0.2, 1.2, 0.05, undefined, notifyConfigChange),
+    sliderRow('Noise scale', 'wind.noiseScale', 0.005, 0.06, 0.001, (v) => v.toFixed(3), notifyConfigChange),
+    sliderRow('Time drift', 'wind.timeScale', 0.002, 0.05, 0.001, (v) => v.toFixed(3), notifyConfigChange),
+    sliderRow('Gust floor', 'wind.gustMin', 0, 0.9, 0.05, undefined, notifyConfigChange)
   );
 
   const displayEl = root.querySelector('[data-section="display"]');
@@ -277,6 +293,7 @@ export function mountBirdsPanel(world, opts = {}) {
   windCheck.checked = birdSimConfig.display.showWindField;
   windCheck.addEventListener('change', () => {
     birdSimConfig.display.showWindField = windCheck.checked;
+    notifyConfigChange();
   });
   windToggle.append(windCheck, document.createTextNode(' Show wind flow'));
   displayEl.append(windToggle);
@@ -288,6 +305,7 @@ export function mountBirdsPanel(world, opts = {}) {
   visionCheck.checked = birdSimConfig.display.showVisionDebug;
   visionCheck.addEventListener('change', () => {
     birdSimConfig.display.showVisionDebug = visionCheck.checked;
+    notifyConfigChange();
   });
   visionToggle.append(visionCheck, document.createTextNode(' Vision debug (FOV + radii)'));
 
@@ -298,6 +316,7 @@ export function mountBirdsPanel(world, opts = {}) {
   visionAllCheck.checked = birdSimConfig.display.visionDebugAll;
   visionAllCheck.addEventListener('change', () => {
     birdSimConfig.display.visionDebugAll = visionAllCheck.checked;
+    notifyConfigChange();
   });
   visionAllToggle.append(
     visionAllCheck,
@@ -306,14 +325,10 @@ export function mountBirdsPanel(world, opts = {}) {
 
   displayEl.append(visionToggle, visionAllToggle);
   displayEl.append(
-    sliderRow('Streak count', 'display.windParticleCount', 40, 280, 10, (v) =>
-      String(Math.round(v))
-    ),
-    sliderRow('Streak length', 'display.windStreakLength', 8, 36, 1, (v) =>
-      String(Math.round(v))
-    ),
-    sliderRow('Visibility', 'display.windOpacity', 8, 70, 1, (v) => String(Math.round(v))),
-    sliderRow('Flow speed', 'display.windDriftSpeed', 0.2, 2, 0.05)
+    sliderRow('Streak count', 'display.windParticleCount', 40, 280, 10, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Streak length', 'display.windStreakLength', 8, 36, 1, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Visibility', 'display.windOpacity', 8, 70, 1, (v) => String(Math.round(v)), notifyConfigChange),
+    sliderRow('Flow speed', 'display.windDriftSpeed', 0.2, 2, 0.05, undefined, notifyConfigChange)
   );
 
   const diagEl = root.querySelector('[data-section="diagnostics"]');

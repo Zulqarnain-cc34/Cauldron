@@ -206,9 +206,11 @@ export class MapManager {
     const def = tab ? getMapDefinition(tab.defId) : undefined;
     if (!tab || !def) return;
 
+    const prior = this.sessions.get(this.activeTabId);
     const session = captureMapSession(this.world, {
       mapId: tab.instanceId,
       label: tab.label,
+      custom: prior?.custom ? structuredClone(prior.custom) : {},
     });
     if (def.hooks?.capture) {
       def.hooks.capture(this.world, session);
@@ -256,9 +258,11 @@ export class MapManager {
 
     def.hooks?.afterBootstrap?.(this.world);
 
+    const prior = this.sessions.get(this.activeTabId);
     const session = captureMapSession(this.world, {
       mapId: tab.instanceId,
       label: tab.label,
+      custom: prior?.custom ? structuredClone(prior.custom) : {},
     });
     def.hooks?.capture?.(this.world, session);
     this.sessions.set(this.activeTabId, session);
@@ -281,6 +285,50 @@ export class MapManager {
    */
   getSession(tabId) {
     return this.sessions.get(tabId);
+  }
+
+  /**
+   * Rename a tab (also updates stored session label when present).
+   * @param {string} instanceId
+   * @param {string} label
+   * @returns {boolean}
+   */
+  renameTab(instanceId, label) {
+    const trimmed = label.trim();
+    if (!trimmed) return false;
+
+    const tab = this.tabs.find((t) => t.instanceId === instanceId);
+    if (!tab) return false;
+
+    tab.label = trimmed;
+    const session = this.sessions.get(instanceId);
+    if (session) session.label = trimmed;
+
+    if (this.activeTabId === instanceId) {
+      this._persistActiveSession();
+    }
+    return true;
+  }
+
+  /** Flush the active world into the active tab session. */
+  persistActive() {
+    this._persistActiveSession();
+  }
+
+  /**
+   * Restore tabs + sessions from localStorage (call instead of `init`).
+   * @param {{ tabs: MapTab[], activeTabId: string, sessions: Map<string, import('./session.js').MapSession> }} saved
+   */
+  initFromSaved(saved) {
+    if (!saved.tabs.length) {
+      throw new Error('MapManager.initFromSaved: no tabs');
+    }
+    this.tabs = saved.tabs.map((t) => ({ ...t }));
+    this.sessions = new Map(saved.sessions);
+    const active =
+      this.tabs.find((t) => t.instanceId === saved.activeTabId)?.instanceId ??
+      this.tabs[0].instanceId;
+    this.switchTo(active);
   }
 }
 

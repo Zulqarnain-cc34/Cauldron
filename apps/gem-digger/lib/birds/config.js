@@ -6,18 +6,18 @@
 
 export const DEFAULT_BIRD_SIM_CONFIG = {
   flock: {
-    /** User-tuned defaults (topological flock, tight local neighbourhood). */
+    /** User-tuned defaults (topological flock). */
     interactionMode: 'topological',
     topologicalNeighbors: 20,
-    perception: 12,
-    separationRadius: 12,
-    alignmentRadius: 12,
-    cohesionRadius: 12,
+    perception: 59,
+    separationRadius: 15,
+    alignmentRadius: 59,
+    cohesionRadius: 26,
     minFlockSize: 2,
     weightSep: 3.3,
-    weightAli: 0.3,
-    weightCoh: 0.55,
-    cohesionSpeed: 0.15,
+    weightAli: 0.4,
+    weightCoh: 1.2,
+    cohesionSpeed: 0.6,
     cohesionNeighbors: 5,
     visionFovDeg: 110,
     wanderWeight: 0.1,
@@ -32,7 +32,7 @@ export const DEFAULT_BIRD_SIM_CONFIG = {
     gustMin: 0.2,
   },
   spawn: {
-    flockCount: 4,
+    flockCount: 3,
     birdsPerFlock: 30,
   },
   motion: {

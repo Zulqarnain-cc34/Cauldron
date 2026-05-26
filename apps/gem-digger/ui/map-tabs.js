@@ -4,13 +4,58 @@ import { getMapDefinition } from '../lib/index.js';
  * Map tab bar — open tabs with + (new) and × (close).
  * @param {import('../lib/maps/manager.js').MapManager} manager
  * @param {HTMLElement | null} hostEl
+ * @param {{ onRenamed?: () => void }} [opts]
  */
-export function mountMapTabs(manager, hostEl) {
+export function mountMapTabs(manager, hostEl, opts = {}) {
   if (!hostEl) return null;
 
   hostEl.classList.add('map-tabs');
   hostEl.setAttribute('role', 'tablist');
   hostEl.setAttribute('aria-label', 'Maps');
+
+  function startRename(wrap, tab) {
+    const btn = wrap.querySelector('.map-tab');
+    if (!btn || btn.hidden) return;
+
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'map-tab-rename';
+    input.value = tab.label;
+    input.setAttribute('aria-label', 'Rename map');
+    input.maxLength = 48;
+
+    btn.hidden = true;
+    wrap.insertBefore(input, btn);
+
+    input.focus();
+    input.select();
+
+    let done = false;
+    function finish(save) {
+      if (done) return;
+      done = true;
+      const next = save ? input.value.trim() : tab.label;
+      if (save && next && next !== tab.label) {
+        manager.renameTab(tab.instanceId, next);
+        opts.onRenamed?.();
+      }
+      renderTabs();
+    }
+
+    input.addEventListener('blur', () => finish(true));
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        input.blur();
+      } else if (e.key === 'Escape') {
+        e.preventDefault();
+        finish(false);
+      }
+      e.stopPropagation();
+    });
+    input.addEventListener('click', (e) => e.stopPropagation());
+    input.addEventListener('dblclick', (e) => e.stopPropagation());
+  }
 
   function renderTabs() {
     hostEl.innerHTML = '';
@@ -29,14 +74,19 @@ export function mountMapTabs(manager, hostEl) {
       btn.dataset.tabId = tab.instanceId;
       btn.setAttribute('role', 'tab');
       btn.setAttribute('aria-selected', String(tab.instanceId === activeId));
-      const shortcut = index < 9 ? ` (${index + 1})` : '';
-      btn.title = def?.description ?? tab.label;
+      btn.title = `${def?.description ?? tab.label} — double-click to rename`;
       btn.textContent = tab.label;
 
       btn.addEventListener('click', (e) => {
         if (e.target.closest('.map-tab-close')) return;
         if (manager.getActiveTabId() === tab.instanceId) return;
         manager.switchTo(tab.instanceId);
+      });
+
+      btn.addEventListener('dblclick', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        startRename(wrap, tab);
       });
 
       const close = document.createElement('button');
@@ -50,6 +100,7 @@ export function mountMapTabs(manager, hostEl) {
         if (manager.getOpenTabs().length <= 1) return;
         manager.closeTab(tab.instanceId);
         renderTabs();
+        opts.onRenamed?.();
       });
 
       wrap.append(btn, close);

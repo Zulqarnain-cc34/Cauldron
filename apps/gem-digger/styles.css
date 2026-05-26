@@ -157,6 +157,21 @@ body {
   color: #fff;
 }
 
+.map-tab-rename {
+  box-sizing: border-box;
+  min-width: 5.5rem;
+  max-width: 10rem;
+  height: 2rem;
+  padding: 0 0.4rem;
+  font: inherit;
+  font-size: 0.8rem;
+  color: #fff;
+  background: #1e2848;
+  border: 1px solid #6a8cff;
+  border-radius: 6px 0 0 6px;
+  outline: none;
+}
+
 #cauldron-ui {
   position: fixed;
   inset: 0;

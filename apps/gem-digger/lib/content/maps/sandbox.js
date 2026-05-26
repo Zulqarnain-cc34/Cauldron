@@ -1,4 +1,5 @@
 import { Species } from '../../../../../js/catalog/species.js';
+import { DEFAULT_BIRD_SIM_CONFIG } from '../../birds/config.js';
 import { spawnDemoFlocks } from '../../birds/birds.js';
 import { spawnGemPickups } from '../../gems/pickups.js';
 
@@ -36,6 +37,9 @@ export const sandboxMap = {
   goals: { gems: { diamond: 2, topaz: 1, ruby: 1 } },
   defaultRules: { grenade: true },
   hooks: {
+    initialCustom() {
+      return { birdSimConfig: structuredClone(DEFAULT_BIRD_SIM_CONFIG) };
+    },
     afterBootstrap(world) {
       spawnDemoFlocks(world);
     },
