@@ -84,6 +84,8 @@ export function createWebGLRenderer(canvas) {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  // CPU buffer is top-down (gy=0 = top); without this, WebGL shows the grid upside-down.
+  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
   /** @type {Uint8Array | null} */
   let pixels = null;
