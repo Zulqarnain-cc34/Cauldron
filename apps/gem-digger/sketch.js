@@ -1,3 +1,7 @@
+/**
+ * Gem Digger — demo game built on the Cauldron library.
+ * This file is the app host (p5 loop). The library lives in ../../js/cauldron/.
+ */
 import {
   World,
   GRID_W,
@@ -6,20 +10,20 @@ import {
   renderPlugins,
   renderWorld,
   canvasSize,
-} from './js/cauldron/app.js';
-import { bootstrapSandbox } from './js/cauldron/bootstrap.js';
-import { setupInput } from './js/input.js';
-import { mountPanel, bindKeyboard } from './js/ui/panel.js';
-import { mountBackpack } from './js/ui/backpack.js';
-import { mountJar } from './js/ui/jar.js';
-import { mountMapTabs } from './js/ui/map-tabs.js';
-import { mountMapHud } from './js/ui/map-hud.js';
+} from '../../js/cauldron/app.js';
+import { bootstrapSandbox } from '../../js/cauldron/bootstrap.js';
+import { setupInput } from '../../js/input.js';
+import { mountPanel, bindKeyboard } from './ui/panel.js';
+import { mountBackpack } from './ui/backpack.js';
+import { mountJar } from './ui/jar.js';
+import { mountMapTabs } from './ui/map-tabs.js';
+import { mountMapHud } from './ui/map-hud.js';
 import {
   registerMapDefinitions,
   createMapManager,
-  BUILTIN_MAPS,
   installGemSystem,
-} from './js/cauldron/game.js';
+} from '../../js/cauldron/game.js';
+import { BUILTIN_MAPS } from '../../js/game/content/index.js';
 
 let world;
 let ui;

@@ -53,7 +53,7 @@ export function bootstrapSandbox(world) {
   ]);
 }
 
-/** @type {import('../registry.js').MapDefinition} */
+/** @type {import('../../maps/registry.js').MapDefinition} */
 export const sandboxMap = {
   id: 'sandbox',
   label: 'Tutorial',

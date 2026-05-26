@@ -1,4 +1,4 @@
-import { getAllMapDefinitions } from '../cauldron/game.js';
+import { getAllMapDefinitions } from '../../../js/cauldron/game.js';
 
 /**
  * Map tab bar — switch between registered map units (separate sessions).

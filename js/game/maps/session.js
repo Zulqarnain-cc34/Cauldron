@@ -1,4 +1,5 @@
 import { clearGemPickups, cloneGemPickups, setGemPickups } from '../gems/pickups.js';
+import { runWorldGenerator } from '../worldgen/registry.js';
 import { createBackpackInventory } from '../inventory/backpack-inventory.js';
 import { createJarInventory } from '../inventory/jar-inventory.js';
 
@@ -107,7 +108,13 @@ export function createFreshMapSession(world, def) {
   world.jar = createJarInventory();
   clearGemPickups(world);
 
-  def.bootstrap(world);
+  if (def.worldGenerator) {
+    runWorldGenerator(world, def.worldGenerator, def.worldGeneratorOptions ?? {});
+  } else if (def.bootstrap) {
+    def.bootstrap(world);
+  } else {
+    throw new Error(`Map "${def.id}" needs bootstrap(world) or worldGenerator`);
+  }
 
   if (def.hooks?.afterBootstrap) {
     def.hooks.afterBootstrap(world);

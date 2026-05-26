@@ -12,9 +12,9 @@ Open in your browser:
 
 | URL | What |
 |-----|------|
-| http://localhost:3456/ | **Sim** — paint and play |
+| http://localhost:3456/ | Redirects to **Gem Digger** demo |
+| http://localhost:3456/apps/gem-digger/ | **Play** — maps, gems, dig caves |
 | http://localhost:3456/docs/ | **Live docs** — materials & plugins with runnable tests |
-| http://localhost:3456/help/ | **Help** — how to run, extend, and build plugins |
 | http://localhost:3456/tests/ | **Test runner** — all behavior specs |
 
 No build step. Static files + ES modules.
@@ -71,17 +71,20 @@ registerPlugin(myThingPlugin);
 
 Reload the sim. Your plugin appears in **Rules** (searchable dropdown) and **Docs** automatically.
 
-See [plugins/README.md](plugins/README.md) and [help/index.html](help/index.html) for the full API.
+See [plugins/README.md](plugins/README.md) and [ARCHITECTURE.md](ARCHITECTURE.md) for the full layout and API.
 
 ## Project layout
 
 ```
-js/           Core engine (catalog, physics, rules, UI) — do not fork for one-off effects
-plugins/      Your extensions (grenade, custom tools, etc.)
-docs/         Auto-generated live documentation UI
-tests/        Behavior specs (also feed docs)
-help/         Getting started & plugin authoring guide
+js/              Library — sim engine + cauldron SDK + game framework
+apps/            Runnable games (gem-digger demo)
+plugins/         Optional extensions (grenade, …)
+docs/            Live documentation UI
+tests/           Behavior specs + golden snapshots
+scripts/         Build, CI, layer checks
 ```
+
+See [ARCHITECTURE.md](ARCHITECTURE.md) for the full library vs game vs tooling split.
 
 ## Architecture (why it scales)
 

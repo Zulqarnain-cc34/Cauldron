@@ -8,6 +8,7 @@ import {
 import { createBackpackInventory } from '../inventory/backpack-inventory.js';
 import { createJarInventory } from '../inventory/jar-inventory.js';
 import { clearGemPickups } from '../gems/pickups.js';
+import { runWorldGenerator } from '../worldgen/registry.js';
 
 /**
  * @typedef {object} MapManagerOptions
@@ -131,7 +132,12 @@ export class MapManager {
     this.world.backpack = keepBackpack ?? createBackpackInventory();
     this.world.jar = keepJar ?? createJarInventory();
 
-    def.bootstrap(this.world);
+    if (def.worldGenerator) {
+      runWorldGenerator(this.world, def.worldGenerator, def.worldGeneratorOptions ?? {});
+    } else if (def.bootstrap) {
+      def.bootstrap(this.world);
+    }
+
     def.hooks?.afterBootstrap?.(this.world);
 
     const session = captureMapSession(this.world, {

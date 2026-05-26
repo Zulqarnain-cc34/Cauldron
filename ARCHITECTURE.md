@@ -1,143 +1,197 @@
-# Architecture — Layered Cauldron
+# Cauldron architecture
 
-Cauldron is a **layered library** for falling-sand simulation. Each layer talks only to the layer below. External code (plugins, apps, tooling) imports through the **SDK boundary** at `js/cauldron/`.
+How this repo is organized: **library first**, demo game second, tooling at the edges.
+
+---
+
+## The big picture
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│  L7 Tooling    docs/  tests/  help/  scripts/check-layers   │
+│  TOOLING (not shipped)     tests/  docs/  scripts/  .github │
 ├─────────────────────────────────────────────────────────────┤
-│  L6 Plugins    plugins/grenade, plugins/your-thing/         │  ← you build here
+│  YOUR GAME (optional)      apps/gem-digger/                 │
 ├─────────────────────────────────────────────────────────────┤
-│  L5 App        sketch.js, js/ui/, js/input.js, js/render.js, js/app/ │
-│                js/game/  (maps, inventory — per-map sessions)        │
+│  GAME FRAMEWORK (optional) js/game/  maps, worldgen, gems   │
 ├─────────────────────────────────────────────────────────────┤
-│  L4 SDK        js/cauldron/   ◄── PUBLIC API                │
-│                plugin.js | app.js | game.js | tooling.js | bootstrap │
+│  PUBLIC SDK                js/cauldron/  ← import from here │
 ├─────────────────────────────────────────────────────────────┤
-│  L3 Runtime    js/sim/, js/rules/                           │
-│                rule-store, manifest, toggle-registry, lifecycle│
-├─────────────────────────────────────────────────────────────┤
-│  L2 Engine     js/engine/  (scanner, physics, cell-api)     │
-├─────────────────────────────────────────────────────────────┤
-│  L1 Catalog    js/catalog/  (species, materials, tags)      │
-├─────────────────────────────────────────────────────────────┤
-│  L0 Kernel     js/world.js  (grid, RNG, cell bytes)         │
+│  SIM ENGINE                js/world.js, catalog, engine,    │
+│                            rules, sim, plugins/             │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## Import rules
+You build **on top of** `js/cauldron/`. You do not fork the engine for one-off effects.
 
-| Who | May import |
-|-----|------------|
-| **Plugins** (`plugins/`) | `js/cauldron/plugin.js` (or full `index.js`) |
-| **App** (`sketch.js`, `js/ui/`, `js/input.js`, `js/render.js`) | `js/cauldron/app.js` + `js/cauldron/game.js` + other L5 peers |
-| **Game** (`js/game/`) | L0–L3 + `js/game/*` (maps, inventory — not core sim) |
-| **Tooling** (`docs/`, `tests/`) | `js/cauldron/tooling.js` + test helpers |
-| **Runtime** (L3) | L0–L2 only |
-| **Engine** (L2) | L0–L1 |
-| **Kernel** (L0) | L1 catalog defaults only — **never plugins** |
+---
 
-Run `npm run check:layers` to enforce boundaries in CI.
+## Why are `docs/`, `tests/`, `scripts/`, `assets/` outside `js/`?
 
-## Cell model (L0)
+**This is normal and correct for a library.**
 
-Each cell is **5 bytes**: `species`, `flags`, `ra` (brightness/aux), `rb` (burn timer / aux state), `clock` (scan dedup — separate from `rb`).
+| Folder | Role | Why outside `js/` |
+|--------|------|-------------------|
+| **`js/`** | The library — code consumers import | Must stay clean; only runtime modules |
+| **`apps/`** | Runnable games (Gem Digger demo) | Not part of the library package |
+| **`plugins/`** | Optional extensions | Same pattern as npm plugins; import SDK only |
+| **`tests/`** | Test harness + golden snapshots | Tests the library; not bundled in apps |
+| **`docs/`** | Live documentation site | Dev/reference UI, served at `/docs/` |
+| **`scripts/`** | Build, CI, layer checks | Node tooling; never loaded in browser |
+| **`.github/`** | CI workflows | Infrastructure |
 
-| Field | Role |
-|-------|------|
-| `species` | Material id — what rules and ASCII tests assert |
-| `rb` | **Burn timer** on `burnable` materials: `0` = idle, `>0` = ignited (counts down each tick until ash) |
-| `ra` | Per-cell brightness grain (rendering + some rules) |
+**Rule of thumb:** if it runs in the browser as part of your game → `apps/` or `js/`. If it validates, documents, or builds → top-level tooling folder.
 
-**Ignition signal (simulation):** touching `FIRE`/`LAVA` sets `rb` to a material-specific start value (e.g. fungus `20`, wood `90`). Species often **stays the same** while smoldering — Sandspiel-style.
+Demo PNG icons live in **`apps/gem-digger/assets/`** (game-specific), not in the library root.
 
-**Ignition signal (rendering):** `cellColor()` in `js/catalog/cell-color.js` blends burnables toward ember orange when `rb > 0`. Export via `cauldron/app.js`. Hosts and plugins should use this instead of raw palette lookup.
+---
 
-**Instant conversion:** the `reactions` phase can replace species immediately (e.g. `Fu` → `FF`). That is a separate, faster path from the smolder `rb` timer.
+## Layer model (inside `js/`)
 
-Behavior tests can assert internal state with an optional `inspect(world)` hook alongside ASCII `expect`.
+| Layer | Path | What it does |
+|-------|------|--------------|
+| **L0 Kernel** | `js/world.js` | Grid, cells, RNG, brush queue |
+| **L1 Catalog** | `js/catalog/` | Species, materials, physics, colors |
+| **L2 Engine** | `js/engine/` | Scanner, movement helpers |
+| **L3 Runtime** | `js/sim/`, `js/rules/` | Rule registry, tick phases, materials |
+| **L4 SDK** | `js/cauldron/` | **Public API** — only import from here in plugins/apps |
+| **L5 Game framework** | `js/game/` | Maps engine, worldgen, inventory, gems (optional) |
 
-## SDK subpaths (L4)
+### Public exports (`package.json`)
 
-| Module | Audience | Exports |
-|--------|----------|---------|
-| `cauldron/plugin.js` | Plugin authors | `Species`, `World`, `registerPlugin`, engine primitives |
-| `cauldron/app.js` | Host apps | `runRules`, `getToggleableRules`, `renderPlugins`, brush, render |
-| `cauldron/game.js` | Host apps | maps, inventory, multi-tab sessions |
-| `cauldron/tooling.js` | Docs & tests | `buildDocCatalog`, `getAllTestSuites` |
-| `cauldron/extend.js` | **Library authors** | `registerMaterialPack`, `registerReaction`, `allocateSpecies` |
-| `cauldron/bootstrap.js` | Startup | `bootstrapSandbox()` — wires rules, plugins, lifecycle |
-| `cauldron/index.js` | Convenience | Re-exports all of the above |
+| Import | Use when you… |
+|--------|----------------|
+| `cauldron/app.js` | Host a sim (World, runRules, render, input) |
+| `cauldron/plugin.js` | Write a plugin |
+| `cauldron/extend.js` | Add materials / reactions |
+| `cauldron/game.js` | Use maps, inventory, worldgen APIs |
+| `cauldron/game/content` | Load **demo** map definitions (not required) |
+| `cauldron/bootstrap.js` | Quick sandbox startup |
 
-## L3 runtime modules
+---
 
-| Module | Role |
-|--------|------|
-| `sim/rule-store.js` | `registerRuleDef()` — extensible rule list |
-| `sim/manifest.js` | Core material imports (one line per material) |
-| `sim/test-registry.js` | Compile rules, toggles, behaviors, test suites |
-| `sim/toggle-registry.js` | Plugin/extension UI toggles (no host cycle) |
-| `sim/lifecycle.js` | `onWorldReset()` — kernel stays plugin-agnostic |
+## Library vs game vs content
 
-### L5 game modules (`js/game/`)
+Three separate ideas — keep them separate in your head:
 
-| Module | Role |
-|--------|------|
-| `game/inventory/` | Item catalog, slot stacks, backpack & jar (not L3 sim) |
-| `game/maps/` | Map registry, session snapshots, tab switching |
+### 1. Simulation library (`js/cauldron/` + L0–L3)
 
-Register a new map unit: add `js/game/maps/definitions/your-map.js`, export from `definitions/index.js`, register via `registerMapDefinitions()` at startup.
+Falling sand physics, materials, reactions, plugins.  
+**No maps, no gems, no UI.** Works without any game code.
 
-### Add a core material (L1–L3)
+### 2. Game framework (`js/game/`)
 
-1. `js/catalog/species.js` + `materials.js`
-2. `js/rules/materials/foo.js` with `fooRuleDef` + `behaviors[]`
-3. One line in `js/sim/manifest.js`
+Reusable systems for games built on Cauldron:
 
-Docs, brush picker, and tests update automatically.
+- **`maps/`** — tabbed worlds, sessions, goals
+- **`worldgen/`** — procedural algorithms (CA caves, ore veins, …)
+- **`inventory/`** — backpack, jar, items
+- **`gems/`** — pickups, collect, render
 
-### Add a plugin (L6)
+Register things; don't edit core files:
 
 ```javascript
-// plugins/my-thing/index.js
-import { Species, registerPlugin } from '../../js/cauldron/plugin.js';
+registerWorldGenerator('cavern', generateCavernWorld);
+registerMapDefinition(myMap);
+```
 
-/** @type {import('../../js/cauldron/plugin.js').Plugin} */
-export const myPlugin = {
-  id: 'my-thing',
-  apiVersion: 1,
-  setup(ctx) {
-    ctx.registerToggle({ key: 'my-thing', id: 'my-rule', label: 'My Thing' });
-    ctx.registerRule('forces', { id: 'my-rule', run(world) { /* … */ } });
-  },
-  behaviors: [/* auto-docs + npm test */],
+### 3. Game content (`js/game/content/`)
+
+**Your** levels — Tutorial, Workshop, Mine Shaft.  
+Demo-only; your real game replaces this with its own maps.
+
+### 4. Runnable app (`apps/gem-digger/`)
+
+The **playable** Gem Digger demo:
+
+```
+apps/gem-digger/
+├── index.html      # page shell
+├── sketch.js       # p5 host loop — wires library + UI
+├── styles.css      # demo styling
+├── ui/             # DOM panels (not library code)
+└── assets/         # PNG icons for this game
+```
+
+Open: `http://localhost:3456/apps/gem-digger/`  
+Root `/` redirects there.
+
+---
+
+## Extensions: plugins vs worldgen vs maps
+
+Same **register pattern**, different layers:
+
+| Kind | Register API | Example |
+|------|--------------|---------|
+| **Plugin** | `registerPlugin()` | Grenade blast |
+| **Material pack** | `registerMaterialPack()` | Custom gravel |
+| **World generator** | `registerWorldGenerator()` | CA cavern, noise caves |
+| **Map** | `registerMapDefinition()` | A level with goals |
+
+Compose algorithms in a map bootstrap or `worldGenerator` field:
+
+```javascript
+export const shaftMap = {
+  id: 'shaft',
+  worldGenerator: 'cavern',
+  worldGeneratorOptions: { oreVeins: [...] },
+  goals: { gems: { diamond: 4 } },
 };
 ```
 
-```javascript
-// plugins/index.js
-import { registerPlugin } from '../js/cauldron/plugin.js';
-import { myPlugin } from './my-thing/index.js';
-registerPlugin(myPlugin);
+Add a new cave algorithm → `js/game/worldgen/my-caves.js` → `registerWorldGenerator('my-caves', fn)`.
+
+---
+
+## One simulation tick
+
+```
+Input (brush, gems, plugins)
+  → runRules(world)     // L3 physics phases
+  → gems.tick()         // L5 game (optional)
+  → renderWorld()       // pixels
+  → renderPlugins()     // grenade sprites, etc.
 ```
 
-## Bootstrap sequence
+Map tabs snapshot the whole `World` (grid + inventories + gem pickups) when you switch.
 
-`bootstrapSandbox({ world, canvas })` runs in order:
+---
 
-1. `registerAppRules()` — brush rule (L5 → L3 via bootstrap, not input.js)
-2. `loadPlugins()` — import `plugins/index.js`
-3. `onWorldReset(resetPlugins)` — lifecycle hook (L0 never imports L6)
-4. `initPlugins()` — plugin setup, toggles, rules, render hooks
-5. `syncRuleEnabledDefaults(world)` — material + plugin toggle keys
+## Import rules (enforced by `npm run check:layers`)
 
-## Layering principles (for 100k+ scale)
+- **Plugins** → `js/cauldron/*` only
+- **Sim (`js/sim/`)** → never imports `js/game/`
+- **Game framework (`js/game/`)** → never imports `apps/`
+- **App UI (`apps/*/ui/`)** → import `cauldron/app.js` or `cauldron/game.js`, not deep paths
 
-1. **Register, don't edit god-files** — materials via `manifest.js`, plugins via `registerPlugin`, toggles via `toggle-registry`.
-2. **Kernel purity** — `World.reset()` fires lifecycle hooks; plugins wire in bootstrap.
-3. **SDK subpaths** — plugins pull minimal surface; apps don't load doc builders.
-4. **Self-documenting** — `behaviors[]` on rules and plugins feed `/docs/` and `npm test`.
-5. **Reproducible** — deterministic RNG, slice tests, live demos from same registry.
-6. **Future perf** (L2) — scanner/active-set optimizations stay below L3; rules unchanged.
+---
 
-See also: [EXTENDING.md](EXTENDING.md), [plugins/README.md](plugins/README.md), [help/index.html](help/index.html)
+## Adding your own game
+
+1. Copy `apps/gem-digger/` → `apps/my-game/`
+2. Change `sketch.js` to register **your** maps from `js/game/content/` or a new folder
+3. Add worldgen in `js/game/worldgen/` and register it
+4. Keep all sim logic in the library; keep levels in content; keep HTML/CSS/UI in `apps/`
+
+---
+
+## Commands
+
+```bash
+npm start          # static server (port 3456)
+npm run build      # verify library modules load
+npm test           # 89 behavior specs
+npm run verify     # build + test + layer/behavior checks
+npm run release    # full release gate
+```
+
+---
+
+## Mental model
+
+> **Cauldron** = falling-sand engine + SDK  
+> **`js/game/`** = optional toolkit for map-based games  
+> **`apps/gem-digger/`** = one game built with that toolkit  
+> **`tests/docs/scripts/`** = quality and documentation around the library  
+
+Build the library once. Swap algorithms, maps, and apps on top.

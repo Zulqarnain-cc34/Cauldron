@@ -2,7 +2,7 @@ import { sandboxMap } from './sandbox.js';
 import { shaftMap } from './shaft.js';
 import { workshopMap } from './workshop.js';
 
-/** Built-in map units shipped with Cauldron. */
+/** Demo game maps — not part of the core library SDK. */
 export const BUILTIN_MAPS = [sandboxMap, shaftMap, workshopMap];
 
 export { sandboxMap, bootstrapSandbox } from './sandbox.js';

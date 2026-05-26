@@ -1,4 +1,4 @@
-import { getItemDef, itemSwatchColor, getSlot } from '../cauldron/game.js';
+import { getItemDef, itemSwatchColor, getSlot } from '../../../js/cauldron/game.js';
 
 /**
  * @param {import('../game/inventory/slot-inventory.js').SlotInventory} inv

@@ -1,4 +1,4 @@
-import { getMaterial, ruleMatchesQuery } from '../cauldron/app.js';
+import { getMaterial, ruleMatchesQuery } from '../../../js/cauldron/app.js';
 
 const MAX_VISIBLE = 80;
 

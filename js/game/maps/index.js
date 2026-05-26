@@ -2,7 +2,8 @@
  * Map session engine — tabbed maps with isolated inventories and settings.
  *
  * @example
- * import { registerMapDefinitions, createMapManager, BUILTIN_MAPS } from './js/cauldron/game.js';
+ * import { registerMapDefinitions, createMapManager } from './js/cauldron/game.js';
+ * import { BUILTIN_MAPS } from './js/game/content/index.js';
  * registerMapDefinitions(BUILTIN_MAPS);
  * const maps = createMapManager({ world, onSwitch: syncUi });
  * mountMapTabs(maps, document.getElementById('map-tabs'));
@@ -32,8 +33,3 @@ export {
   countGemsInWorld,
   countGemsInInventory,
 } from './goals.js';
-
-export { BUILTIN_MAPS, sandboxMap, workshopMap } from './definitions/index.js';
-
-export { generateShaftWorld } from './generators/shaft.js';
-export { shaftMap } from './definitions/shaft.js';

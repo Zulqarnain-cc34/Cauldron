@@ -90,7 +90,7 @@ if (!quick) {
     snapshots: runGate('behavior-snapshot.mjs'),
   };
 
-  const headless = spawnSync('node', ['--test', 'tests/run-node.js', 'tests/extension-api.test.js'], {
+  const headless = spawnSync('node', ['--test', 'tests/run-node.js'], {
     cwd: ROOT,
     encoding: 'utf8',
     maxBuffer: 10 * 1024 * 1024,

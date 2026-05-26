@@ -2,7 +2,7 @@ import { Species } from '../../../catalog/species.js';
 import { addStack } from '../../inventory/slot-inventory.js';
 import { spawnGemPickups } from '../../gems/pickups.js';
 
-/** Stone chamber with water pocket — separate session defaults for Gem Digger prep. */
+/** Stone chamber with water pocket — hand-authored challenge map. */
 export function bootstrapWorkshop(world) {
   const floorY = world.height - 1;
   const midX = Math.floor(world.width / 2);
@@ -61,7 +61,7 @@ export function bootstrapWorkshop(world) {
   ]);
 }
 
-/** @type {import('../registry.js').MapDefinition} */
+/** @type {import('../../maps/registry.js').MapDefinition} */
 export const workshopMap = {
   id: 'workshop',
   label: 'Workshop',
@@ -69,9 +69,7 @@ export const workshopMap = {
   seed: 9001,
   bootstrap: bootstrapWorkshop,
   goals: { gems: { diamond: 1, topaz: 1, ruby: 1 } },
-  defaultRules: {
-    grenade: true,
-  },
+  defaultRules: { grenade: true },
   hooks: {
     afterBootstrap(world) {
       addStack(world.jar, 'sand', 5);

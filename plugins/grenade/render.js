@@ -15,7 +15,7 @@ function ensureSprite(p) {
   if (sprite || spriteFailed || spriteLoading) return;
   spriteLoading = true;
   p.loadImage(
-    '/assets/grenade.png',
+    '/apps/gem-digger/assets/grenade.png',
     (img) => {
       sprite = img;
       spriteLoading = false;

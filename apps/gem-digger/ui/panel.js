@@ -1,4 +1,4 @@
-import { Species, getMaterial, getToggleableRules, buildBrushTools } from '../cauldron/app.js';
+import { Species, getMaterial, getToggleableRules, buildBrushTools } from '../../../js/cauldron/app.js';
 import { mountRulePicker } from './rule-picker.js';
 
 function materialColor(species) {
@@ -113,7 +113,7 @@ export function mountPanel(world, callbacks) {
     <header class="bar bar-top">
       <h1>Cauldron</h1>
       <section class="map-hud-host" id="map-hud" aria-live="polite"></section>
-      <a href="/help/index.html">Help</a>
+      <a href="/docs/index.html">Docs</a>
       <a href="/docs/index.html">Docs</a>
       <span class="tick" id="tick-label">tick 0</span>
       <button type="button" id="btn-pause" title="Space">Pause</button>

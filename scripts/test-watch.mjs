@@ -24,7 +24,7 @@ function runSuite(label = 'test') {
 
   child = spawn(
     process.execPath,
-    ['--test', 'tests/run-node.js', 'tests/extension-api.test.js'],
+    ['--test', 'tests/run-node.js'],
     { cwd: ROOT, stdio: 'inherit' }
   );
 

@@ -90,15 +90,15 @@ for (const file of walk(ROOT)) {
       }
     }
 
-    // L5 Game — no UI (presentation mounts from sketch)
+    // L5 Game — no UI (presentation mounts from app host)
     if (rel.startsWith('js/game/')) {
-      if (target.startsWith('js/ui/')) {
-        violations.push(`${rel}: game layer must not import UI (${spec}) → ${target}`);
+      if (target.startsWith('apps/')) {
+        violations.push(`${rel}: game layer must not import app UI (${spec}) → ${target}`);
       }
     }
 
     // L5 App UI — use SDK barrels, not deep L1/L3/game paths
-    if (rel.startsWith('js/ui/')) {
+    if (rel.startsWith('apps/') && rel.includes('/ui/')) {
       if (target.startsWith('js/sim/test-registry') || target.startsWith('js/rules/registry')) {
         violations.push(`${rel}: UI should import cauldron/app.js, not ${target}`);
       }

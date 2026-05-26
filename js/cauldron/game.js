@@ -1,6 +1,8 @@
 /**
- * Cauldron game SDK — L5 game layer (maps, inventory) for host apps.
+ * Cauldron game SDK — L5 game layer (maps, inventory, worldgen) for host apps.
  * Import from here instead of deep paths into js/game/.
+ *
+ * Demo maps live in `cauldron/game/content` — not bundled here.
  */
 export {
   ITEM_CATALOG,
@@ -40,13 +42,26 @@ export {
   cloneSlotInventory,
   MapManager,
   createMapManager,
-  BUILTIN_MAPS,
-  sandboxMap,
-  shaftMap,
-  workshopMap,
 } from '../game/maps/index.js';
 
-export { generateShaftWorld } from '../game/maps/generators/shaft.js';
+export {
+  registerWorldGenerator,
+  runWorldGenerator,
+  getWorldGenerator,
+  getAllWorldGenerators,
+  clearWorldGeneratorRegistry,
+  generateCavernWorld,
+  generateCellularAutomataMask,
+  createSeededRng,
+  countCaveCells,
+  wallPercent,
+  removeUnsupportedGranular,
+  paintSupportedSurfaceSand,
+  countSpecies,
+  rollingSurfaceHeight,
+  buildSurfaceProfile,
+  placeOreVeins,
+} from '../game/worldgen/index.js';
 
 export {
   computeMapGoalProgress,

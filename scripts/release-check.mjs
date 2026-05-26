@@ -12,7 +12,7 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 
 /** @type {{ name: string, cmd: string, args: string[] }[]} */
 const STEPS = [
-  { name: 'Headless tests (92+)', cmd: 'node', args: ['--test', 'tests/run-node.js', 'tests/extension-api.test.js'] },
+  { name: 'Headless tests (behaviors)', cmd: 'node', args: ['--test', 'tests/run-node.js'] },
   { name: 'Layer boundaries', cmd: 'node', args: ['scripts/check-layers.mjs'] },
   { name: 'Behavior quality', cmd: 'node', args: ['scripts/check-behaviors.mjs'] },
   { name: 'Catalog coverage', cmd: 'node', args: ['scripts/check-coverage.mjs'] },

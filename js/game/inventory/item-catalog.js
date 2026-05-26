@@ -13,6 +13,9 @@ import { getMaterial } from '../../catalog/materials.js';
  * @property {string} [icon] image path for tools / custom icons
  */
 
+/** Demo icon paths (Gem Digger app). Override catalog in your own game content. */
+const DEMO_ICON = (name) => `/apps/gem-digger/assets/${name}.png`;
+
 /** @type {Record<string, ItemDef>} */
 export const ITEM_CATALOG = {
   sand: {
@@ -41,28 +44,28 @@ export const ITEM_CATALOG = {
     label: 'Grenade',
     kind: 'tool',
     stackSize: 16,
-    icon: '/assets/grenade.png',
+    icon: DEMO_ICON('grenade'),
   },
   diamond: {
     id: 'diamond',
     label: 'Diamond',
     kind: 'gem',
     stackSize: 99,
-    icon: '/assets/diamond.png',
+    icon: DEMO_ICON('diamond'),
   },
   topaz: {
     id: 'topaz',
     label: 'Topaz',
     kind: 'gem',
     stackSize: 99,
-    icon: '/assets/topaz.png',
+    icon: DEMO_ICON('topaz'),
   },
   ruby: {
     id: 'ruby',
     label: 'Ruby',
     kind: 'gem',
     stackSize: 99,
-    icon: '/assets/ruby.png',
+    icon: DEMO_ICON('ruby'),
   },
 };
 

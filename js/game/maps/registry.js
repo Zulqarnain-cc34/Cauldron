@@ -17,6 +17,8 @@
  * @property {string} label tab title
  * @property {string} [description]
  * @property {(world: import('../../world.js').World) => void} bootstrap paint terrain / spawns on fresh load
+ * @property {string} [worldGenerator] registered worldgen id (alternative to bootstrap)
+ * @property {Record<string, unknown>} [worldGeneratorOptions] passed to runWorldGenerator
  * @property {number} [seed] default RNG seed when map first opens
  * @property {boolean} [defaultPaused]
  * @property {{ species?: number, radius?: number }} [defaultBrush]
